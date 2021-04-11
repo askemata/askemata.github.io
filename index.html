@@ -1,155 +1,798 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:dc="http://purl.org/dc/terms/"
+      xmlns:foaf="http://xmlns.com/foaf/0.1/"
+       xml:lang="pt">
+
 <head>
+  <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+  <link rel="schema.MARCREL" href="http://www.loc.gov/loc.terms/relators/"/>
+  <link rel="DCTERMS.subject" href="http://rameau.bnf.fr"/>
+  <link rel="schema.prism" href="http://prismstandard.org/namespaces/basic/2.0/"/>
+
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="generator" content="Zettlr" />
-  <meta name="date" content="" />
-  <title></title>
+  <meta name="generator" content="pandoc-template_Html5" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+<!-- for preview only, meta to be removed when published -->
+     <meta name="robots" content="noindex, nofollow"/>
+
+<!--Metadonnees Dublin Core -->
+
+  <meta name="DC.type" content="Text" />
+  <meta name="DC.format" content="text/html" />
+  <meta name="DC.type" content="journalArticle" />
+  <meta name="DC.type" class="typeArticle" content="" />
+  <meta name="DC.title" content="Testando" />
+  <meta name="DC.title.Main" content="Testando" />
+   <meta name="DC.title.Subtitle" content="Testando subtitulo" />
+        <meta name="DC.language" content="pt" />
+   <meta name="DC.rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)" />
+     <meta name="DC.relation.isPartOf" content="true" />
+ 
+
+<!--Utilisation de MARCREL pour specifier le role du "contributeur" en Dublin core
+    drt = director -->
+  <meta name="director" content=" " />
+  <meta name="DC.contributor.drt" content=" " />
+  <meta name="MARCREL.drt" content=" " />
+
+<!--Auteur de l'article -->
+  <meta name="author" content="Marcio Miotto" />
+  <meta name="DC.creator" content="Marcio Miotto" />
+
+<!--Resumes -->
+
+<!--Mots cles auteurs -->
+
+
+<!--  traducteur avec specification MARCREL -->
+
+
+  <!--  transcripteur avec specification MARCREL -->
+
+<!--  redacteur avec specification MARCREL -->
+
+
+<!-- schema citation : Indexation pour Google Scholar  -->
+  <meta name="citation_authors" content="Marcio Miotto" />
+  <meta name="citation_title" content="Testando" />
+  <meta name="citation_subtitle" content="Testando subtitulo" />
+   <meta name="citation_issue" content="" />
+  <meta name="citation_language" content="pt" />
+
+
+
+
+
+<!--PRISM schema - Publishing Requirements for Industry Standard Metadata
+Schema specialise pour les revues et journaux-->
+  <meta name="prism.issueName" content=""/>
+  <meta name="prism.number" content="" />
+
+
+<!--RDFa pour ajout des metadonnees DC-->
+  <meta property="dc:format" content="text/html" />
+  <meta property="dc:title" content="Testando" />
+  <meta property="dc:title.Main" content="Testando" />
+  <meta property="dc:title.Subtitle" content="Testando subtitulo" />
+  <meta property="dc:language" content="pt" />
+  <meta property="dc:type" content="journalArticle" />
+  <meta property="dc:rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)" />
+  <meta property="dc:relation.isPartOf" content="" />
+
+  <meta property="dc:creator" content="Marcio Miotto" />
+
+
+
+
+
+
+
+<!--Fin des metadonnees dans le Head-->
+
+<!--Balise Title pour affichage titre dans le navigateur-->
+<!-- <title>Testando</title>-->
+
+  <title>Testando : Testando subtitulo</title>
   <style type="text/css">
-  * {
-    box-sizing: border-box;
-  }
-
-  a {
-    color: #FF7C3B;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  hr {
-    border: none;
-    border-bottom: 1px solid #999;
-    width: 80%;
-  }
-
-  html, body {
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    background-color: white;
-    color: #333;
-    font-family: 'DejaVu', 'Georgia', 'Times New Roman', 'Times', serif;
-  }
-
-  article {
-    width: 50%;
-    font-size: 1.5em;
-    margin: 0 auto;
-    line-height: 150%;
-  }
-
-  /* Better display on printing */
-  @media print {
-    article {
-      width: 90%;
-      font-size: 12pt;
-      margin: 0 auto;
-      line-height: 150%;
-    }
-  }
-
-  article p {
-    hyphens: auto;
-    text-align: justify;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Raleway', 'Lato', 'Liberation sans', 'Helvetica', sans-serif;
-    color: #FF7C3B;
-  }
-
-  img {
-    max-width: 100%;
-    height: auto;
-  }
-
-  blockquote {
-    font-size: 80%;
-    color: rgba(120, 120, 120, 1);
-    margin: 2% 5%;
-    line-height: 120%;
-  }
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    font-size: 70%;
-    font-family: 'Raleway', 'Lato', 'Liberation sans', 'Helvetica', sans-serif;
-  }
-
-  th, td {
-    padding: 4px 20px;
-    border-bottom: 1px solid #333;
-  }
-
-  /* List of classes taken from the skylighting lib */
-  /* See: https://github.com/jgm/skylighting/blob/master/skylighting-core/src/Skylighting/Format/HTML.hs */
-
-  /* Colors: Solarized theme (light) */
-  /* See: https://ethanschoonover.com/solarized/ */
-
-  /* Specific implementation: Taken from the GEdit theme (light) */
-  /* See: https://github.com/altercation/solarized/blob/master/gedit/solarized-light.xml */
-
-  /* Generic styles */
-  pre.sourceCode {
-    color: #657b83;
-    background-color: #fdf6e3;
-    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, .05);
-    padding: 2px;
-    overflow: auto;
-  }
-
-  /* All classes, taken from skylighting lib */
-  .sourceCode .kw { color: #859900; font-weight: bold; } /* Keyword */
-  .sourceCode .dt { color: #b58900; } /* Datatype */
-  .sourceCode .df { color: #d33682; } /* Decimal values*/
-  .sourceCode .bn { color: #d33682; } /* base-n-integers */
-  .sourceCode .fl { color: #d33682; } /* Floats */
-  .sourceCode .ch { color: #2aa198; } /* Character */
-  .sourceCode .st { color: #2aa198; } /* String */
-  .sourceCode .vs { color: #2aa198; } /* Verbatim String */
-  .sourceCode .ss { color: #2aa198; } /* Special String */
-  .sourceCode .co { color: #586e75; font-style: italic; } /* Comment */
-  .sourceCode .ot { font-weight: bold; } /* Other token */
-  .sourceCode .al { color: #d33682; background-color: #073642; } /* Alert */
-  .sourceCode .fu { color: #268bd2; } /* Function name */
-  .sourceCode .re {} /* Region marker */
-  .sourceCode .er { color: #dc322f; font-weight: bold; } /* Error */
-  .sourceCode .cn { color: #2aa198; } /* Constant */
-  .sourceCode .sc { color: #dc322f; } /* Special character */
-  .sourceCode .im { color: #6c71c4; font-weight: bold; } /* Import statement */
-  .sourceCode .do { color: #dc322f; } /* Documentation string */
-  .sourceCode .an { color: #2aa198; } /* Annotation */
-  .sourceCode .cv { color: #6c71c4; } /* Comment var */
-  .sourceCode .va { color: #268bd2; } /* Variable */
-  .sourceCode .cf { color: #859900; } /* Control Flow (if, else, return) */
-  .sourceCode .op {} /* Operator */
-  .sourceCode .bu { color: #b58900; } /* Builtin function/class/identifier */
-  .sourceCode .ex { color: #268bd2; } /* Extension */
-  .sourceCode .pp { color: #cb4b16; } /* Preprocessor, like #import in C++ */
-  .sourceCode .at { color: #dc322f; } /* Attribute */
-  .sourceCode .in { color: #586e75; } /* Information */
-  .sourceCode .wa { color: #cb4b16; } /* Warning */
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
   </style>
-
-<!-- Pandoc variables -->
-
-<!-- Additional CSS in case the user has passed it -->
-
-<!-- Include MathJax CDN, if applicable -->
+  <style type="text/css">
+      /*
+        * I add this to html files generated with pandoc.
+        */
+      
+        @media only screen and (max-width: 1000px) {
+          nav {
+            display: none;
+          }
+        }
+      
+        html {
+          font-size: 100%;
+          overflow-y: scroll;
+          -webkit-text-size-adjust: 100%;
+          -ms-text-size-adjust: 100%;
+        }
+      
+        body {
+          color: #444;
+          font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
+          font-size: 12px;
+          line-height: 1.7;
+          padding: 1em;
+          margin: auto;
+          max-width: 42em;
+          background: #fefefe;
+        }
+      
+        a {
+          color: #0645ad;
+          text-decoration: none;
+        }
+      
+        a:visited {
+          color: #0b0080;
+        }
+      
+        a:hover {
+          color: #06e;
+        }
+      
+        a:active {
+          color: #faa700;
+        }
+      
+        a:focus {
+          outline: thin dotted;
+        }
+      
+        *::-moz-selection {
+          background: rgba(255, 255, 0, 0.3);
+          color: #000;
+        }
+      
+        *::selection {
+          background: rgba(255, 255, 0, 0.3);
+          color: #000;
+        }
+      
+        a::-moz-selection {
+          background: rgba(255, 255, 0, 0.3);
+          color: #0645ad;
+        }
+      
+        a::selection {
+          background: rgba(255, 255, 0, 0.3);
+          color: #0645ad;
+        }
+      
+        p {
+          margin: 1em 0;
+        }
+      
+        img {
+          max-width: 100%;
+        }
+      
+        h1, h2, h3, h4, h5, h6 {
+          color: #111;
+          line-height: 125%;
+          margin-top: 2em;
+          font-weight: normal;
+        }
+      
+        h4, h5, h6 {
+          font-weight: bold;
+        }
+      
+        h1 {
+          font-size: 2.5em;
+        }
+      
+        h2 {
+          font-size: 2em;
+        }
+      
+        h3 {
+          font-size: 1.5em;
+        }
+      
+        h4 {
+          font-size: 1.2em;
+        }
+      
+        h5 {
+          font-size: 1em;
+        }
+      
+        h6 {
+          font-size: 0.9em;
+        }
+      
+        blockquote {
+          color: #666666;
+          margin: 0;
+          padding-left: 3em;
+          border-left: 0.5em #EEE solid;
+        }
+      
+        hr {
+          display: block;
+          height: 2px;
+          border: 0;
+          border-top: 1px solid #aaa;
+          border-bottom: 1px solid #eee;
+          margin: 1em 0;
+          padding: 0;
+        }
+      
+        pre, code, kbd, samp {
+          color: #000;
+          font-family: monospace, monospace;
+          _font-family: 'courier new', monospace;
+          font-size: 0.98em;
+        }
+      
+        pre {
+          white-space: pre;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+      
+        b, strong {
+          font-weight: bold;
+        }
+      
+        dfn {
+          font-style: italic;
+        }
+      
+        ins {
+          background: #ff9;
+          color: #000;
+          text-decoration: none;
+        }
+      
+        mark {
+          background: #ff0;
+          color: #000;
+          font-style: italic;
+          font-weight: bold;
+        }
+      
+        sub, sup {
+          font-size: 75%;
+          line-height: 0;
+          position: relative;
+          vertical-align: baseline;
+        }
+      
+        sup {
+          top: -0.5em;
+        }
+      
+        sub {
+          bottom: -0.25em;
+        }
+      
+        ul, ol {
+          margin: 1em 0;
+          padding: 0 0 0 2em;
+        }
+      
+        li p:last-child {
+          margin-bottom: 0;
+        }
+      
+        ul ul, ol ol {
+          margin: .3em 0;
+        }
+      
+        dl {
+          margin-bottom: 1em;
+        }
+      
+        dt {
+          font-weight: bold;
+          margin-bottom: .8em;
+        }
+      
+        dd {
+          margin: 0 0 .8em 2em;
+        }
+      
+        dd:last-child {
+          margin-bottom: 0;
+        }
+      
+        img {
+          border: 0;
+          -ms-interpolation-mode: bicubic;
+          vertical-align: middle;
+        }
+      
+        figure {
+          display: block;
+          text-align: center;
+          margin: 1em 0;
+        }
+      
+        figure img {
+          border: none;
+          margin: 0 auto;
+        }
+      
+        figcaption {
+          font-size: 0.8em;
+          font-style: italic;
+          margin: 0 0 .8em;
+        }
+      
+        table {
+          margin-bottom: 2em;
+          border-bottom: 1px solid #ddd;
+          border-right: 1px solid #ddd;
+          border-spacing: 0;
+          border-collapse: collapse;
+        }
+      
+        table th {
+          padding: .2em 1em;
+          background-color: #eee;
+          border-top: 1px solid #ddd;
+          border-left: 1px solid #ddd;
+        }
+      
+        table td {
+          padding: .2em 1em;
+          border-top: 1px solid #ddd;
+          border-left: 1px solid #ddd;
+          vertical-align: top;
+        }
+      
+        .author {
+          font-size: 1.2em;
+          text-align: center;
+        }
+      
+        @media only screen and (min-width: 480px) {
+          body {
+            font-size: 14px;
+          }
+        }
+        @media only screen and (min-width: 768px) {
+          body {
+            font-size: 16px;
+          }
+        }
+        @media print {
+          * {
+            background: transparent !important;
+            color: black !important;
+            filter: none !important;
+            -ms-filter: none !important;
+          }
+      
+          body {
+            font-size: 12pt;
+            max-width: 100%;
+          }
+      
+          a, a:visited {
+            text-decoration: underline;
+          }
+      
+          hr {
+            height: 1px;
+            border: 0;
+            border-bottom: 1px solid black;
+          }
+      
+          a[href]:after {
+            content: " (" attr(href) ")";
+          }
+      
+          abbr[title]:after {
+            content: " (" attr(title) ")";
+          }
+      
+          .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
+            content: "";
+          }
+      
+          pre, blockquote {
+            border: 1px solid #999;
+            padding-right: 1em;
+            page-break-inside: avoid;
+          }
+      
+          tr, img {
+            page-break-inside: avoid;
+          }
+      
+          img {
+            max-width: 100% !important;
+          }
+      
+          @page :left {
+            margin: 15mm 20mm 15mm 10mm;
+        }
+      
+          @page :right {
+            margin: 15mm 10mm 15mm 20mm;
+        }
+      
+          p, h2, h3 {
+            orphans: 3;
+            widows: 3;
+          }
+      
+          h2, h3 {
+            page-break-after: avoid;
+          }
+        }
+      
+        nav::before {
+          content: 'Table des mati\00e8res';
+          font-weight: bold;
+          padding-left: 2em;
+        }
+      
+        nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        font-weight: 500;
+        padding-top: 3em;
+        width: 20%;
+        }
+      
+        nav li {
+          list-style-type: none;
+          padding-top: 0.8em;
+          line-height: 1.3em;
+          
+        }
+      
+        header {
+          border: 1px solid rgb(200,200,200);
+          padding:10px;
+          background-color: rgb(240,240,240);
+            
+        }
+      
+        #schema-scholarly-article > span[property=name]:nth-child(1){
+          font-size: xx-large;
+          line-height: 2em;
+          text-align: center;
+        }
+      
+        #schema-scholarly-article > span[property=name]:nth-child(3){
+          font-size: larger;
+          line-height: 2em;
+          text-align: center;
+        }
+      
+      
+        #schema-scholarly-article > span[property=author]{
+          font-size: large;
+          padding-top: 20px;
+          line-height: 2em;
+        }
+      
+        div.resume {
+          margin-top: 10px;
+        }
+      
+        div.resume[lang=en]::before {
+                  content:"Abstract: ";
+                  font-weight: bold;
+              }
+      
+        div.resume[lang=fr]::before {
+                  content:"R\00e9sum\00e9 : ";
+                  font-weight: bold;
+              }
+      
+        div.resume[lang=es]::before {
+                  content:"Resumen: ";
+                  font-weight: bold;
+              }
+      
+        div.resume[lang=pt]::before {
+                  content:"Abstrato: ";
+                  font-weight: bold;
+              }
+      
+        div.resume[lang=uk]::before {
+                  content:"P&iecy;&fcy;&iecy;&rcy;&acy;&tcy;: ";
+                  font-weight: bold;
+              }
+      
+        div.resume[lang=de]::before {
+                  content:"Abstrakt: ";
+                  font-weight: bold;
+              }
+      
+        div.resume[lang=it]::before {
+                  content:"Astratto: ";
+                  font-weight: bold;
+              }
+      
+        .keywords::before {
+                  content:"Cat\00e9gories :";
+                  font-weight: bold;
+              }
+      
+        div.keywords {
+          margin-top: 10px;
+        }
+      
+        .keywords > div {
+          display: inline-block;
+        }
+      
+        .keywords > div::after {
+          content: " / ";
+        }
+      
+        .keywords > div:last-child::after {
+          content: ".";
+        }
+      
+        div.authorKeywords_fr {
+          margin-top: 10px;
+        }
+      
+        div.authorKeywords_fr span::before {
+          content: 'Mots-cl\00e9s auteur : ';
+          font-weight: bold;
+        }
+      
+        div.authorKeywords_fr span::after {
+          content: '.';
+        }
+      
+        div.authorKeywords_en span::before {
+          content: 'Keywords: ';
+          font-weight: bold;
+        }
+      
+        div.authorKeywords_en span::after {
+          content: '.';
+        }
+      
+        hr#startArticle {
+          margin-top: 4em;
+          height: 1px; 
+          border-top : 1px solid rgb(200,200,200)
+        }
+      
+        p span.epigraphe {
+          margin-left: 10%;
+          margin-right: 20%;
+          text-align: left;
+          margin-bottom: 2em;
+          float: right;
+          font-style: italic;
+        }
+      
+        p span.epigraphe span.source {
+          content: '&mdash; ';
+        }
+      
+        p span.dedicace {
+          margin-left: 10%;
+          text-align: left;
+          margin-bottom: 2em;
+          float: right;
+          font-style: italic;
+        }
+      
+        p span.note {
+          margin-left: 10%;
+          text-align: left;
+          margin-bottom: 2em;
+          float: right;
+          font-style: italic;
+        }
+      
+        span.these {
+          text-decoration: underline double #a91e58;
+        }
+      
+        span.these:hover::before {
+          content: "[These: ";
+          position:relative;
+          color: #a91e58;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.these:hover::after {
+          content: "]";
+          position:relative;
+          color: #a91e58;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.exemple {
+          text-decoration: underline double  #b37114;
+        }
+      
+        span.exemple:hover::before {
+          content: "[Exemple: ";
+          position:relative;
+          color: #b37114;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.exemple:hover::after {
+          content: "]";
+          position:relative;
+          color: #b37114;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.concept {
+          text-decoration: underline double #14b371;
+        }
+      
+        span.concept:hover::before {
+          content: "[Concept: ";
+          position:relative;
+          color: #14b371;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.concept:hover::after {
+          content: "]";
+          position:relative;
+          color: #14b371;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.definition {
+          text-decoration: underline double #1456b3;
+        }
+      
+        span.definition:hover::before {
+          content: "[Definition: ";
+          position:relative;
+          color: #1456b3;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.definition:hover::after {
+          content: "]";
+          position:relative;
+          color: #1456b3;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.question {
+          text-decoration: underline double #ff7214 ;
+        }
+      
+        span.question:hover::before {
+          content: "[Question: ";
+          position:relative;
+          color: #ff7214;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      
+        span.question:hover::after {
+          content: "]";
+          position:relative;
+          color: #ff7214;
+          font-size: 1em;
+          padding-left:5px;
+          padding-right:5px;
+        }
+      </style>
 </head>
+
+
 <body>
-  <!-- Render in article for reader view enabling -->
-    <article>
-    <h1 id="criando-novo-arquivo">Criando novo arquivo</h1>
-    <p>testando</p>
+<nav id="TOC">
+<ul>
+<li><a href="#isso-&eacute;-um-t&iacute;tulo">Isso &eacute; um t&iacute;tulo</a><ul>
+<li><a href="#agora-um-t&iacute;tulo-subordinado">Agora, um t&iacute;tulo subordinado</a></li>
+</ul></li>
+</ul>
+</nav>
+
+
+<!--indexations FOAF-->
+<header>
+<div class="indexations-foaf" style="display:none">
+<!--indexation FOAF pour auteur de l'article-->
+  <div property="http://purl.org/dc/terms/creator">
+    <div vocab="http://xmlns.com/foaf/0.1/" typeof="Person" class="foaf-author">
+       <span property="familyName">Miotto</span>
+       <span property="firstName">Marcio</span>
+       <span property="openid"></span>
+    </div>
+  </div>
+
+<!--indexation FOAF pour redacteur du dossier-->
+
+<!--indexation FOAF pour directeur de la revue-->
+  <div property="http://purl.org/dc/terms/contributor.drt">
+    <div vocab="http://xmlns.com/foaf/0.1/" typeof="Person" class="foaf-director">
+      <span property="familyName"></span>
+      <span property="firstName"></span>
+      <span property="gender"></span>
+      <span property="openid"></span>
+    </div>
+   </div>
+
+<!--indexation FOAF pour traducteur de l'article -->
+
+<!--indexation FOAF pour transcripteur des propos (entretiens, d&eacute;bats) -->
+</div> <!-- End indexation FOAF -->
+
+
+<!--Integration schema "ScholarlyArticle"-->
+<div vocab="http://schema.org/" typeof="ScholarlyArticle" resource="#article" id="schema-scholarly-article">
+
+<!--Indexation titre/soustitre de l'article-->
+  <span property="name">Testando</span><br />
+  <span property="name">Testando subtitulo</span><br />
+
+<!--Indexation auteur de l'article-->
+  <span property="author">Marcio Miotto</span><br />
+
+<!--Indexation editeur-->
+
+<!--Indexation revue-->
+
+<!-- Indexation resumes -->
+
+<!--Indexation traduction-->
+
+<!-- Indexation mots cles controles -->
+
+</div> <!-- end Integration schema "ScholarlyArticle"-->
+
+<!--Indexation mots cles auteurs-->
+
+</header>
+<hr id="startArticle">
+<!--Corps de l'article-->
+<article>
+  <section id="isso-&eacute;-um-t&iacute;tulo" class="level1">
+  <h1>Isso &eacute; um t&iacute;tulo</h1>
+  <section id="agora-um-t&iacute;tulo-subordinado" class="level2">
+  <h2>Agora, um t&iacute;tulo subordinado</h2>
+  <p>Come&ccedil;ando um texto, com um <a href="http://askesis.hypotheses.org">link</a>.</p>
+  <!-- codigo -->
+  </section>
+  </section>
   </article>
 </body>
 </html>
