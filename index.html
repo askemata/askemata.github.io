@@ -1,806 +1,514 @@
-
-<!DOCTYPE html>
-
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:dc="http://purl.org/dc/terms/"
-      xmlns:foaf="http://xmlns.com/foaf/0.1/"
-       xml:lang="pt">
-
+<!doctype html>
+<html>
 <head>
-  <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
-  <link rel="schema.MARCREL" href="http://www.loc.gov/loc.terms/relators/"/>
-  <link rel="DCTERMS.subject" href="http://rameau.bnf.fr"/>
-  <link rel="schema.prism" href="http://prismstandard.org/namespaces/basic/2.0/"/>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>askemata-modelo</title><style type='text/css'>html {overflow-x: initial !important;}:root { --bg-color: #ffffff; --text-color: #333333; --select-text-bg-color: #B5D6FC; --select-text-font-color: auto; --monospace: "Lucida Console",Consolas,"Courier",monospace; --title-bar-height: 20px; }
+.mac-os-11 { --title-bar-height: 28px; }
+html { font-size: 14px; background-color: var(--bg-color); color: var(--text-color); font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0px; padding: 0px; height: auto; bottom: 0px; top: 0px; left: 0px; right: 0px; font-size: 1rem; line-height: 1.42857143; overflow-x: hidden; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; tab-size: 4; background-position: inherit inherit; background-repeat: inherit inherit; }
+iframe { margin: auto; }
+a.url { word-break: break-all; }
+a:active, a:hover { outline: 0px; }
+.in-text-selection, ::selection { text-shadow: none; background: var(--select-text-bg-color); color: var(--select-text-font-color); }
+#write { margin: 0px auto; height: auto; width: inherit; word-break: normal; word-wrap: break-word; position: relative; white-space: normal; overflow-x: visible; padding-top: 36px; }
+#write.first-line-indent p { text-indent: 2em; }
+#write.first-line-indent li p, #write.first-line-indent p * { text-indent: 0px; }
+#write.first-line-indent li { margin-left: 2em; }
+.for-image #write { padding-left: 8px; padding-right: 8px; }
+body.typora-export { padding-left: 30px; padding-right: 30px; }
+.typora-export .footnote-line, .typora-export li, .typora-export p { white-space: pre-wrap; }
+.typora-export .task-list-item input { pointer-events: none; }
+@media screen and (max-width: 500px) { 
+  body.typora-export { padding-left: 0px; padding-right: 0px; }
+  #write { padding-left: 20px; padding-right: 20px; }
+  .CodeMirror-sizer { margin-left: 0px !important; }
+  .CodeMirror-gutters { display: none !important; }
+}
+#write li > figure:last-child { margin-bottom: 0.5rem; }
+#write ol, #write ul { position: relative; }
+img { max-width: 100%; vertical-align: middle; }
+button, input, select, textarea { color: inherit; font-family: inherit; font-size: inherit; font-style: inherit; font-variant-caps: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; }
+input[type="checkbox"], input[type="radio"] { line-height: normal; padding: 0px; }
+*, ::after, ::before { box-sizing: border-box; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p, #write pre { width: inherit; }
+#write h1, #write h2, #write h3, #write h4, #write h5, #write h6, #write p { position: relative; }
+p { line-height: inherit; }
+h1, h2, h3, h4, h5, h6 { break-after: avoid-page; break-inside: avoid; orphans: 4; }
+p { orphans: 4; }
+h1 { font-size: 2rem; }
+h2 { font-size: 1.8rem; }
+h3 { font-size: 1.6rem; }
+h4 { font-size: 1.4rem; }
+h5 { font-size: 1.2rem; }
+h6 { font-size: 1rem; }
+.md-math-block, .md-rawblock, h1, h2, h3, h4, h5, h6, p { margin-top: 1rem; margin-bottom: 1rem; }
+.hidden { display: none; }
+.md-blockmeta { color: rgb(204, 204, 204); font-weight: 700; font-style: italic; }
+a { cursor: pointer; }
+sup.md-footnote { padding: 2px 4px; background-color: rgba(238, 238, 238, 0.701961); color: rgb(85, 85, 85); border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-right-radius: 4px; border-bottom-left-radius: 4px; cursor: pointer; }
+sup.md-footnote a, sup.md-footnote a:hover { color: inherit; text-transform: inherit; text-decoration: inherit; }
+#write input[type="checkbox"] { cursor: pointer; width: inherit; height: inherit; }
+figure { overflow-x: auto; margin: 1.2em 0px; max-width: calc(100% + 16px); padding: 0px; }
+figure > table { margin: 0px; }
+tr { break-inside: avoid; break-after: auto; }
+thead { display: table-header-group; }
+table { border-collapse: collapse; border-spacing: 0px; width: 100%; overflow: auto; break-inside: auto; text-align: left; }
+table.md-table td { min-width: 32px; }
+.CodeMirror-gutters { border-right-width: 0px; background-color: inherit; }
+.CodeMirror-linenumber { }
+.CodeMirror { text-align: left; }
+.CodeMirror-placeholder { opacity: 0.3; }
+.CodeMirror pre { padding: 0px 4px; }
+.CodeMirror-lines { padding: 0px; }
+div.hr:focus { cursor: none; }
+#write pre { white-space: pre-wrap; }
+#write.fences-no-line-wrapping pre { white-space: pre; }
+#write pre.ty-contain-cm { white-space: normal; }
+.CodeMirror-gutters { margin-right: 4px; }
+.md-fences { font-size: 0.9rem; display: block; break-inside: avoid; text-align: left; overflow: visible; white-space: pre; background-image: inherit; background-size: inherit; background-attachment: inherit; background-origin: inherit; background-clip: inherit; background-color: inherit; position: relative !important; background-position: inherit inherit; background-repeat: inherit inherit; }
+.md-diagram-panel { width: 100%; margin-top: 10px; text-align: center; padding-top: 0px; padding-bottom: 8px; overflow-x: auto; }
+#write .md-fences.mock-cm { white-space: pre-wrap; }
+.md-fences.md-fences-with-lineno { padding-left: 0px; }
+#write.fences-no-line-wrapping .md-fences.mock-cm { white-space: pre; overflow-x: auto; }
+.md-fences.mock-cm.md-fences-with-lineno { padding-left: 8px; }
+.CodeMirror-line, twitterwidget { break-inside: avoid; }
+.footnotes { opacity: 0.8; font-size: 0.9rem; margin-top: 1em; margin-bottom: 1em; }
+.footnotes + .footnotes { margin-top: 0px; }
+.md-reset { margin: 0px; padding: 0px; border: 0px; outline: 0px; vertical-align: top; text-decoration: none; text-shadow: none; float: none; position: static; width: auto; height: auto; white-space: nowrap; cursor: inherit; line-height: normal; font-weight: 400; text-align: left; box-sizing: content-box; direction: ltr; background-position: 0px 0px; background-repeat: initial initial; }
+li div { padding-top: 0px; }
+blockquote { margin: 1rem 0px; }
+li .mathjax-block, li p { margin: 0.5rem 0px; }
+li blockquote { margin: 1rem 0px; }
+li { margin: 0px; position: relative; }
+blockquote > :last-child { margin-bottom: 0px; }
+blockquote > :first-child, li > :first-child { margin-top: 0px; }
+.footnotes-area { color: rgb(136, 136, 136); margin-top: 0.714rem; padding-bottom: 0.143rem; white-space: normal; }
+#write .footnote-line { white-space: pre-wrap; }
+@media print { 
+  body, html { border: 1px solid transparent; height: 99%; break-after: avoid; break-before: avoid; font-variant-ligatures: no-common-ligatures; }
+  #write { margin-top: 0px; padding-top: 0px; border-color: transparent !important; }
+  .typora-export * { -webkit-print-color-adjust: exact; }
+  .typora-export #write { break-after: avoid; }
+  .typora-export #write::after { height: 0px; }
+  .is-mac table { break-inside: avoid; }
+}
+.footnote-line { margin-top: 0.714em; font-size: 0.7em; }
+a img, img a { cursor: pointer; }
+pre.md-meta-block { font-size: 0.8rem; min-height: 0.8rem; white-space: pre-wrap; background-color: rgb(204, 204, 204); display: block; overflow-x: hidden; background-position: initial initial; background-repeat: initial initial; }
+p > .md-image:only-child:not(.md-img-error) img, p > img:only-child { display: block; margin: auto; }
+#write.first-line-indent p > .md-image:only-child:not(.md-img-error) img { left: -2em; position: relative; }
+p > .md-image:only-child { display: inline-block; width: 100%; }
+#write .MathJax_Display { margin: 0.8em 0px 0px; }
+.md-math-block { width: 100%; }
+.md-math-block:not(:empty)::after { display: none; }
+.MathJax_ref { fill: currentcolor; }
+[contenteditable="true"]:active, [contenteditable="true"]:focus, [contenteditable="false"]:active, [contenteditable="false"]:focus { outline: 0px; box-shadow: none; }
+.md-task-list-item { position: relative; list-style-type: none; }
+.task-list-item.md-task-list-item { padding-left: 0px; }
+.md-task-list-item > input { position: absolute; top: 0px; left: 0px; margin-left: -1.2em; margin-top: calc(1em - 10px); border: none; }
+.math { font-size: 1rem; }
+.md-toc { min-height: 3.58rem; position: relative; font-size: 0.9rem; border-top-left-radius: 10px; border-top-right-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; }
+.md-toc-content { position: relative; margin-left: 0px; }
+.md-toc-content::after, .md-toc::after { display: none; }
+.md-toc-item { display: block; color: rgb(65, 131, 196); }
+.md-toc-item a { text-decoration: none; }
+.md-toc-inner:hover { text-decoration: underline; }
+.md-toc-inner { display: inline-block; cursor: pointer; }
+.md-toc-h1 .md-toc-inner { margin-left: 0px; font-weight: 700; }
+.md-toc-h2 .md-toc-inner { margin-left: 2em; }
+.md-toc-h3 .md-toc-inner { margin-left: 4em; }
+.md-toc-h4 .md-toc-inner { margin-left: 6em; }
+.md-toc-h5 .md-toc-inner { margin-left: 8em; }
+.md-toc-h6 .md-toc-inner { margin-left: 10em; }
+@media screen and (max-width: 48em) { 
+  .md-toc-h3 .md-toc-inner { margin-left: 3.5em; }
+  .md-toc-h4 .md-toc-inner { margin-left: 5em; }
+  .md-toc-h5 .md-toc-inner { margin-left: 6.5em; }
+  .md-toc-h6 .md-toc-inner { margin-left: 8em; }
+}
+a.md-toc-inner { font-size: inherit; font-style: inherit; font-weight: inherit; line-height: inherit; }
+.footnote-line a:not(.reversefootnote) { color: inherit; }
+.md-attr { display: none; }
+.md-fn-count::after { content: "."; }
+code, pre, samp, tt { font-family: var(--monospace); }
+kbd { margin: 0px 0.1em; padding: 0.1em 0.6em; font-size: 0.8em; color: rgb(36, 39, 41); background-color: rgb(255, 255, 255); border: 1px solid rgb(173, 179, 185); border-top-left-radius: 3px; border-top-right-radius: 3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px; box-shadow: rgba(12, 13, 14, 0.2) 0px 1px 0px, rgb(255, 255, 255) 0px 0px 0px 2px inset; white-space: nowrap; vertical-align: middle; background-position: initial initial; background-repeat: initial initial; }
+.md-comment { color: rgb(162, 127, 3); opacity: 0.8; font-family: var(--monospace); }
+code { text-align: left; }
+a.md-print-anchor { white-space: pre !important; border: none !important; display: inline-block !important; position: absolute !important; width: 1px !important; right: 0px !important; outline: 0px !important; text-shadow: initial !important; background-position: 0px 0px !important; background-repeat: initial initial !important; }
+.md-inline-math .MathJax_SVG .noError { display: none !important; }
+.html-for-mac .inline-math-svg .MathJax_SVG { vertical-align: 0.2px; }
+.md-math-block .MathJax_SVG_Display { text-align: center; margin: 0px; position: relative; text-indent: 0px; max-width: none; max-height: none; min-height: 0px; min-width: 100%; width: auto; overflow-y: hidden; display: block !important; }
+.MathJax_SVG_Display, .md-inline-math .MathJax_SVG_Display { width: auto; margin: inherit; display: inline-block !important; }
+.MathJax_SVG .MJX-monospace { font-family: var(--monospace); }
+.MathJax_SVG .MJX-sans-serif { font-family: sans-serif; }
+.MathJax_SVG { display: inline; font-style: normal; font-weight: 400; line-height: normal; zoom: 90%; text-indent: 0px; text-align: left; text-transform: none; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; direction: ltr; max-width: none; max-height: none; min-width: 0px; min-height: 0px; border: 0px; padding: 0px; margin: 0px; }
+.MathJax_SVG * { transition: none; }
+.MathJax_SVG_Display svg { vertical-align: middle !important; margin-bottom: 0px !important; margin-top: 0px !important; }
+.os-windows.monocolor-emoji .md-emoji { font-family: "Segoe UI Symbol", sans-serif; }
+.md-diagram-panel > svg { max-width: 100%; }
+[lang="flow"] svg, [lang="mermaid"] svg { max-width: 100%; height: auto; }
+[lang="mermaid"] .node text { font-size: 1rem; }
+table tr th { border-bottom-width: 0px; }
+video { max-width: 100%; display: block; margin: 0px auto; }
+iframe { max-width: 100%; width: 100%; border: none; }
+.highlight td, .highlight tr { border: 0px; }
+mark { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); background-position: initial initial; background-repeat: initial initial; }
+.md-html-inline .md-plain, .md-html-inline strong, mark .md-inline-math, mark strong { color: inherit; }
+mark .md-meta { color: rgb(0, 0, 0); opacity: 0.3 !important; }
+@media print { 
+  .typora-export h1, .typora-export h2, .typora-export h3, .typora-export h4, .typora-export h5, .typora-export h6 { break-inside: avoid; }
+}
+.md-diagram-panel .messageText { stroke: none !important; }
+.md-diagram-panel .start-state { fill: var(--node-fill); }
+.md-diagram-panel .edgeLabel rect { opacity: 1 !important; }
+.md-require-zoom-fix foreignObject { font-size: var(--mermaid-font-zoom); }
 
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta name="generator" content="pandoc-template_Html5" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
 
-<!-- for preview only, meta to be removed when published -->
-     <meta name="robots" content="noindex, nofollow"/>
+html {
+	font-size: 19px;
+}
 
-<!--Metadonnees Dublin Core -->
+html, body {
+	margin: auto;
+	background: #fefefe;
+}
+body {
+	font-family: "Vollkorn", Palatino, Times;
+	color: #333;
+	line-height: 1.4;
+	text-align: justify;
+}
 
-  <meta name="DC.type" content="Text" />
-  <meta name="DC.format" content="text/html" />
-  <meta name="DC.type" content="journalArticle" />
-  <meta name="DC.type" class="typeArticle" content="" />
-  <meta name="DC.title" content="Ask&ecirc;mata" />
-  <meta name="DC.title.Main" content="Ask&ecirc;mata" />
-   <meta name="DC.title.Subtitle" content="notas e refer&ecirc;ncias em Ci&ecirc;ncias Humanas" />
-        <meta name="DC.language" content="pt" />
-   <meta name="DC.rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)" />
-     <meta name="DC.relation.isPartOf" content="true" />
- 
+#write {
+	max-width: 960px;
+	margin: 0 auto;
+	margin-bottom: 2em;
+	line-height: 1.53;
+	padding-top: 40px;
+}
 
-<!--Utilisation de MARCREL pour specifier le role du "contributeur" en Dublin core
-    drt = director -->
-  <meta name="director" content=" " />
-  <meta name="DC.contributor.drt" content=" " />
-  <meta name="MARCREL.drt" content=" " />
+@media only screen and (min-width: 1400px) {
+	#write {
+		max-width: 1100px;
+	}
+}
 
-<!--Auteur de l'article -->
-  <meta name="author" content="Marcio Miotto" />
-  <meta name="DC.creator" content="Marcio Miotto" />
+@media print {
+	html {
+		font-size: 13px;
+	}
+}
 
-<!--Resumes -->
-  <meta name="description" xml:lang="pt" lang="pt" content="o presente espa&ccedil;o &eacute; feito para reunir refer&ecirc;ncias acad&ecirc;micas sob instrumentos open source e publicamente dispon&iacute;veis. al&eacute;m de recursos, aborda tamb&eacute;m temas tais como: hist&oacute;ria da filosofia, hist&oacute;ria das ci&ecirc;ncias humanas e hist&oacute;ria da psicologia" />
-  <meta name="DC.description" xml:lang="pt" lang="pt" content="o presente espa&ccedil;o &eacute; feito para reunir refer&ecirc;ncias acad&ecirc;micas sob instrumentos open source e publicamente dispon&iacute;veis. al&eacute;m de recursos, aborda tamb&eacute;m temas tais como: hist&oacute;ria da filosofia, hist&oacute;ria das ci&ecirc;ncias humanas e hist&oacute;ria da psicologia" />
+/* Typography
+-------------------------------------------------------- */
 
-<!--Mots cles auteurs -->
+#write>h1:first-child,
+h1 {
+	margin-top: 1.6em;
+	font-weight: normal;
+}
 
+h1 {
+	font-size:3em;
+}
 
-<!--  traducteur avec specification MARCREL -->
+h2 {
+	margin-top:2em;
+	font-weight: normal;
+}
 
+h3 {
+	font-weight: normal;
+	font-style: italic;
+	margin-top: 3em;
+}
 
-  <!--  transcripteur avec specification MARCREL -->
+h1, 
+h2, 
+h3{
+	text-align: center;
+}
 
-<!--  redacteur avec specification MARCREL -->
+h2:after{
+	border-bottom: 1px solid #2f2f2f;
+    content: '';
+    width: 100px;
+    display: block;
+    margin: 0 auto;
+    height: 1px;
+}
 
+h1+h2, h2+h3 {
+	margin-top: 0.83em;
+}
 
-<!-- schema citation : Indexation pour Google Scholar  -->
-  <meta name="citation_authors" content="Marcio Miotto" />
-  <meta name="citation_title" content="Ask&ecirc;mata" />
-  <meta name="citation_subtitle" content="notas e refer&ecirc;ncias em Ci&ecirc;ncias Humanas" />
-   <meta name="citation_issue" content="" />
-  <meta name="citation_language" content="pt" />
+p,
+.mathjax-block {
+	margin-top: 0;
+	-webkit-hypens: auto;
+	-moz-hypens: auto;
+	hyphens: auto;
+}
+ul {
+	list-style: square;
+	padding-left: 1.2em;
+}
+ol {
+	padding-left: 1.2em;
+}
+blockquote {
+	margin-left: 1em;
+	padding-left: 1em;
+	border-left: 1px solid #ddd;
+}
+code,
+pre {
+	font-family: "Consolas", "Menlo", "Monaco", monospace, serif;
+	font-size: .9em;
+	background: white;
+}
+.md-fences{
+	margin-left: 1em;
+	padding-left: 1em;
+	border: 1px solid #ddd;
+	padding-bottom: 8px;
+	padding-top: 6px;
+	margin-bottom: 1.5em;
+}
 
-  <meta name="citation_abstract" xml:lang="pt" lang="pt" content="o presente espa&ccedil;o &eacute; feito para reunir refer&ecirc;ncias acad&ecirc;micas sob instrumentos open source e publicamente dispon&iacute;veis. al&eacute;m de recursos, aborda tamb&eacute;m temas tais como: hist&oacute;ria da filosofia, hist&oacute;ria das ci&ecirc;ncias humanas e hist&oacute;ria da psicologia" />
+a {
+	color: #2484c1;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a img {
+	border: none;
+}
+h1 a,
+h1 a:hover {
+	color: #333;
+	text-decoration: none;
+}
+hr {
+	color: #ddd;
+	height: 1px;
+	margin: 2em 0;
+	border-top: solid 1px #ddd;
+	border-bottom: none;
+	border-left: 0;
+	border-right: 0;
+}
+.ty-table-edit {
+	background: #ededed;
+    padding-top: 4px;
+}
+table {
+	margin-bottom: 1.333333rem
+}
+table th,
+table td {
+	padding: 8px;
+	line-height: 1.333333rem;
+	vertical-align: top;
+	border-top: 1px solid #ddd
+}
+table th {
+	font-weight: bold
+}
+table thead th {
+	vertical-align: bottom
+}
+table caption+thead tr:first-child th,
+table caption+thead tr:first-child td,
+table colgroup+thead tr:first-child th,
+table colgroup+thead tr:first-child td,
+table thead:first-child tr:first-child th,
+table thead:first-child tr:first-child td {
+	border-top: 0
+}
+table tbody+tbody {
+	border-top: 2px solid #ddd
+}
 
+.task-list{
+	padding:0;
+}
 
+.md-task-list-item {
+	padding-left: 1.6rem;
+}
 
+.md-task-list-item > input:before {
+	content: '\221A';
+	display: inline-block;
+	width: 1.33333333rem;
+  	height: 1.6rem;
+	vertical-align: middle;
+	text-align: center;
+	color: #ddd;
+	background-color: #fefefe;
+}
 
-<!--PRISM schema - Publishing Requirements for Industry Standard Metadata
-Schema specialise pour les revues et journaux-->
-  <meta name="prism.issueName" content=""/>
-  <meta name="prism.number" content="" />
-  <meta name="prism.teaser" xml:lang="pt" lang="pt" content="o presente espa&ccedil;o &eacute; feito para reunir refer&ecirc;ncias acad&ecirc;micas sob instrumentos open source e publicamente dispon&iacute;veis. al&eacute;m de recursos, aborda tamb&eacute;m temas tais como: hist&oacute;ria da filosofia, hist&oacute;ria das ci&ecirc;ncias humanas e hist&oacute;ria da psicologia" />
+.md-task-list-item > input:checked:before,
+.md-task-list-item > input[checked]:before{
+	color: inherit;
+}
+.md-tag {
+	color: inherit;
+	font: inherit;
+}
+#write pre.md-meta-block {
+	min-height: 35px;
+	padding: 0.5em 1em;
+}
+#write pre.md-meta-block {
+	white-space: pre;
+	background: #f8f8f8;
+	border: 0px;
+	color: #999;
+	
+	width: 100vw;
+	max-width: calc(100% + 60px);
+	margin-left: -30px;
+	border-left: 30px #f8f8f8 solid;
+	border-right: 30px #f8f8f8 solid;
 
+	margin-bottom: 2em;
+	margin-top: -1.3333333333333rem;
+	padding-top: 26px;
+	padding-bottom: 10px;
+	line-height: 1.8em;
+	font-size: 0.9em;
+	font-size: 0.76em;
+	padding-left: 0;
+}
+.md-img-error.md-image>.md-meta{
+	vertical-align: bottom;
+}
+#write>h5.md-focus:before {
+	top: 2px;
+}
 
-<!--RDFa pour ajout des metadonnees DC-->
-  <meta property="dc:format" content="text/html" />
-  <meta property="dc:title" content="Ask&ecirc;mata" />
-  <meta property="dc:title.Main" content="Ask&ecirc;mata" />
-  <meta property="dc:title.Subtitle" content="notas e refer&ecirc;ncias em Ci&ecirc;ncias Humanas" />
-  <meta property="dc:language" content="pt" />
-  <meta property="dc:type" content="journalArticle" />
-  <meta property="dc:rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)" />
-  <meta property="dc:relation.isPartOf" content="" />
+.md-toc {
+	margin-top: 40px;
+}
 
-  <meta property="dc:creator" content="Marcio Miotto" />
+.md-toc-content {
+	padding-bottom: 20px;
+}
 
+.outline-expander:before {
+	color: inherit;
+	font-size: 14px;
+	top: auto;
+	content: "\f0da";
+	font-family: FontAwesome;
+}
 
+.outline-expander:hover:before,
+.outline-item-open>.outline-item>.outline-expander:before {
+  	content: "\f0d7";
+}
 
-  <meta property="dcterms:abstract" xml:lang="pt" lang="pt" content="o presente espa&ccedil;o &eacute; feito para reunir refer&ecirc;ncias acad&ecirc;micas sob instrumentos open source e publicamente dispon&iacute;veis. al&eacute;m de recursos, aborda tamb&eacute;m temas tais como: hist&oacute;ria da filosofia, hist&oacute;ria das ci&ecirc;ncias humanas e hist&oacute;ria da psicologia" />
+/** source code mode */
+#typora-source {
+	font-family: Courier, monospace;
+    color: #6A6A6A;
+}
 
+.html-for-mac #typora-sidebar {
+    -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+}
 
+.cm-s-typora-default .cm-header, 
+.cm-s-typora-default .cm-property,
+.CodeMirror.cm-s-typora-default div.CodeMirror-cursor {
+	color: #428bca;
+}
 
+.cm-s-typora-default .cm-atom, .cm-s-typora-default .cm-number {
+	color: #777777;
+}
 
-<!--Fin des metadonnees dans le Head-->
+.typora-node .file-list-item-parent-loc, 
+.typora-node .file-list-item-time, 
+.typora-node .file-list-item-summary {
+	font-family: arial, sans-serif;
+}
 
-<!--Balise Title pour affichage titre dans le navigateur-->
-<!-- <title>Ask&ecirc;mata</title>-->
+.md-task-list-item>input {
+    margin-left: -1.3em;
+    margin-top: calc(1rem - 12px);
+}
 
-  <title>Ask&ecirc;mata : notas e refer&ecirc;ncias em Ci&ecirc;ncias Humanas</title>
-  <style type="text/css">
-      code{white-space: pre-wrap;}
-      span.smallcaps{font-variant: small-caps;}
-      span.underline{text-decoration: underline;}
-      div.column{display: inline-block; vertical-align: top; width: 50%;}
-  </style>
-  <style type="text/css">
-      /*
-        * I add this to html files generated with pandoc.
-        */
-      
-        @media only screen and (max-width: 1000px) {
-          nav {
-            display: none;
-          }
-        }
-      
-        html {
-          font-size: 100%;
-          overflow-y: scroll;
-          -webkit-text-size-adjust: 100%;
-          -ms-text-size-adjust: 100%;
-        }
-      
-        body {
-          color: #444;
-          font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
-          font-size: 12px;
-          line-height: 1.7;
-          padding: 1em;
-          margin: auto;
-          max-width: 42em;
-          background: #fefefe;
-        }
-      
-        a {
-          color: #0645ad;
-          text-decoration: none;
-        }
-      
-        a:visited {
-          color: #0b0080;
-        }
-      
-        a:hover {
-          color: #06e;
-        }
-      
-        a:active {
-          color: #faa700;
-        }
-      
-        a:focus {
-          outline: thin dotted;
-        }
-      
-        *::-moz-selection {
-          background: rgba(255, 255, 0, 0.3);
-          color: #000;
-        }
-      
-        *::selection {
-          background: rgba(255, 255, 0, 0.3);
-          color: #000;
-        }
-      
-        a::-moz-selection {
-          background: rgba(255, 255, 0, 0.3);
-          color: #0645ad;
-        }
-      
-        a::selection {
-          background: rgba(255, 255, 0, 0.3);
-          color: #0645ad;
-        }
-      
-        p {
-          margin: 1em 0;
-        }
-      
-        img {
-          max-width: 100%;
-        }
-      
-        h1, h2, h3, h4, h5, h6 {
-          color: #111;
-          line-height: 125%;
-          margin-top: 2em;
-          font-weight: normal;
-        }
-      
-        h4, h5, h6 {
-          font-weight: bold;
-        }
-      
-        h1 {
-          font-size: 2.5em;
-        }
-      
-        h2 {
-          font-size: 2em;
-        }
-      
-        h3 {
-          font-size: 1.5em;
-        }
-      
-        h4 {
-          font-size: 1.2em;
-        }
-      
-        h5 {
-          font-size: 1em;
-        }
-      
-        h6 {
-          font-size: 0.9em;
-        }
-      
-        blockquote {
-          color: #666666;
-          margin: 0;
-          padding-left: 3em;
-          border-left: 0.5em #EEE solid;
-        }
-      
-        hr {
-          display: block;
-          height: 2px;
-          border: 0;
-          border-top: 1px solid #aaa;
-          border-bottom: 1px solid #eee;
-          margin: 1em 0;
-          padding: 0;
-        }
-      
-        pre, code, kbd, samp {
-          color: #000;
-          font-family: monospace, monospace;
-          _font-family: 'courier new', monospace;
-          font-size: 0.98em;
-        }
-      
-        pre {
-          white-space: pre;
-          white-space: pre-wrap;
-          word-wrap: break-word;
-        }
-      
-        b, strong {
-          font-weight: bold;
-        }
-      
-        dfn {
-          font-style: italic;
-        }
-      
-        ins {
-          background: #ff9;
-          color: #000;
-          text-decoration: none;
-        }
-      
-        mark {
-          background: #ff0;
-          color: #000;
-          font-style: italic;
-          font-weight: bold;
-        }
-      
-        sub, sup {
-          font-size: 75%;
-          line-height: 0;
-          position: relative;
-          vertical-align: baseline;
-        }
-      
-        sup {
-          top: -0.5em;
-        }
-      
-        sub {
-          bottom: -0.25em;
-        }
-      
-        ul, ol {
-          margin: 1em 0;
-          padding: 0 0 0 2em;
-        }
-      
-        li p:last-child {
-          margin-bottom: 0;
-        }
-      
-        ul ul, ol ol {
-          margin: .3em 0;
-        }
-      
-        dl {
-          margin-bottom: 1em;
-        }
-      
-        dt {
-          font-weight: bold;
-          margin-bottom: .8em;
-        }
-      
-        dd {
-          margin: 0 0 .8em 2em;
-        }
-      
-        dd:last-child {
-          margin-bottom: 0;
-        }
-      
-        img {
-          border: 0;
-          -ms-interpolation-mode: bicubic;
-          vertical-align: middle;
-        }
-      
-        figure {
-          display: block;
-          text-align: center;
-          margin: 1em 0;
-        }
-      
-        figure img {
-          border: none;
-          margin: 0 auto;
-        }
-      
-        figcaption {
-          font-size: 0.8em;
-          font-style: italic;
-          margin: 0 0 .8em;
-        }
-      
-        table {
-          margin-bottom: 2em;
-          border-bottom: 1px solid #ddd;
-          border-right: 1px solid #ddd;
-          border-spacing: 0;
-          border-collapse: collapse;
-        }
-      
-        table th {
-          padding: .2em 1em;
-          background-color: #eee;
-          border-top: 1px solid #ddd;
-          border-left: 1px solid #ddd;
-        }
-      
-        table td {
-          padding: .2em 1em;
-          border-top: 1px solid #ddd;
-          border-left: 1px solid #ddd;
-          vertical-align: top;
-        }
-      
-        .author {
-          font-size: 1.2em;
-          text-align: center;
-        }
-      
-        @media only screen and (min-width: 480px) {
-          body {
-            font-size: 14px;
-          }
-        }
-        @media only screen and (min-width: 768px) {
-          body {
-            font-size: 16px;
-          }
-        }
-        @media print {
-          * {
-            background: transparent !important;
-            color: black !important;
-            filter: none !important;
-            -ms-filter: none !important;
-          }
-      
-          body {
-            font-size: 12pt;
-            max-width: 100%;
-          }
-      
-          a, a:visited {
-            text-decoration: underline;
-          }
-      
-          hr {
-            height: 1px;
-            border: 0;
-            border-bottom: 1px solid black;
-          }
-      
-          a[href]:after {
-            content: " (" attr(href) ")";
-          }
-      
-          abbr[title]:after {
-            content: " (" attr(title) ")";
-          }
-      
-          .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
-            content: "";
-          }
-      
-          pre, blockquote {
-            border: 1px solid #999;
-            padding-right: 1em;
-            page-break-inside: avoid;
-          }
-      
-          tr, img {
-            page-break-inside: avoid;
-          }
-      
-          img {
-            max-width: 100% !important;
-          }
-      
-          @page :left {
-            margin: 15mm 20mm 15mm 10mm;
-        }
-      
-          @page :right {
-            margin: 15mm 10mm 15mm 20mm;
-        }
-      
-          p, h2, h3 {
-            orphans: 3;
-            widows: 3;
-          }
-      
-          h2, h3 {
-            page-break-after: avoid;
-          }
-        }
-      
-        nav::before {
-          content: 'Table des mati\00e8res';
-          font-weight: bold;
-          padding-left: 2em;
-        }
-      
-        nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        font-weight: 500;
-        padding-top: 3em;
-        width: 20%;
-        }
-      
-        nav li {
-          list-style-type: none;
-          padding-top: 0.8em;
-          line-height: 1.3em;
-          
-        }
-      
-        header {
-          border: 1px solid rgb(200,200,200);
-          padding:10px;
-          background-color: rgb(240,240,240);
-            
-        }
-      
-        #schema-scholarly-article > span[property=name]:nth-child(1){
-          font-size: xx-large;
-          line-height: 2em;
-          text-align: center;
-        }
-      
-        #schema-scholarly-article > span[property=name]:nth-child(3){
-          font-size: larger;
-          line-height: 2em;
-          text-align: center;
-        }
-      
-      
-        #schema-scholarly-article > span[property=author]{
-          font-size: large;
-          padding-top: 20px;
-          line-height: 2em;
-        }
-      
-        div.resume {
-          margin-top: 10px;
-        }
-      
-        div.resume[lang=en]::before {
-                  content:"Abstract: ";
-                  font-weight: bold;
-              }
-      
-        div.resume[lang=fr]::before {
-                  content:"R\00e9sum\00e9 : ";
-                  font-weight: bold;
-              }
-      
-        div.resume[lang=es]::before {
-                  content:"Resumen: ";
-                  font-weight: bold;
-              }
-      
-        div.resume[lang=pt]::before {
-                  content:"Abstrato: ";
-                  font-weight: bold;
-              }
-      
-        div.resume[lang=uk]::before {
-                  content:"P&iecy;&fcy;&iecy;&rcy;&acy;&tcy;: ";
-                  font-weight: bold;
-              }
-      
-        div.resume[lang=de]::before {
-                  content:"Abstrakt: ";
-                  font-weight: bold;
-              }
-      
-        div.resume[lang=it]::before {
-                  content:"Astratto: ";
-                  font-weight: bold;
-              }
-      
-        .keywords::before {
-                  content:"Cat\00e9gories :";
-                  font-weight: bold;
-              }
-      
-        div.keywords {
-          margin-top: 10px;
-        }
-      
-        .keywords > div {
-          display: inline-block;
-        }
-      
-        .keywords > div::after {
-          content: " / ";
-        }
-      
-        .keywords > div:last-child::after {
-          content: ".";
-        }
-      
-        div.authorKeywords_fr {
-          margin-top: 10px;
-        }
-      
-        div.authorKeywords_fr span::before {
-          content: 'Mots-cl\00e9s auteur : ';
-          font-weight: bold;
-        }
-      
-        div.authorKeywords_fr span::after {
-          content: '.';
-        }
-      
-        div.authorKeywords_en span::before {
-          content: 'Keywords: ';
-          font-weight: bold;
-        }
-      
-        div.authorKeywords_en span::after {
-          content: '.';
-        }
-      
-        hr#startArticle {
-          margin-top: 4em;
-          height: 1px; 
-          border-top : 1px solid rgb(200,200,200)
-        }
-      
-        p span.epigraphe {
-          margin-left: 10%;
-          margin-right: 20%;
-          text-align: left;
-          margin-bottom: 2em;
-          float: right;
-          font-style: italic;
-        }
-      
-        p span.epigraphe span.source {
-          content: '&mdash; ';
-        }
-      
-        p span.dedicace {
-          margin-left: 10%;
-          text-align: left;
-          margin-bottom: 2em;
-          float: right;
-          font-style: italic;
-        }
-      
-        p span.note {
-          margin-left: 10%;
-          text-align: left;
-          margin-bottom: 2em;
-          float: right;
-          font-style: italic;
-        }
-      
-        span.these {
-          text-decoration: underline double #a91e58;
-        }
-      
-        span.these:hover::before {
-          content: "[These: ";
-          position:relative;
-          color: #a91e58;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.these:hover::after {
-          content: "]";
-          position:relative;
-          color: #a91e58;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.exemple {
-          text-decoration: underline double  #b37114;
-        }
-      
-        span.exemple:hover::before {
-          content: "[Exemple: ";
-          position:relative;
-          color: #b37114;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.exemple:hover::after {
-          content: "]";
-          position:relative;
-          color: #b37114;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.concept {
-          text-decoration: underline double #14b371;
-        }
-      
-        span.concept:hover::before {
-          content: "[Concept: ";
-          position:relative;
-          color: #14b371;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.concept:hover::after {
-          content: "]";
-          position:relative;
-          color: #14b371;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.definition {
-          text-decoration: underline double #1456b3;
-        }
-      
-        span.definition:hover::before {
-          content: "[Definition: ";
-          position:relative;
-          color: #1456b3;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.definition:hover::after {
-          content: "]";
-          position:relative;
-          color: #1456b3;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.question {
-          text-decoration: underline double #ff7214 ;
-        }
-      
-        span.question:hover::before {
-          content: "[Question: ";
-          position:relative;
-          color: #ff7214;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      
-        span.question:hover::after {
-          content: "]";
-          position:relative;
-          color: #ff7214;
-          font-size: 1em;
-          padding-left:5px;
-          padding-right:5px;
-        }
-      </style>
+.md-mathjax-midline {
+	background: #fafafa;
+}
+
+.md-fences .code-tooltip {
+	bottom: -2em !important;
+}
+
+.dropdown-menu .divider {
+	border-color: #e5e5e5;
+}
+
+ :root {--mermaid-font-zoom:1em ;} 
+</style>
 </head>
-
-
-<body>
-<nav id="TOC">
-<ul>
-<li><a href="#isso-&eacute;-um-t&iacute;tulo-1">Isso &eacute; um t&iacute;tulo 1</a><ul>
-<li><a href="#introdu&ccedil;&atilde;o">Introdu&ccedil;&atilde;o</a></li>
-</ul></li>
-</ul>
-</nav>
-
-
-<!--indexations FOAF-->
-<header>
-<div class="indexations-foaf" style="display:none">
-<!--indexation FOAF pour auteur de l'article-->
-  <div property="http://purl.org/dc/terms/creator">
-    <div vocab="http://xmlns.com/foaf/0.1/" typeof="Person" class="foaf-author">
-       <span property="familyName">Miotto</span>
-       <span property="firstName">Marcio</span>
-       <span property="openid">https://orcid.org/0000-0003-0608-0542</span>
-    </div>
-  </div>
-
-<!--indexation FOAF pour redacteur du dossier-->
-
-<!--indexation FOAF pour directeur de la revue-->
-  <div property="http://purl.org/dc/terms/contributor.drt">
-    <div vocab="http://xmlns.com/foaf/0.1/" typeof="Person" class="foaf-director">
-      <span property="familyName"></span>
-      <span property="firstName"></span>
-      <span property="gender"></span>
-      <span property="openid"></span>
-    </div>
-   </div>
-
-<!--indexation FOAF pour traducteur de l'article -->
-
-<!--indexation FOAF pour transcripteur des propos (entretiens, d&eacute;bats) -->
-</div> <!-- End indexation FOAF -->
-
-
-<!--Integration schema "ScholarlyArticle"-->
-<div vocab="http://schema.org/" typeof="ScholarlyArticle" resource="#article" id="schema-scholarly-article">
-
-<!--Indexation titre/soustitre de l'article-->
-  <span property="name">Ask&ecirc;mata</span><br />
-  <span property="name">notas e refer&ecirc;ncias em Ci&ecirc;ncias Humanas</span><br />
-
-<!--Indexation auteur de l'article-->
-  <span property="author">Marcio Miotto</span><br />
-
-<!--Indexation editeur-->
-
-<!--Indexation revue-->
-
-<!-- Indexation resumes -->
-  <div class="description">
-    <div property="description" class="resume" lang="pt">o presente espa&ccedil;o &eacute; feito para reunir refer&ecirc;ncias acad&ecirc;micas sob instrumentos open source e publicamente dispon&iacute;veis. al&eacute;m de recursos, aborda tamb&eacute;m temas tais como: hist&oacute;ria da filosofia, hist&oacute;ria das ci&ecirc;ncias humanas e hist&oacute;ria da psicologia</div>
-  </div>
-
-<!--Indexation traduction-->
-
-<!-- Indexation mots cles controles -->
-
-</div> <!-- end Integration schema "ScholarlyArticle"-->
-
-<!--Indexation mots cles auteurs-->
-
-</header>
-<hr id="startArticle">
-<!--Corps de l'article-->
-<article>
-  <section id="isso-&eacute;-um-t&iacute;tulo-1" class="level1">
-  <h1>Isso &eacute; um t&iacute;tulo 1</h1>
-  <section id="introdu&ccedil;&atilde;o" class="level2">
-  <h2>Introdu&ccedil;&atilde;o</h2>
-  <p>Esse espa&ccedil;o agrupa links, textos, tradu&ccedil;&otilde;es, anota&ccedil;&otilde;es e outras refer&ecirc;ncias sob os seguintes temas: Hist&oacute;ria da Filosofia, Hist&oacute;ria das Ci&ecirc;ncias, Hist&oacute;ria das Ci&ecirc;ncias Humanas e Hist&oacute;ria da Psicologia. No espa&ccedil;o h&aacute; tamb&eacute;m uma sele&ccedil;&atilde;o de cita&ccedil;&otilde;es e um <a href="http://askesis.hypotheses.org">blog</a> sobre os mesmos assuntos acima. H&aacute; igualmente uma p&aacute;gina est&aacute;tica e refer&ecirc;ncias sobre Linux para pesquisadores de ci&ecirc;ncias humanas n&atilde;o habituados com programa&ccedil;&atilde;o. Os benef&iacute;cios de manter uma p&aacute;gina est&aacute;tica est&atilde;o descritos aqui. Tamb&eacute;m aqui: alguns textos publicados, bem como minhas p&aacute;ginas PhilPapers, ORCID, Academia e meu blog Philosopher&rsquo;s Desk. Posts in Portugu&ecirc;s [PT], Fran&ccedil;ais [FR], Espa&ntilde;ol [ES] and English [EN].</p>
-  <!-- codigo -->
-  </section>
-  </section>
-  </article>
+<body class='typora-export'>
+<div id='write'  class=''><div style="font-size: 50px;"> askemata &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<div style="font-size: 15px;font-align: right">  </div></div> <p><span>  </span><a href='index.html'><span>início</span></a><span> - </span><a href='web.html'><span>web</span></a><span> - </span><a href='publicacoes.html'><span>publicações</span></a><span> - </span><a href='https://philpeople.org/profiles/marcio-miotto' title='minha página philpapers'><span>philpapers</span></a><span> - </span><a href='sobre.html'><span>contato</span></a><span> </span></p><meta name="DC.type" content="Text">
+  <meta name="DC.format" content="text/html">
+  <meta name="DC.type" content="journalArticle">
+  <meta name="DC.type" class="typeArticle" content="Essai">
+  <meta name="DC.title" content="Titulo do Texto">
+  <meta name="DC.title.Main" content="Titulo do Texto">
+   <meta name="DC.title.Subtitle" content="subtitulo do texto"><meta name="DC.publisher" class="editeur" content="Editora">
+<meta name="DC.language" content="pt">  <meta name="DC.date" class="completeDate" content="1800-01-31">
+  <meta name="DC.date" class="year" content="1800">
+   <meta name="DC.rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)"><meta name="DC.source" content="Revista">
+<meta name="DC.relation.isPartOf" content="true">  <meta name="url" content="endereco URL do artigo, http etc">
+  <meta name="DC.identifier" content="endereco URL do artigo, http etc">
+  <meta name="DC.identifier" class="issn" content="ISSN"><!--Utilisation de MARCREL pour specifier le role du "contributeur" en Dublin core
+    drt = director -->  <meta name="director" content=" ">
+  <meta name="DC.contributor.drt" content=" ">
+  <meta name="MARCREL.drt" content=" "><!--Auteur de l'article -->  <meta name="author" content="Nome do Autor SOBRENOME DO AUTOR">
+  <meta name="DC.creator" content="Nome do Autor SOBRENOME DO AUTOR"><!--Resumes -->  <meta name="description" xml:lang="pt" lang="pt" content="Resumo">
+  <meta name="DC.description" xml:lang="pt" lang="pt" content="Resumo"><!--Mots cles auteurs --><meta name="keywords" xml:lang="pt" lang="pt" content="palavra chave, palavra-chave"><!-- schema citation : Indexation pour Google Scholar  --><meta name="citation_journal_title" content="Revista">
+  <meta name="citation_publisher" content="Editora">
+  <meta name="citation_authors" content="Nome do Autor SOBRENOME DO AUTOR">
+  <meta name="citation_title" content="Titulo do Texto">
+  <meta name="citation_subtitle" content="subtitulo do texto">
+  <meta name="citation_publication_date" content="1800/01/31">
+  <meta name="citation_online_date" content="1800/01/31">
+  <meta name="citation_issn" content="ISSN">
+   <meta name="citation_issue" content="">
+  <meta name="citation_language" content="pt">  <meta name="citation_abstract" xml:lang="pt" lang="pt" content="Resumo">  <meta name="citation_keywords" xml:lang="pt" lang="pt" content="palavra chave, palavra-chave">  <meta name="prism.url" content="endereco URL do artigo, http etc">
+  <meta name="prism.publicationName" content="Revista">
+  <meta name="prism.corporateEntity" content="Editora">
+  <meta name="prism.issueName" content="">
+  <meta name="prism.number" content="">
+  <meta name="prism.publicationDate" content="1800/01/31">
+  <meta name="prism.genre" content="Essai">
+  <meta name="prism.issn" content="ISSN">
+  <meta name="prism.teaser" xml:lang="pt" lang="pt" content="Resumo"><!--RDFa pour ajout des metadonnees DC-->  <meta property="dc:format" content="text/html">
+  <meta property="dc:identifier" content="endereco URL do artigo, http etc">
+  <meta property="dc:identifier" content="ISSN">
+  <meta property="dc:title" content="Titulo do Texto">
+  <meta property="dc:title.Main" content="Titulo do Texto">
+  <meta property="dc:title.Subtitle" content="subtitulo do texto">
+  <meta property="dc:publisher" content="Editora">
+  <meta property="dc:language" content="pt">
+  <meta property="dc:type" content="journalArticle">
+  <meta property="dcterm:created" content="1800/01/31">
+  <meta property="dc:rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)">
+  <meta property="dc:relation.isPartOf" content="">
+  <meta property="dc:source" content="Revista">  <meta property="dc:creator" content="Nome do Autor SOBRENOME DO AUTOR">  <meta property="dcterms:abstract" xml:lang="pt" lang="pt" content="Resumo"><!--Fin des metadonnees dans le Head--><p><span>Introdução</span></p><p><span>Esse espaço agrupa links, textos, traduções, anotações e outras referências sob os seguintes temas: História da Filosofia, História das Ciências, História das Ciências Humanas e História da Psicologia. </span>
+<span>No espaço há também uma seleção de citações e um </span><a href='http://askesis.hypotheses.org'><span>blog</span></a><span> sobre os mesmos assuntos acima. Há igualmente uma página estática e referências sobre Linux para pesquisadores de ciências humanas não habituados com programação. Os benefícios de manter uma página estática estão descritos aqui. </span>
+<span>Também aqui: alguns textos publicados, bem como minhas páginas PhilPapers, ORCID, Academia e meu blog Philosopher’s Desk.</span>
+<span>Posts in Português [PT], Français [FR], Español [ES] and English [EN]. </span></p><p><!-- codigo --><span> </span></p></div>
 </body>
 </html>
