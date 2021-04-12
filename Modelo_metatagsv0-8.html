@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:dc="http://purl.org/dc/terms/"
+      xmlns:foaf="http://xmlns.com/foaf/0.1/"
+       xml:lang="pt">
+
+<head>
+  <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
+  <link rel="schema.MARCREL" href="http://www.loc.gov/loc.terms/relators/"/>
+  <link rel="DCTERMS.subject" href="http://rameau.bnf.fr"/>
+  <link rel="schema.prism" href="http://prismstandard.org/namespaces/basic/2.0/"/>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc-template_Html5" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+
+<!-- for preview only, meta to be removed when published -->
+     <meta name="robots" content="noindex, nofollow"/>
+
+<!--Metadonnees Dublin Core -->
+
+  <meta name="DC.type" content="Text" />
+  <meta name="DC.format" content="text/html" />
+  <meta name="DC.type" content="journalArticle" />
+  <meta name="DC.type" class="typeArticle" content="Essai" />
+  <meta name="DC.title" content="Titulo do Texto" />
+  <meta name="DC.title.Main" content="Titulo do Texto" />
+   <meta name="DC.title.Subtitle" content="subtitulo do texto" />
+     <meta name="DC.publisher" class="editeur" content="Editora" />
+      <meta name="DC.language" content="pt" />
+  <meta name="DC.date" class="completeDate" content="1800-01-31" />
+  <meta name="DC.date" class="year" content="1800" />
+   <meta name="DC.rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)" />
+    <meta name="DC.source" content="Revista" />
+    <meta name="DC.relation.isPartOf" content="true" />
+ 
+  <meta name="url" content="endereco URL do artigo, http etc" />
+  <meta name="DC.identifier" content="endereco URL do artigo, http etc" />
+  <meta name="DC.identifier" class="issn" content="ISSN" />
+
+<!--Utilisation de MARCREL pour specifier le role du "contributeur" en Dublin core
+    drt = director -->
+  <meta name="director" content=" " />
+  <meta name="DC.contributor.drt" content=" " />
+  <meta name="MARCREL.drt" content=" " />
+
+<!--Auteur de l'article -->
+  <meta name="author" content="Nome do Autor SOBRENOME DO AUTOR" />
+  <meta name="DC.creator" content="Nome do Autor SOBRENOME DO AUTOR" />
+
+<!--Resumes -->
+  <meta name="description" xml:lang="pt" lang="pt" content="Resumo" />
+  <meta name="DC.description" xml:lang="pt" lang="pt" content="Resumo" />
+
+<!--Mots cles auteurs -->
+  <meta name="keywords" xml:lang="pt" lang="pt" content="palavra chave, palavra-chave" />
+
+
+<!--  traducteur avec specification MARCREL -->
+
+
+  <!--  transcripteur avec specification MARCREL -->
+
+<!--  redacteur avec specification MARCREL -->
+
+
+<!-- schema citation : Indexation pour Google Scholar  -->
+  <meta name="citation_journal_title" content="Revista" />
+  <meta name="citation_publisher" content="Editora" />
+  <meta name="citation_authors" content="Nome do Autor SOBRENOME DO AUTOR" />
+  <meta name="citation_title" content="Titulo do Texto" />
+  <meta name="citation_subtitle" content="subtitulo do texto" />
+  <meta name="citation_publication_date" content="1800/01/31" />
+  <meta name="citation_online_date" content="1800/01/31" />
+  <meta name="citation_issn" content="ISSN" />
+   <meta name="citation_issue" content="" />
+  <meta name="citation_language" content="pt" />
+
+  <meta name="citation_abstract" xml:lang="pt" lang="pt" content="Resumo" />
+
+
+  <meta name="citation_keywords" xml:lang="pt" lang="pt" content="palavra chave, palavra-chave" />
+
+
+<!--PRISM schema - Publishing Requirements for Industry Standard Metadata
+Schema specialise pour les revues et journaux-->
+  <meta name="prism.url" content="endereco URL do artigo, http etc"/>
+  <meta name="prism.publicationName" content="Revista"/>
+  <meta name="prism.corporateEntity" content="Editora"/>
+  <meta name="prism.issueName" content=""/>
+  <meta name="prism.number" content="" />
+  <meta name="prism.publicationDate" content="1800/01/31"/>
+  <meta name="prism.genre" content="Essai"/>
+  <meta name="prism.issn" content="ISSN"/>
+  <meta name="prism.teaser" xml:lang="pt" lang="pt" content="Resumo" />
+
+
+<!--RDFa pour ajout des metadonnees DC-->
+  <meta property="dc:format" content="text/html" />
+  <meta property="dc:identifier" content="endereco URL do artigo, http etc" />
+  <meta property="dc:identifier" content="ISSN" />
+  <meta property="dc:title" content="Titulo do Texto" />
+  <meta property="dc:title.Main" content="Titulo do Texto" />
+  <meta property="dc:title.Subtitle" content="subtitulo do texto" />
+  <meta property="dc:publisher" content="Editora" />
+  <meta property="dc:language" content="pt" />
+  <meta property="dc:type" content="journalArticle" />
+  <meta property="dcterm:created" content="1800/01/31" />
+  <meta property="dc:rights" content="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0)" />
+  <meta property="dc:relation.isPartOf" content="" />
+  <meta property="dc:source" content="Revista" />
+
+  <meta property="dc:creator" content="Nome do Autor SOBRENOME DO AUTOR" />
+
+
+
+  <meta property="dcterms:abstract" xml:lang="pt" lang="pt" content="Resumo" />
+
+
+
+
+<!--Fin des metadonnees dans le Head-->
+
+<!--Balise Title pour affichage titre dans le navigateur-->
+<!-- <title>Titulo do Texto</title>-->
+
+  <title>Titulo do Texto : subtitulo do texto</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+</head>
+
+
+<body>
+<nav id="TOC">
+<ul>
+<li><a href="#isso-&eacute;-um-t&iacute;tulo-1">Isso &eacute; um t&iacute;tulo 1</a><ul>
+<li><a href="#agora-um-t&iacute;tulo-subordinado">Agora, um t&iacute;tulo subordinado</a></li>
+</ul></li>
+</ul>
+</nav>
+
+
+<!--indexations FOAF-->
+<header>
+<div class="indexations-foaf" style="display:none">
+<!--indexation FOAF pour auteur de l'article-->
+  <div property="http://purl.org/dc/terms/creator">
+    <div vocab="http://xmlns.com/foaf/0.1/" typeof="Person" class="foaf-author">
+       <span property="familyName">SOBRENOME DO AUTOR</span>
+       <span property="firstName">Nome do Autor</span>
+       <span property="openid">https://orcid.org/0000-0003-0608-0542</span>
+    </div>
+  </div>
+
+<!--indexation FOAF pour redacteur du dossier-->
+
+<!--indexation FOAF pour directeur de la revue-->
+  <div property="http://purl.org/dc/terms/contributor.drt">
+    <div vocab="http://xmlns.com/foaf/0.1/" typeof="Person" class="foaf-director">
+      <span property="familyName"></span>
+      <span property="firstName"></span>
+      <span property="gender"></span>
+      <span property="openid"></span>
+    </div>
+   </div>
+
+<!--indexation FOAF pour traducteur de l'article -->
+
+<!--indexation FOAF pour transcripteur des propos (entretiens, d&eacute;bats) -->
+</div> <!-- End indexation FOAF -->
+
+
+<!--Integration schema "ScholarlyArticle"-->
+<div vocab="http://schema.org/" typeof="ScholarlyArticle" resource="#article" id="schema-scholarly-article">
+
+<!--Indexation titre/soustitre de l'article-->
+  <span property="name">Titulo do Texto</span><br />
+  <span property="name">subtitulo do texto</span><br />
+
+<!--Indexation auteur de l'article-->
+  <span property="author">Nome do Autor SOBRENOME DO AUTOR</span><br />
+
+<!--Indexation editeur-->
+  <span resource="#periodical" style="display:none">
+    <span property="publisher">Editora</span><br />
+    <span property="issn">ISSN</span>
+  </span>
+
+<!--Indexation revue-->
+  <div property="isPartOf" typeof="PublicationIssue" resource="#issue">
+    <span typeof="Periodical" resource="#periodical" style="display:none">
+      <span property="name" style="display:none">Revista</span>
+    </span>
+    <span property="datePublished">1800/01/31</span>
+
+<!--Indexation dossier-->
+    <span property="isPartOf" typeof="PublicationVolume" resource="#periodical" class="titreDossier"  style="display:none"></span>
+  </div>
+
+<!-- Indexation resumes -->
+  <div class="description">
+    <div property="description" class="resume" lang="pt">Resumo</div>
+  </div>
+
+<!--Indexation traduction-->
+
+<!-- Indexation mots cles controles -->
+
+</div> <!-- end Integration schema "ScholarlyArticle"-->
+
+<!--Indexation mots cles auteurs-->
+<div class="authorKeywords_pt" vocab="http://purl.org/dc/terms/" lang="pt">
+  <span property="subject">palavra chave, palavra-chave</span>
+</div>
+
+</header>
+<hr id="startArticle">
+<!--Corps de l'article-->
+<article>
+  <section id="isso-&eacute;-um-t&iacute;tulo-1" class="level1">
+  <h1>Isso &eacute; um t&iacute;tulo 1</h1>
+  <section id="agora-um-t&iacute;tulo-subordinado" class="level2">
+  <h2>Agora, um t&iacute;tulo subordinado</h2>
+  <p>Come&ccedil;ando um texto, com um <a href="http://askesis.hypotheses.org">link</a>.</p>
+  <p>Testando pagina com metadata</p>
+  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&rsquor;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&rsquor;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p>
+  <!-- codigo -->
+  </section>
+  </section>
+  </article>
+</body>
+</html>
