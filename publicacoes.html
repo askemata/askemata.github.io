@@ -1,87 +1,190 @@
-<!DOCTYPE html>
-<html>
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="Zettlr" />
+  <meta name="date" content="" />
+  <title></title>
+  <style type="text/css">
+  * {
+    box-sizing: border-box;
+  }
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>publicacoes</title>
+  a {
+    color: #FF7C3B;
+    text-decoration: none;
+  }
 
+  a:hover {
+    text-decoration: underline;
+  }
 
-<style type="text/css">
+  hr {
+    border: none;
+    border-bottom: 1px solid #999;
+    width: 80%;
+  }
 
-</style>
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
 
+  body {
+    background-color: white;
+    color: #333;
+    font-family: 'DejaVu', 'Georgia', 'Times New Roman', 'Times', serif;
+  }
 
-</head>
+  article {
+    width: 50%;
+    font-size: 1.5em;
+    margin: 0 auto;
+    line-height: 150%;
+  }
 
-<body>
+  /* Better display on printing */
+  @media print {
+    article {
+      width: 90%;
+      font-size: 12pt;
+      margin: 0 auto;
+      line-height: 150%;
+    }
+  }
 
-<p><title>Askemata</title>
-<link rel="stylesheet" type="text/css" href="styles2.css" />
-<style>
-table {
+  article p {
+    hyphens: auto;
+    text-align: justify;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway', 'Lato', 'Liberation sans', 'Helvetica', sans-serif;
+    color: #FF7C3B;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  blockquote {
+    font-size: 80%;
+    color: rgba(120, 120, 120, 1);
+    margin: 2% 5%;
+    line-height: 120%;
+  }
+
+  table {
+    border-collapse: collapse;
     width: 100%;
-    font-weight: lighter;
-}
-</style></p>
+    font-size: 70%;
+    font-family: 'Raleway', 'Lato', 'Liberation sans', 'Helvetica', sans-serif;
+  }
 
-<p><!-- asdf asdf adsf  --></p>
+  th, td {
+    padding: 4px 20px;
+    border-bottom: 1px solid #333;
+  }
 
-<table>
-<thead>
-<tr>
-<th><div style="font-size:xx-large"># askêmata</div></th>
-<th style="text-align: right"></th>
-<th style="text-align: right"><div style="text-align: right"> [ <a href="index.html" title="início">início</a> ] [ <a href="web.html" title="referências em rede: textos, efemérides e atualizações">conteúdos</a> ]  [ <a href="publicacoes.html" title="lista de publicações">publicações</a> ]   [ <a href="https://philpeople.org/profiles/marcio-miotto" title="repositório de minhas publicações acadêmicas">philpapers</a> ] [ <a href="sobre.html" title="créditos, contato etc.">sobre</a> ]</div></th>
-</tr>
-</thead>
+  /* List of classes taken from the skylighting lib */
+  /* See: https://github.com/jgm/skylighting/blob/master/skylighting-core/src/Skylighting/Format/HTML.hs */
 
-<tbody>
-</tbody>
-</table>
+  /* Colors: Solarized theme (light) */
+  /* See: https://ethanschoonover.com/solarized/ */
 
-<p></p>
-<p></p>
+  /* Specific implementation: Taken from the GEdit theme (light) */
+  /* See: https://github.com/altercation/solarized/blob/master/gedit/solarized-light.xml */
 
-<h1 id="toc_0">Lista de Publicações</h1>
+  /* Generic styles */
+  pre.sourceCode {
+    color: #657b83;
+    background-color: #fdf6e3;
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, .05);
+    padding: 2px;
+    overflow: auto;
+  }
 
-<p><em>Capítulos de livro, artigos e traduções:</em></p>
+  /* All classes, taken from skylighting lib */
+  .sourceCode .kw { color: #859900; font-weight: bold; } /* Keyword */
+  .sourceCode .dt { color: #b58900; } /* Datatype */
+  .sourceCode .df { color: #d33682; } /* Decimal values*/
+  .sourceCode .bn { color: #d33682; } /* base-n-integers */
+  .sourceCode .fl { color: #d33682; } /* Floats */
+  .sourceCode .ch { color: #2aa198; } /* Character */
+  .sourceCode .st { color: #2aa198; } /* String */
+  .sourceCode .vs { color: #2aa198; } /* Verbatim String */
+  .sourceCode .ss { color: #2aa198; } /* Special String */
+  .sourceCode .co { color: #586e75; font-style: italic; } /* Comment */
+  .sourceCode .ot { font-weight: bold; } /* Other token */
+  .sourceCode .al { color: #d33682; background-color: #073642; } /* Alert */
+  .sourceCode .fu { color: #268bd2; } /* Function name */
+  .sourceCode .re {} /* Region marker */
+  .sourceCode .er { color: #dc322f; font-weight: bold; } /* Error */
+  .sourceCode .cn { color: #2aa198; } /* Constant */
+  .sourceCode .sc { color: #dc322f; } /* Special character */
+  .sourceCode .im { color: #6c71c4; font-weight: bold; } /* Import statement */
+  .sourceCode .do { color: #dc322f; } /* Documentation string */
+  .sourceCode .an { color: #2aa198; } /* Annotation */
+  .sourceCode .cv { color: #6c71c4; } /* Comment var */
+  .sourceCode .va { color: #268bd2; } /* Variable */
+  .sourceCode .cf { color: #859900; } /* Control Flow (if, else, return) */
+  .sourceCode .op {} /* Operator */
+  .sourceCode .bu { color: #b58900; } /* Builtin function/class/identifier */
+  .sourceCode .ex { color: #268bd2; } /* Extension */
+  .sourceCode .pp { color: #cb4b16; } /* Preprocessor, like #import in C++ */
+  .sourceCode .at { color: #dc322f; } /* Attribute */
+  .sourceCode .in { color: #586e75; } /* Information */
+  .sourceCode .wa { color: #cb4b16; } /* Warning */
+  </style>
 
-<p>MIOTTO, Marcio Luiz. Gustav Fechner e a alma do mundo. <em>Revista Helius</em>, v. 3, n. 2, fasc. 2, p. 852–906, 2020. Disponível em: &lt;//helius.uvanet.br/index.php/helius/article/view/208&gt;.</p>
+<!-- Pandoc variables -->
+<meta name="keywords" content="true" />
 
-<p>MIOTTO, Marcio Luiz. De Canguilhem a Foucault, em torno da Psicologia. <em>Cadernos de Ética e Filosofia Política</em>, v. 2, n. 35, p. 112–142, 2019. Disponível em: <a href="https://www.revistas.usp.br/cefp/article/view/162285">https://www.revistas.usp.br/cefp/article/view/162285</a>.</p>
+<!-- Additional CSS in case the user has passed it -->
 
-<p>MIOTTO, Marcio Luiz. A Psicologia entre o “longo passado” e a “curta história”. <em>Revista Dissertatio de Filosofia</em>, v. 47, n. 0, p. 95–134, 2018. Disponível em: <a href="https://periodicos.ufpel.edu.br/ojs2/index.php/dissertatio/article/view/9996">https://periodicos.ufpel.edu.br/ojs2/index.php/dissertatio/article/view/9996</a>.</p>
-
-<p>MIOTTO, M. Histórias das Ciências e os “Fundamentos Históricos” da Psicologia | <em>Temporalidades</em>. Temporalidades, v. 10, n. 26, p. 129–158, 2018. Disponível em: <a href="https://periodicos.ufmg.br/index.php/temporalidades/article/view/6090">https://periodicos.ufmg.br/index.php/temporalidades/article/view/6090</a>. </p>
-
-<p>MIOTTO, Marcio; TEMPLE, Giovana. Sobre a Questão Do Sujeito Em Michel Foucault. In: TEMPLE, Giovana (Org.). <em>Subjetividade no Pensamento Contemporâneo - Uma Introdução</em>. [s.l.]: Curitiba: Appris, 2017, p. 227–266. Disponível em: <a href="https://philpapers.org/rec/MIOSAQ">https://philpapers.org/rec/MIOSAQ</a>.</p>
-
-<p>MIOTTO, Marcio Luiz; MIOTTO, Marcio Luiz. Da Psicologia à Questão da “Morte do Homem” em Michel Foucault. <em>Trans/Form/Ação</em>, v. 39, n. 2, p. 119–146, 2016. Disponível em: <a href="http://www.scielo.br/scielo.php?script=sci_abstract&amp;pid=S0101-31732016000200119&amp;lng=pt&amp;nrm=iso&amp;tlng=pt">http://www.scielo.br/scielo.php?script=sci_abstract&amp;pid=S0101-31732016000200119&amp;lng=pt&amp;nrm=iso&amp;tlng=pt</a>. </p>
-
-<p>MENGAL, Paul; MIOTTO, Márcio Luiz. PARA UMA HISTÓRIA DA PSICOLOGIA. <em>Revista Ideação</em>, v. 1, n. 34, p. 355–374, 2016. Disponível em: <a href="http://periodicos.uefs.br/index.php/revistaideacao/article/view/1268">http://periodicos.uefs.br/index.php/revistaideacao/article/view/1268</a>. </p>
-
-<p>MENGAL, Paul; MIOTTO, Márcio Luiz. NASCIMENTOS DA PSICOLOGIA: A NATUREZA E O ESPÍRITO. <em>Revista Ideação</em>, v. 32, n. 1, p. 259–288, 2015. Disponível em: <a href="http://periodicos.uefs.br/index.php/revistaideacao/article/view/1304">http://periodicos.uefs.br/index.php/revistaideacao/article/view/1304</a>. </p>
-
-<p>MIOTTO, Marcio. Sobre o Infinito Na Idade Clássica Em Michel Foucault. <em>Revista Ideação</em>, v. 27, n. 1, p. 157–186, 2013. Disponível em: <a href="https://philpapers.org/rec/MIOSOI">https://philpapers.org/rec/MIOSOI</a>.</p>
-
-<p>FOUCAULT, Michel; TRADUTOR, Marcio Miotto-. A Pesquisa Científica E a Psicologia. In: NASCIMENTO, Wanderson (Org.). <em>Espaço Michel Foucault</em>. [s.l.: s.n.], 2010. Disponível em: <a href="https://philpapers.org/rec/FOUAPC">https://philpapers.org/rec/FOUAPC</a>.</p>
-
-<p>MIOTTO, Marcio. A Consciência Entre o Formalismo E a Psicologia, Em Sartre. <em>AdVerbum</em>, v. 3, n. 2, p. 144–155, 2008. Disponível em: <a href="https://philpapers.org/rec/MIOACE">https://philpapers.org/rec/MIOACE</a>.</p>
-
-<p>MIOTTO, Marcio. O Problema Do Homem E a Dispersão da Psicologia. <em>AdVerbum</em>, v. 2, n. 2, p. 128–136, 2007. Disponível em: <a href="https://philpapers.org/rec/MIOOPD">https://philpapers.org/rec/MIOOPD</a>.</p>
-
-<p>MIOTTO, Marcio. Os a Priori da Psicologia Em História da Loucura. <em>Acheronta</em>, v. 22, p. 282–290, 2005. Disponível em: <a href="https://philpapers.org/rec/MIOOAP">https://philpapers.org/rec/MIOOAP</a>.</p>
-
-<p>MIOTTO, Marcio. Sobre a Alteridade E a Exclusão No Trabalho. <em>Acheronta – Revista de Psicoanálisis y Cultura</em>, v. 18, p. 160–163, 2003. Disponível em: <a href="https://philpapers.org/rec/MIOSAA">https://philpapers.org/rec/MIOSAA</a>.</p>
-
-<p></p>
-<p></p>
-
-
-
-
+<!-- Include MathJax CDN, if applicable -->
+</head>
+<body>
+  <!-- Render in article for reader view enabling -->
+    <article>
+    <table style="width:100%" border="0">
+    <tr border="0">
+    <td border="0">
+    <div style="font-size:xx-large">
+    # askêmata
+    </div>
+    </td>
+    <td border="0">
+    <div style="text-align: right">
+    <div style="font-size:small">
+    [ <a href="index.html" title="início">início</a> ] [ <a href="web.html" title="referências em rede: textos, efemérides e atualizações">conteúdos</a> ] [ <a href="publicacoes.html" title="lista de publicações">publicações</a> ] [ <a href="https://philpeople.org/profiles/marcio-miotto" title="repositório de minhas publicações acadêmicas">philpapers</a> ] [ <a href="sobre.html" title="créditos, contato etc.">sobre</a> ]
+    </div>
+    </div>
+    </td>
+    </tr>
+    </table>
+    <p><br></p>
+    <h1 id="lista-de-publicações">Lista de Publicações</h1>
+    <p><em>Capítulos de livro, artigos e traduções:</em></p>
+    <p>MIOTTO, Marcio Luiz. Gustav Fechner e a alma do mundo. <strong><em>Revista Helius</em></strong>, v. 3, n. 2, fasc. 2, p. 852–906, 2020. Disponível em: <a href="http://helius.uvanet.br/index.php/helius/article/view/208" class="uri">http://helius.uvanet.br/index.php/helius/article/view/208</a>. (disponível também em <a href="https://philpapers.org/rec/MIOGFE">https://philpapers.org/rec/MIOGFE</a> )</p>
+    <p>MIOTTO, Marcio Luiz. De Canguilhem a Foucault, em torno da Psicologia. <strong><em>Cadernos de Ética e Filosofia Política</em></strong>, v. 2, n. 35, p. 112–142, 2019. Disponível em: <a href="https://www.revistas.usp.br/cefp/article/view/162285" class="uri">https://www.revistas.usp.br/cefp/article/view/162285</a>.</p>
+    <p>MIOTTO, Marcio Luiz. A Psicologia entre o “longo passado” e a “curta história”. <strong><em>Revista Dissertatio de Filosofia</em></strong>, v. 47, n. 0, p. 95–134, 2018. Disponível em: <a href="https://periodicos.ufpel.edu.br/ojs2/index.php/dissertatio/article/view/9996" class="uri">https://periodicos.ufpel.edu.br/ojs2/index.php/dissertatio/article/view/9996</a>.</p>
+    <p>MIOTTO, M. Histórias das Ciências e os “Fundamentos Históricos” da Psicologia | <strong><em>Temporalidades</em></strong>. Temporalidades, v. 10, n. 26, p. 129–158, 2018. Disponível em: <a href="https://periodicos.ufmg.br/index.php/temporalidades/article/view/6090" class="uri">https://periodicos.ufmg.br/index.php/temporalidades/article/view/6090</a>.</p>
+    <p>MIOTTO, Marcio; TEMPLE, Giovana. Sobre a Questão Do Sujeito Em Michel Foucault. In: TEMPLE, Giovana (Org.). <strong><em>Subjetividade no Pensamento Contemporâneo - Uma Introdução</em></strong>. [s.l.]: Curitiba: Appris, 2017, p. 227–266. Disponível em: <a href="https://philpapers.org/rec/MIOSAQ" class="uri">https://philpapers.org/rec/MIOSAQ</a>.</p>
+    <p>MIOTTO, Marcio Luiz; MIOTTO, Marcio Luiz. Da Psicologia à Questão da “Morte do Homem” em Michel Foucault. <strong><em>Trans/Form/Ação</em></strong>, v. 39, n. 2, p. 119–146, 2016. Disponível em: <a href="http://www.scielo.br/scielo.php?script=sci_abstract&amp;pid=S0101-31732016000200119&amp;lng=pt&amp;nrm=iso&amp;tlng=pt" class="uri">http://www.scielo.br/scielo.php?script=sci_abstract&amp;pid=S0101-31732016000200119&amp;lng=pt&amp;nrm=iso&amp;tlng=pt</a>.</p>
+    <p>MENGAL, Paul; MIOTTO, Márcio Luiz. PARA UMA HISTÓRIA DA PSICOLOGIA. <strong><em>Revista Ideação</em></strong>, v. 1, n. 34, p. 355–374, 2016. Disponível em: <a href="http://periodicos.uefs.br/index.php/revistaideacao/article/view/1268" class="uri">http://periodicos.uefs.br/index.php/revistaideacao/article/view/1268</a>.</p>
+    <p>MENGAL, Paul; MIOTTO, Márcio Luiz. NASCIMENTOS DA PSICOLOGIA: A NATUREZA E O ESPÍRITO. <strong><em>Revista Ideação</em></strong>, v. 32, n. 1, p. 259–288, 2015. Disponível em: <a href="http://periodicos.uefs.br/index.php/revistaideacao/article/view/1304" class="uri">http://periodicos.uefs.br/index.php/revistaideacao/article/view/1304</a>.</p>
+    <p>MIOTTO, Marcio. Sobre o Infinito Na Idade Clássica Em Michel Foucault. <strong><em>Revista Ideação</em></strong>, v. 27, n. 1, p. 157–186, 2013. Disponível em: <a href="https://philpapers.org/rec/MIOSOI" class="uri">https://philpapers.org/rec/MIOSOI</a>.</p>
+    <p>FOUCAULT, Michel; TRADUTOR, Marcio Miotto-. A Pesquisa Científica E a Psicologia. In: NASCIMENTO, Wanderson (Org.). <strong><em>Espaço Michel Foucault</em></strong>. [s.l.: s.n.], 2010. Disponível em: <a href="https://philpapers.org/rec/FOUAPC" class="uri">https://philpapers.org/rec/FOUAPC</a>.</p>
+    <p>MIOTTO, Marcio. A Consciência Entre o Formalismo E a Psicologia, Em Sartre. <strong><em>AdVerbum</em></strong>, v. 3, n. 2, p. 144–155, 2008. Disponível em: <a href="https://philpapers.org/rec/MIOACE" class="uri">https://philpapers.org/rec/MIOACE</a>.</p>
+    <p>MIOTTO, Marcio. O Problema Do Homem E a Dispersão da Psicologia. <em>AdVerbum</em>, v. 2, n. 2, p. 128–136, 2007. Disponível em: <a href="https://philpapers.org/rec/MIOOPD" class="uri">https://philpapers.org/rec/MIOOPD</a>.</p>
+    <p>MIOTTO, Marcio. Os a Priori da Psicologia Em História da Loucura. <strong><em>Acheronta</em></strong>, v. 22, p. 282–290, 2005. Disponível em: <a href="https://philpapers.org/rec/MIOOAP" class="uri">https://philpapers.org/rec/MIOOAP</a>.</p>
+    <p>MIOTTO, Marcio. Sobre a Alteridade E a Exclusão No Trabalho. <strong><em>Acheronta – Revista de Psicoanálisis y Cultura</em></strong>, v. 18, p. 160–163, 2003. Disponível em: <a href="https://philpapers.org/rec/MIOSAA" class="uri">https://philpapers.org/rec/MIOSAA</a>.</p>
+    <p>
+    </p>
+    <p>
+    </p>
+  </article>
 </body>
-
 </html>
