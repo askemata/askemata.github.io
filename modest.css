@@ -71,13 +71,15 @@ pre {
 
 a,
 a:visited {
-  color: #3498db;
+  color: #3366ff;
+  text-decoration: none;
 }
 
 a:hover,
 a:focus,
 a:active {
-  color: #2980b9;
+  color: #d86d4e;
+  text-decoration: underline;
 }
 
 .modest-no-decoration {
@@ -131,7 +133,7 @@ h1,
 
 h2,
 .modest-h2 {
-  font-size: 2.827rem;
+  font-size: 2.427rem;
 }
 
 h3,
@@ -181,7 +183,7 @@ html {
 }
 
 body {
-  color: #444;
+  color: #606060;
   font-family: Georgia, 'Open Sans Condensed', sans-serif;
   font-weight: 300;
   margin: 0 auto;
@@ -208,9 +210,15 @@ h3 {
   text-align: center;
 }
 
-blockquote {
-  border-left: 8px solid #fafafa;
-  padding: 1rem;
+blockquote p {
+  font-size: 1.1rem;
+  font-style: normal;
+  text-align: justify;
+  line-height: 1.6em;
+  margin: 1rem auto 1rem;
+  padding: 30px 30px 30px 30px;
+  max-width: 41rem;
+  background: #fafafa url(quote.gif) no-repeat; color: #666;
 }
 
 pre,
