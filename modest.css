@@ -28,7 +28,7 @@
 
   pre,
   blockquote {
-    border: 1px solid #999;
+    border: 0px solid #999;
     page-break-inside: avoid;
   }
 
@@ -85,7 +85,7 @@ a:active {
 }
 
 html {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 @media screen and (min-width: 32rem) and (max-width: 48rem) {
@@ -106,7 +106,7 @@ body {
 
 p,
 .modest-p {
-  font-size: 1rem;
+  font-size: 1.2rem;
   margin-bottom: 1.3rem;
 }
 
