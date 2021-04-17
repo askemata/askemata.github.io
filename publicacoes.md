@@ -3,6 +3,7 @@ Lista de Publicações
 
 Capítulos de livro, artigos e traduções:
 ----------------------------------------
+![](imec.jpeg)
 
 MIOTTO, Marcio Luiz. Gustav Fechner e a alma do mundo. ***Revista Helius***, v. 3, n. 2, fasc. 2, p. 852–906, 2020. Disponível em: <http://helius.uvanet.br/index.php/helius/article/view/208>. (disponível também em [https://philpapers.org/rec/MIOGFE](https://philpapers.org/rec/MIOGFE) )
 
