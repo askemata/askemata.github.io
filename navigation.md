@@ -18,3 +18,5 @@
 [philpapers](https://philpeople.org/profiles/marcio-miotto)
 - - - -
 [sobre](sobre.md)
+
+[gimmick:theme](readable)
