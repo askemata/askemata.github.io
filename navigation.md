@@ -1,8 +1,7 @@
 # askemata
 
-[início](index.md)
-- - - -
-[primeiro menu]()
+
+[conteúdos]()
 
   * # SubMenu Heading 1
   * [SubMenu Item 1](subitem1.md)
@@ -14,6 +13,8 @@
   * # SubMenu Heading 3
   * [SubMenu Item 3](subitem3.md)
 
-[Menu Item 2](item2.md)
+[publicações](publicacoes.md)
 - - - -
-[Menu Item 3](item3.md)
+[philpapers](https://philpeople.org/profiles/marcio-miotto)
+- - - -
+[sobre](sobre.md)
