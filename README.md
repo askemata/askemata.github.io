@@ -1,3 +1,3 @@
 # Askemata
 
-Arquivos para o site estático askemata.github.io
+Arquivos para o website estático askemata.github.io
