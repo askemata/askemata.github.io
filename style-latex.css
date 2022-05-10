@@ -580,3 +580,10 @@ h5,
 h6 {
   margin-bottom: 0.8rem;
 }
+
+ul, li {
+  font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-size: 1.3rem;
+  line-height: 1.5
+
+}
