@@ -143,7 +143,7 @@ body {
   counter-reset: sidenote-counter;
 
   color: hsl(0, 5%, 10%);
-  background-color: hsl(210, 20%, 98%);
+  background-color: #ffffff;
 
   text-rendering: optimizeLegibility;
 }
