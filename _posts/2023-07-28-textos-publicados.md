@@ -1,5 +1,7 @@
 # Lista de textos publicados
 
+Artigos, capítulos de livro, traduções e transcrições.
+
 MIOTTO, M. Entre Jaspers e o "jovem Foucault": Antropologia, Loucura, Obra e Civilização. **Araripe** 3 (2): 30-114. 2022 [[Philpapers](https://philpapers.org/rec/MIOEJE)]
 
 MIOTTO, M. Michel Foucault e A Questão Antropológica: precisões históricas e conceituais. **Lampião** 3 (1): 125-169, 2022 [[Philpapers](https://philpapers.org/rec/MIOMFE)] [[Lampião](https://www.seer.ufal.br/index.php/lampiao/article/view/15622)]  [[HAL](https://hal.science/hal-04119186)]
@@ -12,7 +14,7 @@ MIOTTO, Marcio Luiz. De Canguilhem a Foucault, em torno da Psicologia. **Caderno
 
 MIOTTO, Marcio Luiz. A Psicologia entre o “longo passado” e a “curta história”. **Revista Dissertatio de Filosofia**, v. 47, n. 0, p. 95–134, 2018. Disponível em: <https://periodicos.ufpel.edu.br/ojs2/index.php/dissertatio/article/view/9996>. [[Philpapers](https://philpapers.org/rec/LUIAPE)] [[DOI](http://dx.doi.org/10.15210/dissertatio.v47i0.9996)]
 
-MIOTTO, M. Histórias das Ciências e os “Fundamentos Históricos” da Psicologia | **Temporalidades**. Temporalidades, v. 10, n. 26, p. 129–158, 2018. Disponível em: <https://periodicos.ufmg.br/index.php/temporalidades/article/view/6090>. [[Philpapers](https://philpapers.org/rec/LUIHDC)]
+MIOTTO, M. Histórias das Ciências e os “Fundamentos Históricos” da Psicologia. **Temporalidades**. Temporalidades, v. 10, n. 26, p. 129–158, 2018. Disponível em: <https://periodicos.ufmg.br/index.php/temporalidades/article/view/6090>. [[Philpapers](https://philpapers.org/rec/LUIHDC)]
 
 MIOTTO, Marcio; TEMPLE, Giovana. Sobre a Questão Do Sujeito Em Michel Foucault. In: TEMPLE, Giovana (Org.). **Subjetividade no Pensamento Contemporâneo - Uma Introdução**. [s.l.]: Curitiba: Appris, 2017, p. 227–266. Disponível em: <https://philpapers.org/rec/MIOSAQ>. [[Philpapers](https://philpapers.org/rec/MIOSAQ)] [[link](https://www.editoraappris.com.br/produto/1947-subjetividade-no-pensamento-do-sculo-xx-uma-introduo)]
 
