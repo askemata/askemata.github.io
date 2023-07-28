@@ -1,2 +1,2 @@
 Nestes exercícios há links, textos, traduções, anotações e outras referências sobre: História da Filosofia, História das Ciências, História das Ciências Humanas e História da Psicologia. Temos um [blog no diretório hypotheses.org](https://askesis.hypotheses.org) e um site sobre [recursos de internet para pesquisadores em ciências humanas](https://askemata.github.io/recursos/). 
-Também aqui: alguns textos publicados, a página [PhilPapers](http://philpeople.org/profiles/marcio-miotto), e meu [ORCID](https://orcid.org/0000-0003-0608-0542).
+Também aqui: alguns textos publicados, a página [PhilPapers](http://philpeople.org/profiles/marcio-miotto) e meu [ORCID](https://orcid.org/0000-0003-0608-0542).
