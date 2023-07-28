@@ -25,8 +25,8 @@ theme: "minima"
 rss: rss
 
 header_pages:
-  - https://askemata.github.io/2023/07/28/textos-publicados.html
-  - archive.html
+  - textos.md
+  - archive.md
   - books.md
   - bookmarks.md
 
