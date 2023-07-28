@@ -1,5 +1,3 @@
-Here you can say lots of fun things about your site.
-
-Maybe say a some things about yourself.
-
-Or maybe what you plan to blog about.
+Agrupo aqui links, textos, traduções, anotações e outras referências sob os seguintes temas: História da Filosofia, História das Ciências, História das Ciências Humanas e História da Psicologia.  
+Este espaço também se articula com um [blog situado no diretório acadêmico hypotheses.org](https://askesis.hypotheses.org) e um site sobre [recursos para pesquisadores em ciências humanas](https://askemata.github.io/recursos/) não habituados com programação. 
+Também aqui: alguns textos publicados, bem como minhas páginas [PhilPapers](http://philpeople.org/profiles/marcio-miotto), [ORCID](https://orcid.org/0000-0003-0608-0542) e Academia (embora eu privilegie repositórios públicos).
