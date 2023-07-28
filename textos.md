@@ -1,4 +1,4 @@
-# Lista de textos publicados
+# Publicações
 
 ## Artigos, capítulos de livro, traduções e transcrições.
 
