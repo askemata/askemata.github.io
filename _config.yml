@@ -24,6 +24,12 @@ theme: "minima"
 
 rss: rss
 
+header_pages:
+  - https://askemata.github.io/2023/07/28/textos-publicados.html
+  - archive.html
+  - books.md
+  - bookmarks.md
+
 kramdown:
   syntax_highlighter_opts:
     disable: true
