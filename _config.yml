@@ -6,6 +6,7 @@ description: "Um site sobre exercícios em filosofia, ciências humanas e psicol
 # All of these are optional and can be removed or commented out
 # email: "example@mail.com"
 mastodon_username: "@askesis@qoto.org"
+askesis_username: "https://askesis.hypotheses.org"
 # twitter_username: "twitteruser"
 github_username: "githubuser"
 linkedin_username: "linkedinuser"
