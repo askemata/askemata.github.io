@@ -26,4 +26,7 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ```
 , de onde se vê, dentre outras funcionalidades, também a possibilidade de confecção de tags para separar os posts por assunto no Arquivo. [Esse texto](https://blog.nandomoreira.dev/usando-categorias-e-tags-no-jekyll), em português, explica um pouco mais a implementação de tags e categorias.
 
-Este post é um *work in progress*
+Este post é um *work in progress*[^1]
+
+
+[^1]: Testando nota de rodapé.
