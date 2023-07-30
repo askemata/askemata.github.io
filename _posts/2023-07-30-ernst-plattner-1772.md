@@ -2,10 +2,9 @@
 layout: post
 title: "Ernst Plattner e a antropologia médica e filosófica (1772)"
 tags: Plattner Antropologia
-image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 
-# Ernst Plattner e a antropologia médica e filosófica (1772)
+# Ernst Plattner e a antropologia médica e filosófica (1772) 
 
 Há algum tempo Roberto Palaia e John Zamitto já havima escrito sobre Ernst Plattner, autor cuja bibliografia primária e secundária era há alguns anos difícil de encontrar:
 
