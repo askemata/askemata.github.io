@@ -6,7 +6,7 @@ tags: Plattner Antropologia
 
 # Ernst Plattner e a antropologia médica e filosófica (1772) 
 
-Há algum tempo Roberto Palaia e John Zamitto já havima escrito sobre Ernst Plattner, autor cuja bibliografia primária e secundária era há alguns anos difícil de encontrar:
+Há algum tempo Roberto Palaia e John Zamitto já haviam escrito sobre Ernst Plattner, autor cuja bibliografia primária e secundária era há alguns anos difícil de encontrar por aqui:
 
 ```
 ZAMMITO, J. H. Médecin‐philosoph : Persona for Radical Enlightenment. Intellectual History Review, v. 18, n. 3, p. 427–440, jan. 2008. doi: 10.1080/17496970802319334
