@@ -5,7 +5,7 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 # Criando facilmente um blog em html estático no Github
 
-É na página de [Chad Baldwin](https://chadbaldwin.net/2021/03/14/how-to-build-a-sql-blog.html) que se pode encontrar uma dica fácil, na qual em poucos minutos é possível criar um blog em html estático usando o Github Pages. 
+É na página de [Chad Baldwin](https://chadbaldwin.net/2021/03/14/how-to-build-a-sql-blog.html) que se pode encontrar uma dica fácil, na qual em poucos minutos é possível criar um blog em html estático usando o *Github Pages*. 
 
 Após seguir os passos ali contidos, vale olhar também a [fonte de seu próprio blog](https://github.com/chadbaldwin/chadbaldwin.github.io/tree/main), para implementações. Ou, para quem quiser entender como funciona o Jeckyll, programa que constrói o site, [esse texto]( https://tableless.com.br/jekyll-servindo-sites-estaticos/) é bem esclarecedor.
 
@@ -24,6 +24,6 @@ tags: T-SQL
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 ```
-, de onde se vê, dentre outras funcionalidades, também a possibilidade de confecção de tags para separar os posts por assunto no Arquivo. 
+, de onde se vê, dentre outras funcionalidades, também a possibilidade de confecção de tags para separar os posts por assunto no Arquivo. [Esse texto](https://blog.nandomoreira.dev/usando-categorias-e-tags-no-jekyll), em português, explica um pouco mais a implementação de tags e categorias.
 
 Este post é um *work in progress*
