@@ -87,6 +87,24 @@ Cujo resultado é:
 > [!WARNING]  
 > Critical content demanding immediate user attention due to potential risks.
 
+Usando `callouts`:
+
+```
+{% note %}
+
+**Note:** Owners and administrators can add outside collaborators to a repository.
+
+{% endnote %}
+```
+
+Cujo resultado é
+
+{% note %}
+
+**Note:** Owners and administrators can add outside collaborators to a repository.
+
+{% endnote %}
+
 Este post é um *work in progress*[^1]
 
 
