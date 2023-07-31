@@ -48,10 +48,10 @@ Conteúdo a ser expandido
 Há também códigos para `admonitions`:
 
 ```
-> **Note**
+> **Note**  
 Your note text here
 
-> **Warning**
+> **Warning**  
 Your warning text here
 ```
 
