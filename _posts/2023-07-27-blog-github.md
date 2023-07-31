@@ -48,14 +48,20 @@ Conteúdo a ser expandido
 Há também códigos para `admonitions`:
 
 ```
-!!! note
-    You should note that the title will be automatically capitalized.
+> **Note**
+Your note text here
+
+> **Warning**
+Your warning text here
 ```
 
 Cujo resultado é
 
-!!! note
-    You should note that the title will be automatically capitalized.
+> **Note**
+Your note text here
+
+> **Warning**
+Your warning text here
 
 Ou ainda, também assim:
 
