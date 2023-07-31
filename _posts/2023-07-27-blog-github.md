@@ -43,8 +43,10 @@ Cujo resultado é:
 <details> 
 <summary>conteudo de sumário</summary>
 Conteúdo a ser expandido  
-  <br><br>
+ 
 </details>
+ <br><br>
+
 
 Há também códigos para `admonitions`:
 
@@ -91,20 +93,12 @@ Cujo resultado é:
 Usando `callouts`:
 
 ```
-{% note %}
-
-**Note:** Owners and administrators can add outside collaborators to a repository.
-
-{% endnote %}
+{% include note.html content="This is my note. All the content I type here is treated as a single paragraph. <br/><br/> Now I'm typing on a new line." %}
 ```
 
-Cujo resultado é
+cujo resultado é
 
-{% note %}
-
-**Note:** Owners and administrators can add outside collaborators to a repository.
-
-{% endnote %}
+{% include note.html content="This is my note. All the content I type here is treated as a single paragraph. <br/><br/> Now I'm typing on a new line." %}
 
 Este post é um *work in progress*[^1]
 
