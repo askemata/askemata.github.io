@@ -48,18 +48,14 @@ Conteúdo a ser expandido
 Há também códigos para `admonitions`:
 
 ```
-! This is an info message.
-!v This is a success message.
-!! Consider this a warning.
-!x This is an error message.
+!!! note
+    You should note that the title will be automatically capitalized.
 ```
 
 Cujo resultado é
 
-! This is an info message.
-!v This is a success message.
-!! Consider this a warning.
-!x This is an error message.
+!!! note
+    You should note that the title will be automatically capitalized.
 
 Ou ainda, também assim:
 
