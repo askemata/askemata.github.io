@@ -43,6 +43,7 @@ Cujo resultado é:
 <details> 
 <summary>conteudo de sumário</summary>
 Conteúdo a ser expandido  
+  <br><br>
 </details>
 
 Há também códigos para `admonitions`:
