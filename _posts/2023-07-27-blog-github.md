@@ -45,6 +45,46 @@ Cujo resultado é:
 Conteúdo a ser expandido  
 </details>
 
+Há também códigos para `admonitions`:
+
+```
+! This is an info message.
+!v This is a success message.
+!! Consider this a warning.
+!x This is an error message.
+```
+
+Cujo resultado é
+
+! This is an info message.
+!v This is a success message.
+!! Consider this a warning.
+!x This is an error message.
+
+Ou ainda, também assim:
+
+```
+> [!NOTE]  
+> Highlights information that users should take into account, even when skimming.
+
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
+> [!WARNING]  
+> Critical content demanding immediate user attention due to potential risks.
+```
+
+Cujo resultado é:
+
+> [!NOTE]  
+> Highlights information that users should take into account, even when skimming.
+
+> [!IMPORTANT]  
+> Crucial information necessary for users to succeed.
+
+> [!WARNING]  
+> Critical content demanding immediate user attention due to potential risks.
+
 Este post é um *work in progress*[^1]
 
 
