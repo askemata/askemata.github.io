@@ -24,9 +24,16 @@ tags: T-SQL
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 ```
+
 , de onde se vê, dentre outras funcionalidades, também a possibilidade de confecção de tags para separar os posts por assunto no Arquivo. [Esse texto](https://blog.nandomoreira.dev/usando-categorias-e-tags-no-jekyll), em português, explica um pouco mais a implementação de tags e categorias.
 
 É também possível inserir um mecanismo de busca. [Esse site](https://jekyllcodex.org/without-plugin/search-lunr/) tem regras simples para o mecanismo Lunr.js. 
+
+Pode-se criar uma seção recolhida assim:
+
+```
+<details> <summary>My top languages</summary> | Rank | Languages | |-----:|-----------| | 1| Javascript| | 2| Python | | 3| SQL | </details>
+```
 
 Este post é um *work in progress*[^1]
 
