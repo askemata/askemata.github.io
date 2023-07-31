@@ -32,8 +32,18 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 Pode-se criar uma seção recolhida assim:
 
 ```
-<details> <summary>My top languages</summary> | Rank | Languages | |-----:|-----------| | 1| Javascript| | 2| Python | | 3| SQL | </details>
+<details> 
+<summary>conteudo de sumário</summary>
+Conteúdo a ser expandido  
+</details>
 ```
+
+Cujo resultado é:
+
+<details> 
+<summary>conteudo de sumário</summary>
+Conteúdo a ser expandido  
+</details>
 
 Este post é um *work in progress*[^1]
 
