@@ -5,7 +5,7 @@ tags: Foucault Foucault-Manuscrits
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 
-# Michel Foucault - Le psychanalyste selon Nacht
+# Michel Foucault - Le psychanalyste selon Nacht (28730-B38-chem36)
 
 > Transcription de: FOUCAULT, M. **Le psychanalyste selon Nacht**. BNF Boite_038-36-chem - Psychanalyse des enfants. cote NAF 28730”, [s.d.]. Disponível em: <https://eman-archives.org/Foucault-fiches/items/show/7025>. 
 
