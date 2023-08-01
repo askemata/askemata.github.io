@@ -90,6 +90,18 @@ Cujo resultado é:
 > [!WARNING]  
 > Critical content demanding immediate user attention due to potential risks.
 
+É possível fazer html css simples também: 
+
+```
+<div style="width: 100%; height: 100%; background-color: lightblue;">Texto com fundo azul claro</div>
+```
+
+Cujo resultado é: 
+
+<div style="width: 100px; height: 100px; background-color: lightblue;">
+Texto com fundo azul claro
+</div>
+
 Este post é um *work in progress*[^1]
 
 
