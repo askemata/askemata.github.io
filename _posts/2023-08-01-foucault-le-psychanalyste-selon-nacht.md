@@ -7,7 +7,7 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 # Michel Foucault - Le psychanalyste selon Nacht
 
-<div style="width: 90%; height: 100%; margin: 15px; padding: 15px; background-color: #E0FFFF;">
+<div style="width: 90%; height: 100%; margin: 15px 15px 15px 15px; padding: 15px; background-color: #E0FFFF;">
     <b>Transcription de</b>: FOUCAULT, M. <b>Le psychanalyste selon Nacht</b>. BNF Boite_038-36-chem - Psychanalyse des enfants. cote NAF 28730”, [s.d.]. Disponível em: <https://eman-archives.org/Foucault-fiches/items/show/7025>. 
 </div>
 
