@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Michel Foucault: Le Psychanalyste selon Nacht"
+title: "Michel Foucault, Le Psychanalyste selon Nacht"
 description: "transcription de la fiche de lecture de Foucault BNF NAF 28730 Boite_038-36"
 tags: Foucault Foucault-fiches-de-lecture
 ---
