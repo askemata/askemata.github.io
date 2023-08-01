@@ -93,13 +93,17 @@ Cujo resultado é:
 É possível fazer html css simples também: 
 
 ```
-<div style="width: 100%; height: 100%; background-color: lightblue;">Texto com fundo azul claro</div>
+<div style="width: 90%; height: 100%; margin: 15px 15px 15px 15px; padding: 15px; background-color: #E0FFFF;">
+    "A arte da vida consiste em fazer da vida uma obra de arte"<br>
+    Gandhi
+</div>
 ```
 
 Cujo resultado é: 
 
-<div style="width: 100%; height: 100px; background-color: #E0FFFF;">
-Texto com fundo azul claro
+<div style="width: 90%; height: 100%; margin: 15px 15px 15px 15px; padding: 15px; background-color: #E0FFFF;">
+    "A arte da vida consiste em fazer da vida uma obra de arte"<br>
+    Gandhi
 </div>
 
 Este post é um *work in progress*[^1]
