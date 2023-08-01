@@ -98,7 +98,7 @@ Cujo resultado é:
 
 Cujo resultado é: 
 
-<div style="width: 100%; height: 100px; background-color: lightblue;">
+<div style="width: 100%; height: 100px; background-color: #E0FFFF;">
 Texto com fundo azul claro
 </div>
 
