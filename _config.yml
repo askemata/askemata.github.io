@@ -27,7 +27,7 @@ rss: rss
 header_pages:
   - textos.md
   - archive.md
-  - {% include search-lunr.html %}
+#  - {% include search-lunr.html %}
 
 kramdown:
   syntax_highlighter_opts:
