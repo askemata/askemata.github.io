@@ -11,9 +11,9 @@ tags: Foucault Foucault-fiches-de-lecture
 
 La necessité d'être psychanalysé est due aux raisons suivantes:
 
-* **la mémoire**: le psychanalyste ne doit pas prendre de notes; il faut que la mémoire de l'analyste se laisse pénétrer pour ce qu'il écoute, et le restitue au moment opportun.
+- **la mémoire**: le psychanalyste ne doit pas prendre de notes; il faut que la mémoire de l'analyste se laisse pénétrer pour ce qu'il écoute, et le restitue au moment opportun.
     
-* **l'attention flottante**: manière, selon Freud, de s'habituer à écouter les associations libres du malade. Laisser pénétrer dans son propre inconscient ce qui émane de celui du malade.  
+- **l'attention flottante**: manière, selon Freud, de s'habituer à écouter les associations libres du malade. Laisser pénétrer dans son propre inconscient ce qui émane de celui du malade.  
     La compréension naîtra "du contact de l'inconscient des deux partenaires"
     
-* **le contre-transfert**: ensemble des sentiments ou de réactions plus ou moins conscientes que le médecin peut lui-même éprouver à l'égard du malade. Seule sa psychanalyse peut lui donner le maximum de sécurité, et la possibilité de s'apercevoir de qui se passe.
+- **le contre-transfert**: ensemble des sentiments ou de réactions plus ou moins conscientes que le médecin peut lui-même éprouver à l'égard du malade. Seule sa psychanalyse peut lui donner le maximum de sécurité, et la possibilité de s'apercevoir de qui se passe.
