@@ -90,16 +90,6 @@ Cujo resultado é:
 > [!WARNING]  
 > Critical content demanding immediate user attention due to potential risks.
 
-Usando `callouts`:
-
-```
-{% include note.html content="This is my note. All the content I type here is treated as a single paragraph. <br/><br/> Now I'm typing on a new line." %}
-```
-
-cujo resultado é
-
-{% include note.html content="This is my note. All the content I type here is treated as a single paragraph. <br/><br/> Now I'm typing on a new line." %}
-
 Este post é um *work in progress*[^1]
 
 
