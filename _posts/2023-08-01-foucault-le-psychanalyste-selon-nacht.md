@@ -1,11 +1,11 @@
 ---
 layout: post
-title: "Michel Foucault, Le Psychanalyste selon Nacht"
+title: "Michel Foucault - Le Psychanalyste selon Nacht"
 description: "transcription de la fiche de lecture de Foucault BNF NAF 28730 Boite_038-36"
 tags: Foucault Foucault-fiches-de-lecture
 ---
 
-# Le psychanalyste selon Nacht
+# Michel Foucault - Le psychanalyste selon Nacht
 
 > Transcription de: FOUCAULT, M. **Le psychanalyste selon Nacht**. BNF Boite_038-36-chem | Psychanalyse des enfants. cote NAF 28730”, [s.d.]. Disponível em: <https://eman-archives.org/Foucault-fiches/items/show/7025>. 
 
