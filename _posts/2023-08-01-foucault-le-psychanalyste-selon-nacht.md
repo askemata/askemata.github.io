@@ -9,8 +9,8 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 <div style="width: 100%; height: 100px; background-color: #E0FFFF;">
 <blockquote>
-    Transcription de</b>: FOUCAULT, M. <b>Le psychanalyste selon Nacht</b>. BNF Boite_038-36-chem - Psychanalyse des enfants. cote NAF 28730”, [s.d.]. Disponível em: <https://eman-archives.org/Foucault-fiches/items/show/7025>. 
-</blockquote><b>
+    <b>Transcription de</b>: FOUCAULT, M. <b>Le psychanalyste selon Nacht</b>. BNF Boite_038-36-chem - Psychanalyse des enfants. cote NAF 28730”, [s.d.]. Disponível em: <https://eman-archives.org/Foucault-fiches/items/show/7025>. 
+</blockquote>
 </div>
 
 La necessité d'être psychanalysé est due aux raisons suivantes:
