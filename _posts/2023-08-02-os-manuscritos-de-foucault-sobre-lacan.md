@@ -142,6 +142,7 @@ Psychanalyse](http://www.psicanaliseefilosofia.com.br/acervo/fonctionetchamp.doc
 **La Psychanalyse**, v. 1, p. 81–166, 1956.
 
 MIOTTO, M. **Referências cruzadas entre os “Fonds Michel Foucault” (BnF)
-e outras fontes - Askesis**, 3 maio 2021. Disponível em:
+e outras fontesAskesis**, 3 maio 2021. Disponível em:
 \<<https://askesis.hypotheses.org/2049>\>
+
 
