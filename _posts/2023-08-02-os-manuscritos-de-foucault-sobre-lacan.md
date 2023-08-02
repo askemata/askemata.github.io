@@ -36,17 +36,20 @@ com alguns documentos fugindo à regra (há, por ex., um artigo de jornal
 datado de 1971). Os temas também são muito variados.
 
 Na pasta sobre Lacan (NAF 28730, Boite_038-34-chem), As notas se dividem
-em: - citações compiladas do texto *Formulações sobre a causalidade
+em: 
+
+- citações compiladas do texto *Formulações sobre a causalidade
 psíquica*, de 1946
 ([1](https://eman-archives.org/Foucault-fiches/items/show/6979) e
 [2](https://eman-archives.org/Foucault-fiches/items/show/6980)) (LACAN,
-1947), - anotações para o texto sobre *A Agressividade em psicanálise*,
+1947),
+- anotações para o texto sobre *A Agressividade em psicanálise*,
 de 1948 (LACAN, 1948), divididas numa anotação intitulada *[Narcissisme
 et
 Agressivité](https://eman-archives.org/Foucault-fiches/items/show/6981)*
 e outra intitulada *[Paranoïa et
-psychanalyse](https://eman-archives.org/Foucault-fiches/items/show/6983)*. -
-anotações intituladas *[Morcellement et miroir selon
+psychanalyse](https://eman-archives.org/Foucault-fiches/items/show/6983)*.
+- anotações intituladas *[Morcellement et miroir selon
 Lacan](https://eman-archives.org/Foucault-fiches/items/show/6982)*,
 sobre o estádio do espelho, atribuído a Lacan mas citando ao fim
 *Meconnaissances et hallucinations corporelles : integration et
