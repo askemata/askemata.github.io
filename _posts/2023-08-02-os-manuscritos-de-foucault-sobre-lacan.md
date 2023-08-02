@@ -32,23 +32,11 @@ Vale notar que, nas fichas de leitura disponibilizadas nos links acima, não con
 
 ---
 
-<div id="refs" class="references csl-bib-body" entry-spacing="1">
-
-<div id="ref-lacanlafamille1938" class="csl-entry">
-
 LACAN, J. [La famille: le complexe, facteur concret de la psychologie
 familiale. Les complexes familiaux en
 pathologie.](https://ecole-lacanienne.net/wp-content/uploads/2016/04/1938-03-00.pdf)
 **L’Encyclopédie Française**, Pas-tout Lacan. v. VII, mar-1938mar-1938.
 
-</div>
-
-<div id="ref-LacanFonctionetChampLaPsychanalyse1956" class="csl-entry">
-
 LACAN, J. [Fonction et champ de la parole et du langage en
 Psychanalyse](http://www.psicanaliseefilosofia.com.br/acervo/fonctionetchamp.doc).
 **La Psychanalyse**, v. 1, p. 81–166, 1956.
-
-</div>
-
-</div>
