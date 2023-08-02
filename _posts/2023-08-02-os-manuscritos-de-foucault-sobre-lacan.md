@@ -27,7 +27,7 @@ referência NAF 28730, caixa 38, [pasta
 34](https://eman-archives.org/Foucault-fiches/collections/show/295)
 (FOUCAULT, \[s.d.\]). A caixa 38, tal como a
 [apresentação](https://eman-archives.org/Foucault-fiches/collections/show/261)
-o diz no site *EMAN-Fiches de Lecture* (FOUCAULT, 2020), contém 1119
+o diz no site *EMAN-Fiches de Lecture* (FOUCAULT, 2020a), contém 1119
 folhetos de anotações cobrindo um longo período, entre 1944 e 1960 (com
 algumas folhas fugindo desse período e datadas de 1971). Basicamente, as
 notas vão dos anos de formação de Foucault (nos anos 1940) ao período
@@ -36,29 +36,30 @@ com alguns documentos fugindo à regra (há, por ex., um artigo de jornal
 datado de 1971). Os temas também são muito variados.
 
 Na pasta sobre Lacan (NAF 28730, Boite_038-34-chem), As notas se dividem
-em: 
+em:
 
-- citações compiladas do texto *Formulações sobre a causalidade
-psíquica*, de 1946
-([1](https://eman-archives.org/Foucault-fiches/items/show/6979) e
-[2](https://eman-archives.org/Foucault-fiches/items/show/6980)) (LACAN,
-1947),
-- anotações para o texto sobre *A Agressividade em psicanálise*,
-de 1948 (LACAN, 1948), divididas numa anotação intitulada *[Narcissisme
-et
-Agressivité](https://eman-archives.org/Foucault-fiches/items/show/6981)*
-e outra intitulada *[Paranoïa et
-psychanalyse](https://eman-archives.org/Foucault-fiches/items/show/6983)*.
-- anotações intituladas *[Morcellement et miroir selon
-Lacan](https://eman-archives.org/Foucault-fiches/items/show/6982)*,
-sobre o estádio do espelho, atribuído a Lacan mas citando ao fim
-*Meconnaissances et hallucinations corporelles : integration et
-desintegration de la somatognosie*, de Henri Hecaen e Juan de
-Ajuriaguerra (ed. Masson. Paris: 1952, (AJURIAGUERRA; HÉCAEN, 1952)). O
-texto redigido parece muito próximo da p. 360 desse livro e é
-praticamente uma paráfrase. O único texto de Lacan em jogo (e citado por
-Ajuriaguerra e Lacan) é o de 1938 sobre os *Complexos Familiares*
-(LACAN, mar-1938).
+-   citações compiladas do texto *Formulações sobre a causalidade
+    psíquica*, de 1946
+    ([1](https://eman-archives.org/Foucault-fiches/items/show/6979) e
+    [2](https://eman-archives.org/Foucault-fiches/items/show/6980))
+    (FOUCAULT, 2020b; LACAN, 1947),
+-   anotações para o texto sobre *A Agressividade em psicanálise*, de
+    1948 (LACAN, 1948), divididas numa anotação intitulada *[Narcissisme
+    et
+    Agressivité](https://eman-archives.org/Foucault-fiches/items/show/6981)*
+    (FOUCAULT, 2020c) e outra intitulada *[Paranoïa et
+    psychanalyse](https://eman-archives.org/Foucault-fiches/items/show/6983)*
+    (FOUCAULT, 2020d).
+-   anotações intituladas *[Morcellement et miroir selon
+    Lacan](https://eman-archives.org/Foucault-fiches/items/show/6982)*
+    (FOUCAULT, 1944–1950), sobre o estádio do espelho, atribuído a Lacan
+    mas citando ao fim *Meconnaissances et hallucinations corporelles :
+    integration et desintegration de la somatognosie*, de Henri Hecaen e
+    Juan de Ajuriaguerra (ed. Masson. Paris: 1952, (AJURIAGUERRA;
+    HÉCAEN, 1952)). O texto redigido parece muito próximo da p. 360
+    desse livro e é praticamente uma paráfrase. O único texto de Lacan
+    em jogo (e citado por Ajuriaguerra e Lacan) é o de 1938 sobre os
+    *Complexos Familiares* (LACAN, mar-1938).
 
 Dentro das fichas de leitura, também há uma outra referência “curiosa”.
 Na caixa nº 44B, pasta 23 (intitulada *[La perception et
@@ -89,17 +90,40 @@ AJURIAGUERRA, J. DE; HÉCAEN, H. **[Méconnaissances et hallucinations
 corporelles](https://books.google.com/books/about/M%C3%A9connaissances_et_hallucinations_corpo.html?hl=pt-BR&id=KJIRAQAAMAAJ)**.
 Paris: Masson, 1952.
 
+FOUCAULT, M. **Morcellement et miroir selon Lacan**. BNF, 1944–1950.
+Disponível em:
+\<<https://eman-archives.org/export/compilation-fichiers.php?url=/Foucault-fiches/items/show/6982>\>.
+Acesso em: 28 mar. 2023. Foucault NAF 28730 Coteb038_f0789.
+
 FOUCAULT, M. **Boite_038 \| Rue d’Ulm, circa 1944-1950. · Foucault
 fiches de lecture**. Disponível em:
 \<<https://eman-archives.org/Foucault-fiches/collections/show/261>\>.
+Acesso em: 2 ago. 2023a.
+
+FOUCAULT, M. **Lacan : Causalité psychique   · Foucault fiches de
+lecture Boite_038-34-chem - Lacan - b038_f0786**. Disponível em:
+\<<https://eman-archives.org/Foucault-fiches/items/show/6979>\>. Acesso
+em: 2 ago. 2023b.
+
+FOUCAULT, M. **Narcissisme et agressivité · Foucault fiches de lecture
+Boite_038-34-chem - Lacan b038_f0788**. Disponível em:
+\<<https://eman-archives.org/Foucault-fiches/items/show/6981>\>. Acesso
+em: 2 ago. 2023c.
+
+FOUCAULT, M. **Paranoïa et psychanalyse · Foucault fiches de lecture
+Boite_038-34-chem - Lacan - b038_f0790**. Disponível em:
+\<<https://eman-archives.org/Foucault-fiches/items/show/6983>\>. Acesso
+em: 2 ago. 2023d.
 
 FOUCAULT, M. **Boite_038-34-chem - Lacan. · Foucault fiches de
 lecture**. Disponível em:
 \<<https://eman-archives.org/Foucault-fiches/collections/show/295>\>.
+Acesso em: 2 ago. 2023.
 
 FOUCAULT, M.; ÉQUIPE FFL. **Boite_044_B-23-chem \| La perception et
 l’information. · Foucault fiches de lecture**. Disponível em:
-\<<https://eman-archives.org/Foucault-fiches/collections/show/363>\>
+\<<https://eman-archives.org/Foucault-fiches/collections/show/363>\>.
+Acesso em: 2 ago. 2023.
 
 LACAN, J. [La famille: le complexe, facteur concret de la psychologie
 familiale. Les complexes familiaux en
@@ -118,5 +142,6 @@ Psychanalyse](http://www.psicanaliseefilosofia.com.br/acervo/fonctionetchamp.doc
 **La Psychanalyse**, v. 1, p. 81–166, 1956.
 
 MIOTTO, M. **Referências cruzadas entre os “Fonds Michel Foucault” (BnF)
-e outras fontesAskesis**, 3 maio 2021. Disponível em:
+e outras fontes - Askesis**, 3 maio 2021. Disponível em:
 \<<https://askesis.hypotheses.org/2049>\>
+
