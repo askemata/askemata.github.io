@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Os manuscritos inéditos do jovem Michel Foucault sobre Jacques Lacan"
-tags: Foucault Lacan Foucault-Manuscrits
+tags: Foucault Lacan Foucault-Manuscrits Psicanalise
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 ---
