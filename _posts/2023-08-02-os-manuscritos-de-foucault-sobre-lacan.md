@@ -30,6 +30,8 @@ do discurso de Roma (de setembro de 1953).
 
 Vale notar que, nas fichas de leitura disponibilizadas nos links acima, não constam todas as pastas depositadas na BNF. Isso significa dizer que parte do acesso às fichas é público, mas é apenas parte.
 
+---
+
 <div id="refs" class="references csl-bib-body" entry-spacing="1">
 
 <div id="ref-lacanlafamille1938" class="csl-entry">
