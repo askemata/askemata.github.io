@@ -43,11 +43,3 @@ hr {
   font-size: 2.5em;
   opacity: 0.3;
 }
-
-
-body {
- font-family: 'Latin Modern', Georgia, Cambria, 'Times New Roman', Times, serif; line-height: 1.8; max-width: 80ch; min-height: 100vh; overflow-x: hidden; margin: 0 auto; padding: 2rem 1.25rem; counter-reset: theorem definition sidenote-counter; color: var(--body-color); background-color: var(--body-bg-color); text-rendering: optimizeLegibility; } 
-
-/* Justify and hyphenate all paragraphs */
-
-p { text-align: justify; hyphens: auto; -webkit-hyphens: auto; -moz-hyphens: auto; margin-top: 1rem; }
