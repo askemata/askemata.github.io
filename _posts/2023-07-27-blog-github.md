@@ -1,5 +1,5 @@
 ---
-tags: Recursos Html
+tags: Recursos
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 
