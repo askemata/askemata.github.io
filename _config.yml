@@ -4,7 +4,7 @@ description: "Um site sobre exercícios em filosofia, ciências humanas e psicol
 
 # Email / Social media user names used by the minima theme:
 # All of these are optional and can be removed or commented out
-# email: "example@mail.com"
+email: "mlmiotto[arroba]gmail[.]com"
 mastodon_username: "@askesis@qoto.org"
 askesis_username: "https://askesis.hypotheses.org"
 # twitter_username: "twitteruser"
@@ -27,7 +27,7 @@ rss: rss
 header_pages:
   - textos.md
   - archive.md
-  - "{% include search-lunr.html %}"
+#  - "{% include search-lunr.html %}"
 
 kramdown:
   syntax_highlighter_opts:
