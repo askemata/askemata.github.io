@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Darwin - A Origem das Espécies (1859)"
-tags: Darwin Evolucionismo
+tags: Evolucionismo
 ---
 
 # Darwin - A Origem das Espécies (1859)
