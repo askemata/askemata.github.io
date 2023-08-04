@@ -1,5 +1,5 @@
 ---
 layout: tagpage
-title: "Tag: Recursos"
-tag: Recursos
+title: "Tag: recursos"
+tag: recursos
 ---
