@@ -5,11 +5,11 @@ tags: Husserl Fenomenologia
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 
+# John Drummond: Constituição, Fenomenologia estática e genética
+
 <div style="width: 90%; height: 100%; margin: 15px 15px 15px 15px; padding: 15px; background-color: #F0E6E4;">
    Tradução de excertos de DRUMMOND, John. Historical Dictionary of Husserl’s Philosophy. [s.l.]: The Scarecrow Press, Inc., 2007. (tradução de Marcio Miotto, feita para propósitos didáticos e sem fins lucrativos)
 </div>
-
-# John Drummond: Constituição, Fenomenologia estática e genética
 
 ## Constituição
 
