@@ -1,5 +1,5 @@
 ---
 layout: tagpage
 title: "Tag: Fenomenologia"
-tag: Fenomenologia
+tag: fenomenologia
 ---
