@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Natalie Depraz: Resumo das etapas metodológicas da Fenomenologia"
-tags: Husserl Fenomenologia
+tags: husserl fenomenologia
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 
