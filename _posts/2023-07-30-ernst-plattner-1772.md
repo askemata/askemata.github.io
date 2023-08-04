@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Ernst Plattner e a antropologia médica e filosófica (1772)"
-tags: Antropologia
+tags: antropologia
 ---
 
 # Ernst Plattner e a antropologia médica e filosófica (1772) 
