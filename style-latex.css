@@ -1,0 +1,200 @@
+/*!
+ * LaTeX.css (https://latex.now.sh/)
+ *
+ * Source: https://github.com/vincentdoerig/latex-css
+ * Licensed under MIT (https://github.com/vincentdoerig/latex-css/blob/master/LICENSE)
+*/
+
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/LM-regular.woff2') format('woff2'),
+    url('https://askemata.github.io/fonts/LM-regular.woff') format('woff'),
+    url('https://askemata.github.io/fonts/LM-regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: italic;
+  font-weight: normal;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/LM-italic.woff2') format('woff2'),
+    url('https://askemata.github.io/fonts/LM-italic.woff') format('woff'),
+    url('https://askemata.github.io/fonts/LM-italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: normal;
+  font-weight: bold;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/LM-bold.woff2') format('woff2'),
+    url('https://askemata.github.io/fonts/LM-bold.woff') format('woff'),
+    url('https://askemata.github.io/fonts/LM-bold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: italic;
+  font-weight: bold;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/LM-bold-italic.woff2') format('woff2'),
+    url('https://askemata.github.io/fonts/LM-bold-italic.woff') format('woff'),
+    url('https://askemata.github.io/fonts/LM-bold-italic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal;
+  font-weight: normal;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/Libertinus-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic;
+  font-weight: normal;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/Libertinus-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal;
+  font-weight: bold;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/Libertinus-bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic;
+  font-weight: bold;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/Libertinus-bold-italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/Libertinus-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('https://askemata.github.io/fonts/Libertinus-semibold-italic.woff2') format('woff2');
+}
+
+/* Make default font-size 1rem and add smooth scrolling to anchors */
+html {
+  font-size: 1rem;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
+
+}
+
+/* Justify and hyphenate all paragraphs */
+p {
+  text-align: justify;
+  font-size: 1.3em;
+}
+
+h1, h2, h3 {
+  font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+/* Make links red */
+h1 a, h2 a, h3 a, a,
+a:visited {
+  color: #0070b7;
+  text-decoration: none;
+}
+
+h1 a, h2 a, h3 a, a:hover {
+  color: #d86d4e;
+  text-decoration: underline;
+}
+
+h1 a, h2 a, h3 a, a:focus {
+  outline-offset: 2px;
+  outline: 2px solid hsl(220, 90%, 52%);
+}
+
+ul {
+  font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-size: 1.1rem;
+  line-height: 1.5
+
+}
+
+li {
+  font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-size: 1.1rem;
+  line-height: 1.5
+
+}
+
+@media print {
+
+  .panel>.list-group .list-group-item, .panel, .list-group,
+  .list-group-item, #md-page-menu, .visible-xs.visible-sm, .visible-sm, .visible-xs, sm, xs, #header-widgets, nav, aside.mashsb-container,
+.sidebar, .mashshare-top, .mashshare-bottom,
+.content-ads, .make-comment, .author-bio,
+.heading, .related-posts, #decomments-form-add-comment,
+#breadcrumbs, #footer, .post-byline, .meta-single,
+.site-title img, .post-tags, .readability, aside {
+    display: none;
+  }
+  article {
+    width:100%!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  body {
+font: 14pt;
+}
+}
+@page {
+  size: A4;
+  margin: 1.5cm 1.2cm 1.5cm 1.2cm;
+}
+
+
+@media print {
+  * {
+      background: transparent;
+      color: #000;
+      text-shadow: none;
+      filter: none;
+      aside: none;
+      SideMenu: none;
+     -ms-filter: none;
+
+  }
+}
+
+@media print {
+  .menu,
+  .banner,
+  .useSideMenu,
+  .SideMenu,
+  .bs-sidebar,
+  .nav { display: none; }
+ }
+
+ @media print {
+  .header {
+    padding-top: 0px;
+  }
+}
