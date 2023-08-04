@@ -1,5 +1,5 @@
 ---
 layout: tagpage
 title: "Tag: Psicanalise"
-tag: Psicanalise
+tag: psicanalise
 ---
