@@ -4,6 +4,6 @@ Este espaço de exercícios contém links, textos, traduções, anotações e re
 Para navegar, a **busca** abaixo é bastante eficiente. O link "**arquivos**" separa os textos por termos ou *tags*, e há páginas específicas para cada *tag*, cada uma com uma nuvem de *tags* ([exemplo](https://askemata.github.io/tag/fenomenologia)).  
 Também aqui: alguns [textos](https://askemata.github.io/textos.html) publicados, a página [PhilPapers](http://philpeople.org/profiles/marcio-miotto) e meu [ORCID](https://orcid.org/0000-0003-0608-0542).
 
-## Busca
+# Busca
 
 {% include search-lunr.html %}
