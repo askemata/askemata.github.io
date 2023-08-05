@@ -7,7 +7,7 @@ tags: husserl fenomenologia
 # Husserl - o mundo, solo universal da crença
 
 <div style="width: 90%; height: 100%; margin: 15px 15px 15px 15px; padding: 15px; background-color: #CBFEB3;">
-    Tradução do parágrafo 7 de: HUSSERL, Edmund. <b></b>Expérience et jugement: recherches en vue d’une généalogie de la logique</b>. 2e éd. Paris: Presses Universitaires de France, 1991. (Epiméthée). (tradução cotejada entre a versão francesa e em espanhol de HUSSERL, Edmund. Experiencia y juicio: investigación acerca de la genealogía de la lógica. México: Universidad Nacional Autónoma, 1980, por Marcio Miotto, para fins didáticos)
+    Tradução do parágrafo 7 de: HUSSERL, Edmund. <b>Expérience et jugement: recherches en vue d’une généalogie de la logique</b>. 2e éd. Paris: Presses Universitaires de France, 1991. (Epiméthée). (tradução cotejada entre a versão francesa e em espanhol de HUSSERL, Edmund. Experiencia y juicio: investigación acerca de la genealogía de la lógica. México: Universidad Nacional Autónoma, 1980, por Marcio Miotto, para fins didáticos)
 </div>
 
 ## § 7. O Mundo, solo universal da crença enquanto sempre já dado a toda experiência de objetos singulares
