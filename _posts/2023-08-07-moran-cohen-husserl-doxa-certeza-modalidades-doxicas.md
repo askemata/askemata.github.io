@@ -1,0 +1,27 @@
+---
+layout: post
+title: "Husserl - Doxa, certeza e modalidades doxicas (Cohen e Moran)"
+tags: husserl fenomenologia
+---
+
+# Husserl: Doxa, certeza e modalidades doxicas (Cohen e Moran)
+
+<div class="warning">
+  <p><strong>Tradução de excertos de:</strong> MORAN, Dermot; COHEN, Joseph D. The Husserl dictionary. London ; New York, NY: Continuum, 2012. (Continuum philosophy dictionaries), por Marcio Miotto, sob fins didáticos</p>
+</div>
+
+## Doxa
+
+O termo grego “doxa”, significa “crença” ou “opinião” e é utilizado por Husserl para caracterizar a rede inter-relacionada de crenças não questionadas e pressupostos que caracterizam a atitude natural e a atitude cotidiana da vida pré-científica. Platão contrastava a crença (*doxa*), como uma opinião que pode ser mudada, com o conhecimento (*epistémê*), que é certo e assegurado através de justificação e evidência. O conhecimento científico é fundado em nossas suposições ordinárias da atitude natural. Assim, por exemplo, na *Crise* § 34, Husserl nota que a filosofia tradicional tem uma atitude negativa ou depreciativa frente à doxa (ver também *Crise*, §44). Entretanto, Husserl acredita que seja importante estabelecer uma ciência de nossas crenças ingênuas do cotidiano, uma ciência da doxa. Ele também pensa que nossas crenças cotidianas tem seu próprio tipo de validação e justificação dentro do mundo da vida de nossos engajamentos práticos e interesses. Nesse âmbito, a posição de Husserl é próxima daquela articulada por Wittgenstein em *Da Certeza* – onde a certeza é descrita como uma jangada flutuando num mar de crença. Husserl dedica muitas análises para compreender como o mundo é o solo universal da crença (ex. *Experiência e Juízo*, § [7](https://askemata.github.io/2023/08/05/Husserl-mundo-solo-universal-da-crenca.html). A crença passiva no mundo é chamada por Husserl de “doxa passiva”. Podemos estabelecer diferentes graus de complexidade dóxica (dos níveis passivos aos ativos) e diferentes variantes modais. **[p. 86]**
+
+## Crença (Glaube, Doxa)
+
+Crença é uma “modalidade dóxica” que pode ser livremente alterada em dúvida, incerteza, incredulidade e assim por diante. A percepção envolve uma crença implícita na existência do que é percebido. Nossas percepções tem o caráter de certeza. Husserl realça que nossa “crença fundamental” ou “nível básico” (*Urglaube*) em relação à existência e efetividade do mundo é dada pela percepção. Ele contrasta crença (em grego: *doxa*) com conhecimento (*Erkenntnis, episteme*). A atitude natural é fundamentalmente uma atitude de crença não questionada no mundo. Crenças são experiências vividas de natureza temporal, mas podem ser assentadas em convicções. **(p. 49)**
+
+## Modalidades dóxicas (die doxischen Modalitäten)
+
+Modalidades dóxicas é o termo de Husserl (ver *Idéias* I, § 117) para estados epistêmicos básicos tais como estar em estado de certeza, dúvida, questionamento, de pressupor, efetivar e assim por diante. Há diferentes posições dóxicas, mas a crença fundamental ou *Urdoxa* é a certeza perceptual, uma espécie de aceitação ingênua imediata da existência e da realidade dos objetos da experiência perceptual. Todas as formas de posição (compromisso tético) envolvem algum tipo de modalidade dóxica. A consciência de crença dóxica (*doxische Glaubensbewusstsein*) é uma certeza simples, que pode ser modificada. As três principais variantes que Husserl leva em consideração são a negação, a possibilidade e a dúvida (EU, § 21). A certeza simples pode ser modificada por meio de novos eventos ou decepções que quebram a concordância inicial. Não obstante, a falta de concordância em muitos atos e situações não apaga a posição dóxica principal, por meio da qual vivemos uma crença básica sobre o mundo. Essa concordância elementar é o plano de fundo para as certezas parciais e suas modalidades (EU, § 7).
+
+## Certeza (Gewissheit)
+
+Certeza é a mais simples modalidade dóxica (*Doxische Modalität ou Modalität des Glaubens*, Hua III/1, 271), por meio da qual temos convicção sobre certos fatos ou situações. Essa modalidade dóxica pode ser transformada em outros tipos de modalidade: modalização de certeza (*Modalisierungen der Gewissheit*) em dúvida, possibilidade e negação são possíveis (EU, parágrafo 21). A certeza tem graus de “perfeição” ou “completude” (*Vollkommenheit*) e imperfeição, ou pureza (*Reinheit*) e impureza (EU, 77). Há imperfeição quando diferentes possibilidades entram em nosso horizonte e decidimos apenas por uma delas. A certeza empírica pode ser negada (mesmo embora não encontremos motivações para negá-la no presente). A certeza assentada em terreno empírico é sempre certeza de presunção, mas precisamos distinguir esse tipo de certeza da mera “suposição” (*Vermutung*). Enquanto a certeza empírica é inteiramente motivada, a mera suposição considera ao mesmo tempo razões contrárias e possibilidades. A certeza sobre o mundo empírico é necessariamente de presunção, mas isso não significa que seja mera suposição. Nossas crenças sobre o mundo são inteiramente motivadas, mas podem ser canceladas ou corrigidas. Husserl situa em nível mais alto a certeza apodítica. Juízos apodíticos apreendem estados de coisa verdadeiros e apresenta-os de modo perfeito. A certeza apodítica também tem papel decisivo no método de Husserl. Para ele, a fenomenologia deve identificar leis apodíticas da consciência ou estruturas essenciais da subjetividade. **(p. 62-63)**
