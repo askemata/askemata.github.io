@@ -50,47 +50,70 @@ Conteúdo a ser expandido
  <br><br>
 
 
-Há também códigos para `admonitions`:
+Há também códigos para `admonitions` ou `call outs`, como se pode ver [aqui](https://www.w3schools.com/howto/howto_css_notes.asp):
 
 ```
-> **Note**  
-Your note text here
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+div {
+  margin-bottom: 15px;
+  padding: 4px 12px;
+}
 
-> **Warning**  
-Your warning text here
+.danger {
+  background-color: #ffdddd;
+  border-left: 6px solid #f44336;
+}
+
+.success {
+  background-color: #ddffdd;
+  border-left: 6px solid #04AA6D;
+}
+
+.info {
+  background-color: #e7f3fe;
+  border-left: 6px solid #2196F3;
+}
+
+
+.warning {
+  background-color: #ffffcc;
+  border-left: 6px solid #ffeb3b;
+}
+</style>
+</head>
+<body>
+
+<h2>Notes</h2>
+<div class="danger">
+  <p><strong>Danger!</strong> Some text...</p>
+</div>
+
+<div class="success">
+  <p><strong>Success!</strong> Some text...</p>
+</div>
+
+<div class="info">
+  <p><strong>Info!</strong> Some text...</p>
+</div>
+
+<div class="warning">
+  <p><strong>Warning!</strong> Some text...</p>
+</div>
+
+</body>
+</html>
+
 ```
 
 Cujo resultado é
 
-> **Note**
-Your note text here
-
-> **Warning**
-Your warning text here
-
-Ou ainda, também assim:
-
-```
-> [!NOTE]  
-> Highlights information that users should take into account, even when skimming.
-
-> [!IMPORTANT]  
-> Crucial information necessary for users to succeed.
-
-> [!WARNING]  
-> Critical content demanding immediate user attention due to potential risks.
-```
-
-Cujo resultado é:
-
-> [!NOTE]  
-> Highlights information that users should take into account, even when skimming.
-
-> [!IMPORTANT]  
-> Crucial information necessary for users to succeed.
-
-> [!WARNING]  
-> Critical content demanding immediate user attention due to potential risks.
+<div class="danger">
+  <p><strong>Jamais esquecer!</strong> "A arte da vida consiste em fazer da vida uma obra de arte" (Gandhi) </p>
+</div>
 
 É possível fazer html css simples também: 
 
