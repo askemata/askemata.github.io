@@ -141,8 +141,7 @@ ul {
 
 li {
   font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
-#  font-size: 1.1rem;
-  font-size: 1em;
+  font-size: 1rem;
   line-height: 1.5
 
 }
@@ -152,6 +151,7 @@ li {
   border-left: 6px solid #f44336;
   margin-bottom: 15px;
   padding: 4px 12px;
+  font-size: 0.9rem;
 }
 
 .success {
@@ -159,6 +159,7 @@ li {
   border-left: 6px solid #04AA6D;
   margin-bottom: 15px;
   padding: 4px 12px;
+  font-size: 0.9rem;
 }
 
 .info {
@@ -166,6 +167,7 @@ li {
   border-left: 6px solid #2196F3;
   margin-bottom: 15px;
   padding: 4px 12px;
+  font-size: 0.9rem;
 }
 
 
@@ -174,6 +176,7 @@ li {
   border-left: 6px solid #ffeb3b;
   margin-bottom: 15px;
   padding: 4px 12px;
+  font-size: 0.9rem;
 }
 
 
