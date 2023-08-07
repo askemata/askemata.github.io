@@ -114,7 +114,7 @@ h1, h2, h3 {
   font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
 }
 
-/* Make links red */
+/* Make links blue */
 h1 a, h2 a, h3 a, a,
 a:visited {
   color: #0070b7;
@@ -134,7 +134,7 @@ h1 a, h2 a, h3 a, a:focus {
 ul {
   font-family: 'Latin Modern', 'Libertinus', Georgia, Cambria, 'Times New Roman', Times, serif;
 #  font-size: 1.1rem;
-  font-size: 1em;
+#  font-size: 1em;
   line-height: 1.5
 
 }
