@@ -154,7 +154,7 @@ li {
 }
 
 .success {
-  background-color: #E5FADB;
+  background-color: #F3FEEC;
   border-left: 6px solid #04AA6D;
   margin-bottom: 15px;
   padding: 4px 12px;
@@ -162,16 +162,23 @@ li {
 }
 
 .info {
-  background-color: #D2E8FF;
+  background-color: #ECF9FF;
   border-left: 6px solid #2196F3;
   margin-bottom: 15px;
   padding: 4px 12px;
   font-size: 0.8rem;
 }
 
-
 .warning {
   background-color: #FCFFEC;
+  border-left: 6px solid #ffeb3b;
+  margin-bottom: 15px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+.marrom {
+  background-color: #FAEFE3;
   border-left: 6px solid #ffeb3b;
   margin-bottom: 15px;
   padding: 4px 12px;
