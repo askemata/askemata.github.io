@@ -7,7 +7,7 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 É na página de [Chad Baldwin](https://chadbaldwin.net/2021/03/14/how-to-build-a-sql-blog.html) que se pode encontrar uma dica fácil, na qual em poucos minutos é possível criar um blog em html estático usando o *Github Pages*. 
 
-Após seguir os passos ali contidos, vale olhar também a [fonte de seu próprio blog](https://github.com/chadbaldwin/chadbaldwin.github.io/tree/main), para implementações. Ou, para quem quiser entender como funciona o Jeckyll, programa que constrói o site, [esse texto]( https://tableless.com.br/jekyll-servindo-sites-estaticos/) é bem esclarecedor.
+Após seguir os passos ali contidos, vale olhar também a [fonte de seu próprio blog](https://github.com/chadbaldwin/chadbaldwin.github.io/tree/main), para implementações. Ou, para quem quiser entender como funciona o Jekyll, programa que constrói o site, [esse texto]( https://tableless.com.br/jekyll-servindo-sites-estaticos/) é bem esclarecedor.
 
 ## Olhando um pouco mais
 
@@ -130,6 +130,10 @@ Cujo resultado é:
     "A arte da vida consiste em fazer da vida uma obra de arte"<br>
     Gandhi
 </div>
+
+## Outras possibilidades
+
+Há outros empreendimentos incríveis em Jekyll. Por ex., o [Just the Docs](https://just-the-docs.com).
 
 Este post é um *work in progress*[^1]
 
