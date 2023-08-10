@@ -149,23 +149,24 @@ Cujo resultado é:
     Gandhi
 </div>
 
-### Divs para conteudos separados
+### Divs para conteudos destacados
 
 Resultados com divs com conteudos separados. Ex.:
 
 ```
-<div class="div-toc">
+<div class="div-destaque">
     <b>Lembrete:</b>
     "Quem mata o tempo fere a eternidade" (Thoreau)
   </div>
 ```
-Cujo resultado é: <br><br><br><br>
+Cujo resultado é:
 
-<div class="div-toc">
+<div class="div-destaque">
     <b>Lembrete:</b>
     "Quem mata o tempo fere a eternidade" (Thoreau)
   </div>
-
+ <br><br><br><br>
+ 
 ### Tabela de conteudos
 
 Há tabelas de conteúdos já inseridas nas possibilidades do Jekyll, como se vê [aqui](http://www.seanbuscay.com/blog/jekyll-toc-markdown/)
