@@ -197,7 +197,9 @@ li {
 .div-toc {
   float: right;
   width: 35%;
+  background: #ffffff;
   margin-left: 10px; /* Adicione margem esquerda para separar de outros elementos */
+  margin: 10px;
   border: 1px solid #ccc; /* Adicione uma borda para visualização */
   padding: 10px; /* Adicione preenchimento interno */
   box-sizing: border-box; /* Garanta que a largura inclua a borda e o preenchimento */
