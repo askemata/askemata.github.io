@@ -29,8 +29,9 @@ layout: default
   </div>
 
   <div class="post-content e-content" itemprop="articleBody">
-   
-    {% include toc.html html=content h_min=2 %}
+   <div class="div-toc">
+    {% include toc.html html=content h_min=2 %} 
+   </div>
     {{ content }}
     {% include navlinks.html %}
   </div>
