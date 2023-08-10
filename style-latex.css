@@ -185,6 +185,14 @@ li {
   font-size: 0.8rem;
 }
 
+.branco {
+  background-color: #FAFAFA;
+  border-left: 6px solid #666666;
+  margin-bottom: 15px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
 /* Estilização da div para TOC */
 .div-toc {
   float: right;
