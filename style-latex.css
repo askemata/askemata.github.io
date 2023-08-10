@@ -193,8 +193,8 @@ li {
   font-size: 0.8rem;
 }
 
-/* Estilização da div para TOC */
-.div-toc {
+/* Estilização do destaque */
+.div-destaque {
   float: right;
   width: 35%;
   background: #ffffff;
@@ -203,6 +203,29 @@ li {
   border: 1px solid #ccc; /* Adicione uma borda para visualização */
   padding: 10px; /* Adicione preenchimento interno */
   box-sizing: border-box; /* Garanta que a largura inclua a borda e o preenchimento */
+}
+
+/* Estilização de div para TOC */
+.div-toc {
+    float: right;
+    border: 1px solid #2a7ae2;
+    border-radius: 0.25rem;
+    padding-top: 15px;
+    padding-right: 15px;
+    margin-left: 15px;
+}
+
+.div-toc b {
+    margin-left: 20px;
+}
+
+.div-toc ul {
+    list-style: none;
+    margin-left: 10px;
+}
+
+.div-toc li {
+    margin-left: 10px;
 }
 
 
