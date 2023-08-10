@@ -164,8 +164,7 @@ Cujo resultado é:
 <div class="div-destaque">
     <b>Lembrete:</b>
     "Quem mata o tempo fere a eternidade" (Thoreau)
-  </div>
-  <br><br><br><br>
+  </div><br><br><br><br>
  
 ### Tabela de conteudos
 
