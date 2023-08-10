@@ -5,9 +5,9 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 # Criando facilmente um blog em html estático no Github
 
-<div class="toc">
+<div class="div-toc">
     <b>Jump to:</b>
-    {% include custom/contents.html html=content %}
+    {% include toc.html html=content %}
   </div>
 
 ## Introdução
