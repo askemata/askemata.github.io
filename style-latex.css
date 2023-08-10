@@ -213,10 +213,12 @@ li {
     padding-top: 15px;
     padding-right: 15px;
     margin-left: 15px;
+  list-style: none;
 }
 
 .div-toc b {
     margin-left: 20px;
+  list-style: none;
 }
 
 .div-toc ul {
