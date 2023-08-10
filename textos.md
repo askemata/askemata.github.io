@@ -2,7 +2,7 @@
 
 ## Artigos, capítulos de livro, traduções e transcrições.
 
-<div class="branco" markdown="1">
+<div class="warning" markdown="1">
 
 MIOTTO, M. ==Entre Jaspers e o "jovem Foucault": Antropologia, Loucura, Obra e Civilização==. **Araripe** 3 (2): 30-114. 2022 [[Philpapers](https://philpapers.org/rec/MIOEJE)] #foucault #jaspers
 
@@ -10,15 +10,27 @@ MIOTTO, M. ==Entre Jaspers e o "jovem Foucault": Antropologia, Loucura, Obra e C
 
 ---
 
+<div class="danger" markdown="1">
+
 MIOTTO, M. Michel Foucault e A Questão Antropológica: precisões históricas e conceituais. **Lampião** 3 (1): 125-169, 2022 [[Philpapers](https://philpapers.org/rec/MIOMFE)] [[Lampião](https://www.seer.ufal.br/index.php/lampiao/article/view/15622)]  [[HAL](https://hal.science/hal-04119186)]
 
+</div>
+
 ---
+
+<div class="info" markdown="1">
 
 MIOTTO, M. Sujeito antropológico e metafísica do amor em Binswanger et l’Analyse Existentielle. **Revista Ideação**, v. 44, n. 1, p. 107–140, 2021. Disponível em: <https://philpapers.org/rec/MIOSAE>. [[Ideação](http://periodicos.uefs.br/index.php/revistaideacao/article/view/7649)] [[HAL](https://hal.archives-ouvertes.fr/hal-03480835)] [[pdf](https://askesis.hypotheses.org/files/2021/12/Miotto-Sujeito-antropologico-e-metafisica-do-amor-em-Binswanger-et-l-Analyse-Existentielle.pdf)]
 
+</div>
+
 ---
 
+<div class="sucess" markdown="1">
+
 MIOTTO, Marcio Luiz. Gustav Fechner e a alma do mundo. **Revista Helius**, v. 3, n. 2, fasc. 2, p. 852–906, 2020. Disponível em: <http://helius.uvanet.br/index.php/helius/article/view/208>. [[Philpapers](https://philpapers.org/rec/MIOGFE) ] [[HAL](https://hal.archives-ouvertes.fr/hal-03182830)]
+
+</div>
 
 ---
 
