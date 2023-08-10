@@ -30,6 +30,7 @@ layout: default
 
   <div class="post-content e-content" itemprop="articleBody">
     {{ content }}
+    {% include toc.html html=content %}
     {% include navlinks.html %}
   </div>
 
