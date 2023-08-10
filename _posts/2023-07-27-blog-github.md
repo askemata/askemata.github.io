@@ -165,9 +165,7 @@ Cujo resultado é:
     <b>Lembrete:</b>
     "Quem mata o tempo fere a eternidade" (Thoreau)
   </div>
-
   <br><br><br><br>
-
  
 ### Tabela de conteudos
 
