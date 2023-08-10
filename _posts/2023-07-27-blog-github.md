@@ -7,7 +7,7 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 <div class="div-toc">
     <b>Jump to:</b>
-    {% include ../includes/toc.html html=content %}
+    {% include ../_includes/toc.html html=content %}
   </div>
 
 ## Introdução
