@@ -2,7 +2,11 @@
 
 ## Artigos, capítulos de livro, traduções e transcrições.
 
+<div class="branco" markdown="1">
+
 MIOTTO, M. ==Entre Jaspers e o "jovem Foucault": Antropologia, Loucura, Obra e Civilização==. **Araripe** 3 (2): 30-114. 2022 [[Philpapers](https://philpapers.org/rec/MIOEJE)] #foucault #jaspers
+
+</div>
 
 ---
 
