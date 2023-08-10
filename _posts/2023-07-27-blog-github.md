@@ -155,14 +155,14 @@ Resultados com divs com conteudos separados. Ex.:
 
 ```
 <div class="div-toc">
-    <b>Jump to:</b>
+    <b>Lembrete:</b>
     "Quem mata o tempo fere a eternidade" (Thoreau)
   </div>
 ```
-Cujo resultado é: 
+Cujo resultado é: <br><br><br><br>
 
 <div class="div-toc">
-    <b>Jump to:</b>
+    <b>Lembrete:</b>
     "Quem mata o tempo fere a eternidade" (Thoreau)
   </div>
 
