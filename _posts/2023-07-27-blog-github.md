@@ -5,14 +5,19 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 
 # Criando facilmente um blog em html estático no Github
 
+## Conteúdos
 * TOC
 {:toc}
+
+## Introdução
 
 É na página de [Chad Baldwin](https://chadbaldwin.net/2021/03/14/how-to-build-a-sql-blog.html) que se pode encontrar uma dica fácil, na qual em poucos minutos é possível criar um blog em html estático usando o *Github Pages*. 
 
 Após seguir os passos ali contidos, vale olhar também a [fonte de seu próprio blog](https://github.com/chadbaldwin/chadbaldwin.github.io/tree/main), para implementações. Ou, para quem quiser entender como funciona o Jekyll, programa que constrói o site, [esse texto]( https://tableless.com.br/jekyll-servindo-sites-estaticos/) é bem esclarecedor.
 
 ## Olhando um pouco mais
+
+### Cabeçalho YML
 
 Basicamente, pode-se ver que os cabeçalhos das publicações podem se desenrolar como se segue, a partir da estrutura em YML front-matter:
 
@@ -28,11 +33,17 @@ image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
 ---
 ```
 
-, de onde se vê, dentre outras funcionalidades, também a possibilidade de confecção de tags para separar os posts por assunto no Arquivo. [Esse texto](https://blog.nandomoreira.dev/usando-categorias-e-tags-no-jekyll), em português, explica um pouco mais a implementação de tags e categorias.
+## Tags e categorias
+
+Há também a possibilidade de confecção de tags para separar os posts por assunto no Arquivo. [Esse texto](https://blog.nandomoreira.dev/usando-categorias-e-tags-no-jekyll), em português, explica um pouco mais a implementação de tags e categorias.
 
 As mesmas tags também podem ser utilizadas para a criação de [páginas específicas e nuvens](https://longqian.me/2017/02/09/github-jekyll-tag/).
 
+## Busca
+
 É também possível inserir um mecanismo de busca. [Esse site](https://jekyllcodex.org/without-plugin/search-lunr/) tem regras simples para o mecanismo Lunr.js. 
+
+## Seções expansíveis
 
 Pode-se criar uma seção recolhida assim:
 
@@ -52,8 +63,9 @@ Conteúdo a ser expandido
 </details>
  <br><br>
 
+## Callouts
 
-Há também códigos para `admonitions` ou `call outs`, como se pode ver [aqui](https://www.w3schools.com/howto/howto_css_notes.asp):
+Há também códigos para `admonitions` ou `callouts`, como se pode ver [aqui](https://www.w3schools.com/howto/howto_css_notes.asp):
 
 ```
 <!DOCTYPE html>
@@ -118,6 +130,8 @@ Cujo resultado é
   <p><strong>Jamais esquecer!</strong> "A arte da vida consiste em fazer da vida uma obra de arte" (Gandhi) </p>
 </div>
 
+## Css simples
+
 É possível fazer html css simples também: 
 
 ```
@@ -133,6 +147,10 @@ Cujo resultado é:
     "A arte da vida consiste em fazer da vida uma obra de arte"<br>
     Gandhi
 </div>
+
+## Tabela de conteudos
+
+Há tabelas de conteúdos já inseridas nas possibilidades do Jekyll, como se vê [aqui](http://www.seanbuscay.com/blog/jekyll-toc-markdown/)
 
 ## Outras possibilidades
 
