@@ -30,8 +30,11 @@ layout: default
 
   <div class="post-content e-content" itemprop="articleBody">
     {{ content }}
-    {% include toc.html html=content %}
     {% include navlinks.html %}
+  </div>
+
+  <div class="div-toc">
+    {% include toc.html html=content %}
   </div>
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
