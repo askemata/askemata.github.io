@@ -208,6 +208,7 @@ li {
 /* Estilização de div para TOC */
 .div-toc {
     float: right;
+    width: 35%;
     border: 1px solid #2a7ae2;
     border-radius: 0.25rem;
     padding-top: 15px;
