@@ -1,6 +1,7 @@
 ---
 tags: recursos
 image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
+table_of_contents_header
 ---
 
 # Criando facilmente um blog em html estático no Github
