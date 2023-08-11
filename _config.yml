@@ -27,6 +27,14 @@ rss: rss
 header_pages:
   - textos.md
   - archive.md
+  - title: Group 1
+    subfolderitems:
+      - page: Thing 1
+        url: /thing1.html
+      - page: Thing 2
+        url: /thing2.html
+      - page: Thing 3
+        url: /thing3.html
 #  - "{% include search-lunr.html %}"
 
 kramdown:
