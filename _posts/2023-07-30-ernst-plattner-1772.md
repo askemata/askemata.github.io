@@ -6,21 +6,21 @@ tags: antropologia
 
 # Ernst Plattner e a antropologia médica e filosófica (1772) 
 
-Há algum tempo Roberto Palaia e John Zamitto já haviam escrito sobre Ernst Plattner, autor cuja bibliografia primária e secundária era há alguns anos difícil de encontrar por aqui:
+Há algum tempo Roberto Palaia e John Zamitto já haviam escrito sobre Ernst Plattner, autor cuja bibliografia primária e secundária era, há alguns anos, difícil de encontrar por aqui:
 
-```
+<div class="branco" markdown="1">
 ZAMMITO, J. H. Médecin‐philosoph : Persona for Radical Enlightenment. Intellectual History Review, v. 18, n. 3, p. 427–440, jan. 2008. doi: 10.1080/17496970802319334
-```
+</div>
 
-```
+<div class="branco" markdown="1">
 PALAIA, R. Ernst Platner avversario della Filosofia critica. Nouvelles de la Republique des Lettres, ISSN 0392-2332, Nº 1, 1985 , pags. 7-26
-```
+</div>
 
 O livro sobre antropologia de Plattner está disponível aqui: 
 
-```
+<div class="branco" markdown="1">
 PLATTNER, E. Anthropologie für Aerzte und Weltweise - Theil 1. Leipzig: Dyck, 1772. http://digitale.bibliothek.uni-halle.de/vd18/9187146
-```
+</div>>
 
 Tal como se comentava há alguns anos (a [fonte](https://philosophersdesk.blogspot.com/2008/06/ernst-platner-anthropologie-fr-rzte-und.html) se perdeu), 
 
