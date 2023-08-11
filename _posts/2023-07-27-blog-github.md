@@ -171,7 +171,7 @@ Há tabelas de conteúdos já inseridas nas possibilidades do Jekyll, como se v�
 {:toc}
 ```
 
-É possível fazer uma tabela de conteúdos mais complexa. [Jake Lee](https://blog.jakelee.co.uk/blog-v2-1-with-table-of-contents-and-anchor-links/) ensina isso naquele link (nos comentários é possível ver como colocar TOC apenas nas páginas desejadas).
+É possível fazer uma tabela de conteúdos mais complexa. [Jake Lee](https://blog.jakelee.co.uk/blog-v2-1-with-table-of-contents-and-anchor-links/) ensina isso naquele link (nos comentários é possível ver como colocar TOC apenas nas páginas desejadas). Há também uma solução com o TOC simplificado [aqui](https://jwrr.github.io/minima-sidebar/sidebar-toc2/)
 
 ## Outras possibilidades
 
