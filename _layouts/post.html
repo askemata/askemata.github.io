@@ -28,6 +28,10 @@ layout: default
     {% include sharelinks.html %}
   </div>
 
+   {% if page.table_of_contents_header != blank? %}
+    {% include toc.html html=content sanitize=true h_min=2 h_max=4 %}
+  {% endif %}
+
   <div class="post-content e-content" itemprop="articleBody">
     {{ content }}
     {% include navlinks.html %}
