@@ -22,11 +22,11 @@ Basicamente, pode-se ver que os cabeçalhos das publicações podem se desenrola
 ```
 ---
 layout: post
-title: "What's new in SQL Server 2022"
+title: "Título do post"
 description: "Taking a look at some of the new language enhancements coming in SQL Server 2022"
 date: 2022-06-02T12:30:00-07:00
-tags: T-SQL
-image: img/postbanners/2022-06-02-whats-new-in-sql-server-2022.png
+tags: categoria1 categoria 2
+table_of_contents_header: yes # quando se quer mostrar a TOC
 ---
 ```
 
@@ -170,6 +170,8 @@ Há tabelas de conteúdos já inseridas nas possibilidades do Jekyll, como se v�
 * TOC
 {:toc}
 ```
+
+É possível fazer uma tabela de conteúdos mais complexa. [Jake Lee](https://blog.jakelee.co.uk/blog-v2-1-with-table-of-contents-and-anchor-links/) ensina isso naquele link (nos comentários é possível ver como colocar TOC apenas nas páginas desejadas).
 
 ## Outras possibilidades
 
