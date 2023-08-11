@@ -6,13 +6,6 @@ table_of_contents_header: yes
 
 # Criando facilmente um blog em html estático no Github
 
-<div class="div-toc" markdown="span">
-
-    * TOC
-    {:toc}
-
-  </div>
-
 ## Introdução
 
 É na página de [Chad Baldwin](https://chadbaldwin.net/2021/03/14/how-to-build-a-sql-blog.html) que se pode encontrar uma dica fácil, na qual em poucos minutos é possível criar um blog em html estático usando o *Github Pages*. 
