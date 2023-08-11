@@ -29,7 +29,9 @@ layout: default
   </div>
 
    {% if page.table_of_contents_header != blank? %}
+  <div class="div-toc">
     {% include toc.html html=content sanitize=true h_min=2 h_max=4 %}
+  </div>
   {% endif %}
 
   <div class="post-content e-content" itemprop="articleBody">
