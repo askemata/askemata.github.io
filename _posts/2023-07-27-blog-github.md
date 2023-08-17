@@ -175,7 +175,15 @@ Há tabelas de conteúdos já inseridas nas possibilidades do Jekyll, como se v�
 
 ## Outras possibilidades
 
-Há outros empreendimentos incríveis em Jekyll. Por ex., o [Just the Docs](https://just-the-docs.com), para sites em documentação. o [minimal](https://github.com/orderedlist/minimal) é um belo design. E *la nave va*.
+Há outros empreendimentos incríveis em Jekyll e outros. Por ex., 
+
+- O [Just the Docs](https://just-the-docs.com), para sites em documentação. 
+- O [wowchemy](https://wowchemy.com/) facilita bastante a vida de quem quer criar um site.
+- belo [tutorial](https://efraimgentil.github.io/post/jekyll/comecando-com-jekyll) de como começar no Jekyll.
+- O [minimal](https://github.com/orderedlist/minimal) é um belo template-design.
+- este [tutorial](https://docs.github.com/pt/pages/getting-started-with-github-pages/creating-a-github-pages-site) é ótimo para principiantes.
+
+E *la nave va*.
 
 Este post é um *work in progress*[^1]
 
