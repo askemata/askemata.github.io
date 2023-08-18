@@ -244,6 +244,17 @@ background: #fafafa url(https://lh3.googleusercontent.com/-NhnRnGf6Jvc/WEe4GO2Of
 border: 2px solid #fafafa;
 }
 
+/* Formatacao para nota de rodape */
+.footnotes p {
+  text-align: left;
+  line-height: 1.5;
+  font-size: 85%;
+  margin-bottom: 0.4rem;
+}
+.footnotes {
+  border-top: 1px solid #c0c0c0;
+}
+
 
 
 @media print {
