@@ -20,7 +20,7 @@ Tradução de Kleber Amora [^2] :
 
 Tradução de Jankélévitch, 1946 [^3] :
 
-Pensez à un courant: il est d’abord *identité pure*; mais là où il se heurte à un obstacle, il se produit un tourbillon qui ne se maintient pas, disparaît, mais se reforme à chaque instant. Dans la nature il n’y a pas de différences au début; tous les produits sont encore pour ainsi dire à l’état indifférencié et invisibles dans la productivité générale. C’est seulement lorsqu’elle se heurte à des entraves que se forment peu à peu des dépôts qui tranchent sur l’identité générale. En chacun de ces points le courant se brise (la productivité est annihilée), mais à chque moment arrive une nouvelle vague qui emplit la sphère.
+> Pensez à un courant: il est d’abord *identité pure*; mais là où il se heurte à un obstacle, il se produit un tourbillon qui ne se maintient pas, disparaît, mais se reforme à chaque instant. Dans la nature il n’y a pas de différences au début; tous les produits sont encore pour ainsi dire à l’état indifférencié et invisibles dans la productivité générale. C’est seulement lorsqu’elle se heurte à des entraves que se forment peu à peu des dépôts qui tranchent sur l’identité générale. En chacun de ces points le courant se brise (la productivité est annihilée), mais à chque moment arrive une nouvelle vague qui emplit la sphère.
 
 ## Notas
 
