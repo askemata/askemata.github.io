@@ -238,6 +238,7 @@ blockquote {
 margin: 10px 20px 10px 20px;
 padding: 10px 20px 10px 20px;
 line-height: 1.6em;
+font-style: normal;
 color: #666666;
 background: #fafafa url(https://lh3.googleusercontent.com/-NhnRnGf6Jvc/WEe4GO2Of9I/AAAAAAAAA-M/bGlEsFZZqIklmZzfbAw2AInrwHx8_MPAgCLcB/h120/quote.gif) no-repeat; color: #666; 
 border: 2px solid #fafafa;
