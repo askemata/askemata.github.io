@@ -7,7 +7,9 @@ table_of_contents_header: yes
 
 # Schelling e a corrente
 
-## Traduções em torno de uma passagem de Schelling (SW I, 3, 289)
+Traduções em torno de uma passagem de Schelling (SW I, 3, 289)
+
+## Traduções
 
 Schelling (SW I, 3, 289) [^1]  :
 
