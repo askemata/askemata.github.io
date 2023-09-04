@@ -13,4 +13,4 @@ Também aqui: alguns [textos](https://askemata.github.io/textos.html) publicados
 
 {% include search-lunr.html %}
 
-<center><a href='https://clustrmaps.com/site/1bwdo'  title='Visit tracker'><img src='//clustrmaps.com/map_v2.png?cl=7b94f0&w=209&t=tt&d=fYCrZNCvpFifgkfasztQwZDOR21NJab0PJ5_nGtQ1XA&co=ffffff&ct=453838'/></a></center>
+<center><a href='https://clustrmaps.com/site/1bwdo'  title='Visit tracker'><img src='//clustrmaps.com/map_v2.png?cl=cdd3e8&w=209&t=tt&d=fYCrZNCvpFifgkfasztQwZDOR21NJab0PJ5_nGtQ1XA&co=ffffff&ct=808080'/></a></center>
