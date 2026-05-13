@@ -1,0 +1,2222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Askesis-MD — editor Markdown ultraleve e universal">
+<meta name="theme-color" content="#000000">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Askesis-MD">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23000'/><text x='4' y='24' font-size='22' fill='%2350fa7b' font-family='monospace' font-weight='bold'>M</text></svg>">
+<title>Askesis-MD</title>
+<style>
+/* ─── FONTS ─── */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+/* ─── CSS VARIABLES / THEMES ─── */
+:root {
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  --font-serif: 'Source Serif 4', Georgia, serif;
+  --font-size: 14px;
+  --line-height: 1.7;
+  --radius: 2px;
+  --transition: 0.15s ease;
+}
+
+/* THEME: Terminal — alto contraste, fundo preto, cores vivas e elegantes */
+[data-theme="terminal"] {
+  --bg-root:      #000000;
+  --bg-menu:      #0a0a0a;
+  --bg-tab:       #000000;
+  --bg-tab-active:#0f0f0f;
+  --bg-editor:    #000000;
+  --bg-preview:   #080808;
+  --bg-statusbar: #0a0a0a;
+  --bg-dialog:    #111111;
+  --bg-input:     #050505;
+  --bg-hover:     #161616;
+  --bg-toolbar:   #0a0a0a;
+
+  --fg-main:      #e8e8e8;
+  --fg-dim:       #505050;
+  --fg-accent:    #50fa7b;
+  --fg-accent2:   #8be9fd;
+  --fg-warn:      #ffb86c;
+  --fg-err:       #ff5555;
+  --fg-tab:       #505050;
+  --fg-tab-active:#e8e8e8;
+  --fg-menu:      #d0d0d0;
+  --fg-menu-dim:  #404040;
+  --fg-status:    #404040;
+
+  --border:       #1e1e1e;
+  --border-focus: #50fa7b;
+  --cursor:       #50fa7b;
+  --selection:    #1a3a1a;
+
+  /* Syntax — inspirado em Dracula com alto contraste */
+  --syn-heading:  #50fa7b;
+  --syn-bold:     #f8f8f2;
+  --syn-italic:   #ffb86c;
+  --syn-code:     #8be9fd;
+  --syn-link:     #bd93f9;
+  --syn-quote:    #6272a4;
+  --syn-list:     #ffb86c;
+  --syn-hr:       #2a2a2a;
+  --syn-html:     #ff79c6;
+  --syn-comment:  #44475a;
+  --syn-string:   #f1fa8c;
+  --syn-keyword:  #ff79c6;
+
+  --scrollbar-bg: #0a0a0a;
+  --scrollbar-thumb: #1e1e1e;
+}
+
+/* THEME: Thesis — inspirado no tema Thesis/DIYthemes de Chris Pearson
+   Paleta editorial: off-white, serifas cinza-escuro, azul-ardósia, bege */
+[data-theme="light"] {
+  --bg-root:      #f5f2ed;
+  --bg-menu:      #edeae4;
+  --bg-tab:       #e5e1da;
+  --bg-tab-active:#f5f2ed;
+  --bg-editor:    #faf8f5;
+  --bg-preview:   #f0ece6;
+  --bg-statusbar: #e5e1da;
+  --bg-dialog:    #faf8f5;
+  --bg-input:     #faf8f5;
+  --bg-hover:     #e0dbd3;
+  --bg-toolbar:   #edeae4;
+
+  --fg-main:      #2c2c2c;
+  --fg-dim:       #8a8278;
+  --fg-accent:    #2e6da4;
+  --fg-accent2:   #5a3e8a;
+  --fg-warn:      #8a6420;
+  --fg-err:       #9a2a2a;
+  --fg-tab:       #8a8278;
+  --fg-tab-active:#2c2c2c;
+  --fg-menu:      #2c2c2c;
+  --fg-menu-dim:  #bbb5ac;
+  --fg-status:    #bbb5ac;
+
+  --border:       #d5cfc6;
+  --border-focus: #2e6da4;
+  --cursor:       #2c2c2c;
+  --selection:    #c5d8ee;
+
+  /* Syntax — tons terrosos e azul-ardósia, refinados e legíveis */
+  --syn-heading:  #1e4f7a;
+  --syn-bold:     #1a1a1a;
+  --syn-italic:   #6b4c1e;
+  --syn-code:     #1a5c4a;
+  --syn-link:     #2e6da4;
+  --syn-quote:    #7a6e63;
+  --syn-list:     #7a5218;
+  --syn-hr:       #d5cfc6;
+  --syn-html:     #8a2828;
+  --syn-comment:  #bbb5ac;
+  --syn-string:   #2a6a2a;
+  --syn-keyword:  #5a3e8a;
+
+  --scrollbar-bg: #edeae4;
+  --scrollbar-thumb: #d5cfc6;
+}
+
+/* THEME: Soft / Warm */
+[data-theme="soft"] {
+  --bg-root:      #f7f3ee;
+  --bg-menu:      #efe9e2;
+  --bg-tab:       #e8e1d9;
+  --bg-tab-active:#f7f3ee;
+  --bg-editor:    #faf7f4;
+  --bg-preview:   #f2ede7;
+  --bg-statusbar: #e8e1d9;
+  --bg-dialog:    #f7f3ee;
+  --bg-input:     #faf7f4;
+  --bg-hover:     #ece5dc;
+  --bg-toolbar:   #efe9e2;
+
+  --fg-main:      #3a2e24;
+  --fg-dim:       #9a8a7a;
+  --fg-accent:    #5a7a3a;
+  --fg-accent2:   #3a5a8a;
+  --fg-warn:      #8a6a20;
+  --fg-err:       #8a3030;
+  --fg-tab:       #9a8a7a;
+  --fg-tab-active:#3a2e24;
+  --fg-menu:      #3a2e24;
+  --fg-menu-dim:  #bbaaa0;
+  --fg-status:    #bbaaa0;
+
+  --border:       #d8cfc4;
+  --border-focus: #5a7a3a;
+  --cursor:       #3a2e24;
+  --selection:    #d8e8c8;
+
+  --syn-heading:  #4a6a2a;
+  --syn-bold:     #2a1e14;
+  --syn-italic:   #6a4a20;
+  --syn-code:     #2a6a5a;
+  --syn-link:     #2a4a7a;
+  --syn-quote:    #7a6a5a;
+  --syn-list:     #7a5a20;
+  --syn-hr:       #d8cfc4;
+  --syn-html:     #8a3a2a;
+  --syn-comment:  #bbaaa0;
+  --syn-string:   #3a6a2a;
+  --syn-keyword:  #6a2a7a;
+
+  --scrollbar-bg: #efe9e2;
+  --scrollbar-thumb: #d8cfc4;
+}
+
+/* ─── RESET ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%; width: 100%;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  background: var(--bg-root);
+  color: var(--fg-main);
+  transition: background var(--transition), color var(--transition);
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 0; }
+
+/* ─── APP LAYOUT ─── */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ─── MENU BAR ─── */
+#menubar {
+  display: flex;
+  align-items: center;
+  background: var(--bg-menu);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  user-select: none;
+  height: 26px;
+  position: relative;
+  z-index: 1000;
+}
+
+.app-title {
+  padding: 0 12px;
+  font-size: 11px;
+  color: var(--fg-accent);
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  border-right: 1px solid var(--border);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.menu-item {
+  position: relative;
+  height: 100%;
+}
+
+.menu-item > button {
+  background: none;
+  border: none;
+  color: var(--fg-menu);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 0 10px;
+  cursor: pointer;
+  height: 100%;
+  letter-spacing: 0.04em;
+  transition: background var(--transition), color var(--transition);
+}
+
+.menu-item > button:hover,
+.menu-item.open > button {
+  background: var(--bg-hover);
+  color: var(--fg-accent);
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-menu);
+  border: 1px solid var(--border);
+  min-width: 220px;
+  z-index: 2000;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.4);
+}
+
+.menu-item.open .dropdown { display: block; }
+
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--fg-menu);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--transition);
+  font-family: var(--font-mono);
+}
+
+.dropdown-item:hover { background: var(--bg-hover); color: var(--fg-accent); }
+.dropdown-item.disabled { color: var(--fg-menu-dim); cursor: default; pointer-events: none; }
+.dropdown-sep { border-top: 1px solid var(--border); margin: 3px 0; }
+.kbd { font-size: 10px; color: var(--fg-dim); letter-spacing: 0; }
+
+.menu-spacer { flex: 1; }
+
+.theme-switcher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  border-left: 1px solid var(--border);
+  height: 100%;
+}
+
+.theme-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all var(--transition);
+  border-radius: var(--radius);
+}
+
+.theme-btn:hover,
+.theme-btn.active { border-color: var(--fg-accent); color: var(--fg-accent); }
+
+/* ─── TOOLBAR ─── */
+#toolbar {
+  display: flex;
+  align-items: center;
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
+  padding: 3px 6px;
+  gap: 1px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.tool-btn {
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 3px 7px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all var(--transition);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tool-btn:hover { background: var(--bg-hover); color: var(--fg-main); }
+.tool-btn:active { background: var(--border); }
+.tool-sep { width: 1px; background: var(--border); height: 16px; margin: 0 3px; flex-shrink: 0; }
+
+/* ─── TAB BAR ─── */
+#tabbar {
+  display: flex;
+  align-items: flex-end;
+  background: var(--bg-tab);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  min-height: 28px;
+}
+#tabbar::-webkit-scrollbar { height: 3px; }
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: var(--fg-tab);
+  cursor: pointer;
+  border-right: 1px solid var(--border);
+  border-top: 1px solid transparent;
+  white-space: nowrap;
+  min-width: 80px;
+  max-width: 180px;
+  position: relative;
+  transition: all var(--transition);
+  background: var(--bg-tab);
+  flex-shrink: 0;
+}
+
+.tab:hover { color: var(--fg-main); background: var(--bg-hover); }
+
+.tab.active {
+  color: var(--fg-tab-active);
+  background: var(--bg-tab-active);
+  border-top-color: var(--fg-accent);
+}
+
+.tab-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.tab-modified { color: var(--fg-warn); font-size: 10px; }
+
+.tab-close {
+  font-size: 12px;
+  color: var(--fg-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 3px;
+  line-height: 1;
+  opacity: 1;
+  transition: color var(--transition), background var(--transition);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.tab-close:hover { color: var(--fg-err); background: var(--bg-hover); }
+
+.tab-new {
+  padding: 5px 10px;
+  background: none;
+  border: none;
+  color: var(--fg-dim);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: color var(--transition);
+  flex-shrink: 0;
+}
+.tab-new:hover { color: var(--fg-accent); }
+
+/* ─── MAIN CONTENT ─── */
+#content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ─── EDITOR PANE ─── */
+#editor-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+#editor-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hidden textarea for actual editing */
+#editor {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--cursor);
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  padding: 20px 24px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 2;
+  tab-size: 2;
+  selection-color: var(--selection);
+}
+
+#editor::selection { background: var(--selection); color: transparent; }
+
+/* Syntax highlight overlay */
+#highlight {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  padding: 20px 24px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow: hidden;
+  z-index: 1;
+  color: var(--fg-main);
+  background: var(--bg-editor);
+}
+
+/* ─── DIVIDER ─── */
+#divider {
+  width: 4px;
+  background: var(--border);
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background var(--transition);
+  position: relative;
+}
+#divider:hover, #divider.dragging { background: var(--fg-accent); }
+
+/* ─── PREVIEW PANE ─── */
+#preview-pane {
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-preview);
+  border-left: 1px solid var(--border);
+}
+
+#preview-header {
+  padding: 4px 12px;
+  font-size: 10px;
+  color: var(--fg-dim);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-toolbar);
+  letter-spacing: 0.08em;
+}
+
+#preview {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 32px;
+  font-family: var(--font-serif);
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--fg-main);
+}
+
+/* Preview typography */
+#preview h1, #preview h2, #preview h3,
+#preview h4, #preview h5, #preview h6 {
+  font-family: var(--font-serif);
+  color: var(--syn-heading);
+  margin-top: 1.4em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+#preview h1 { font-size: 1.7em; border-bottom: 1px solid var(--border); padding-bottom: 0.2em; }
+#preview h2 { font-size: 1.4em; }
+#preview h3 { font-size: 1.15em; }
+#preview p { margin-bottom: 0.9em; }
+#preview blockquote {
+  border-left: 3px solid var(--syn-quote);
+  margin: 1em 0;
+  padding: 0.5em 1em;
+  color: var(--syn-quote);
+  font-style: italic;
+}
+#preview code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--bg-hover);
+  padding: 1px 5px;
+  border-radius: var(--radius);
+  color: var(--syn-code);
+}
+#preview pre {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  overflow-x: auto;
+  margin: 1em 0;
+  border-radius: var(--radius);
+}
+#preview pre code { background: none; padding: 0; font-size: 0.9em; }
+#preview a { color: var(--syn-link); text-decoration: none; border-bottom: 1px solid var(--syn-link); }
+#preview a:hover { opacity: 0.75; }
+#preview ul, #preview ol { padding-left: 1.8em; margin-bottom: 0.9em; }
+#preview li { margin-bottom: 0.25em; }
+#preview hr { border: none; border-top: 1px solid var(--border); margin: 1.5em 0; }
+#preview table { border-collapse: collapse; width: 100%; margin-bottom: 1em; }
+#preview th, #preview td { border: 1px solid var(--border); padding: 6px 10px; }
+#preview th { background: var(--bg-hover); font-weight: 600; }
+#preview img { max-width: 100%; }
+#preview strong { color: var(--syn-bold); }
+#preview em { color: var(--syn-italic); font-style: italic; }
+
+/* ─── STATUS BAR ─── */
+#statusbar {
+  display: flex;
+  align-items: center;
+  background: var(--bg-statusbar);
+  border-top: 1px solid var(--border);
+  padding: 0 12px;
+  height: 20px;
+  font-size: 10px;
+  color: var(--fg-status);
+  letter-spacing: 0.05em;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.status-item { display: flex; align-items: center; gap: 4px; }
+.status-sep { color: var(--border); }
+#status-msg { flex: 1; text-align: right; }
+#status-msg.ok { color: var(--fg-accent); }
+#status-msg.err { color: var(--fg-err); }
+
+/* ─── SYNTAX HIGHLIGHT COLORS ─── */
+.hl-h1,.hl-h2,.hl-h3,.hl-h4,.hl-h5,.hl-h6 { color: var(--syn-heading); font-weight: 500; }
+.hl-bold { color: var(--syn-bold); font-weight: 700; }
+.hl-italic { color: var(--syn-italic); font-style: italic; }
+.hl-code { color: var(--syn-code); }
+.hl-codeblock { color: var(--syn-code); }
+.hl-link { color: var(--syn-link); }
+.hl-img { color: var(--syn-link); }
+.hl-quote { color: var(--syn-quote); font-style: italic; }
+.hl-list { color: var(--syn-list); }
+.hl-hr { color: var(--syn-hr); }
+.hl-html { color: var(--syn-html); }
+.hl-punct { color: var(--fg-dim); }
+.hl-comment { color: var(--syn-comment); }
+.hl-keyword { color: var(--syn-keyword); }
+
+/* ─── DIALOG ─── */
+.dialog-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+}
+.dialog-overlay.open { display: flex; }
+
+.dialog {
+  background: var(--bg-dialog);
+  border: 1px solid var(--border);
+  min-width: 360px;
+  max-width: 520px;
+  width: 90%;
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.5);
+}
+
+.dialog-title {
+  padding: 10px 14px;
+  font-size: 11px;
+  color: var(--fg-accent);
+  border-bottom: 1px solid var(--border);
+  letter-spacing: 0.08em;
+  background: var(--bg-toolbar);
+}
+
+.dialog-body { padding: 16px 14px; }
+.dialog-body label { display: block; font-size: 11px; color: var(--fg-dim); margin-bottom: 5px; }
+.dialog-body input, .dialog-body select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--fg-main);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  padding: 5px 8px;
+  margin-bottom: 12px;
+  outline: none;
+  border-radius: var(--radius);
+}
+.dialog-body input:focus, .dialog-body select:focus { border-color: var(--border-focus); }
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-toolbar);
+}
+
+.btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--fg-main);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 12px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all var(--transition);
+  letter-spacing: 0.04em;
+}
+.btn:hover { border-color: var(--fg-accent); color: var(--fg-accent); }
+.btn.primary { border-color: var(--fg-accent); color: var(--fg-accent); }
+.btn.primary:hover { background: var(--fg-accent); color: var(--bg-root); }
+
+/* ─── VIEW MODES ─── */
+#app.view-editor #preview-pane,
+#app.view-editor #divider { display: none; }
+#app.view-editor #editor-pane { flex: 1; }
+
+#app.view-preview #editor-pane,
+#app.view-preview #divider { display: none; }
+#app.view-preview #preview-pane { flex: 1; width: 100%; }
+
+
+/* ─── PWA INSTALL BUTTON ─── */
+#pwa-install-btn {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-left: 1px solid var(--border);
+  height: 100%;
+  background: none;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  color: var(--fg-accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  letter-spacing: 0.06em;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+#pwa-install-btn:hover { background: var(--bg-hover); }
+#pwa-install-btn.visible { display: flex; }
+
+/* ─── NOTIFICATIONS ─── */
+#toast {
+  position: fixed;
+  bottom: 30px;
+  right: 20px;
+  background: var(--bg-dialog);
+  border: 1px solid var(--fg-accent);
+  color: var(--fg-accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 6px 14px;
+  z-index: 5000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  letter-spacing: 0.05em;
+}
+#toast.show { opacity: 1; }
+</style>
+</head>
+<body data-theme="terminal">
+
+<div id="app">
+
+  <!-- MENU BAR -->
+  <div id="menubar">
+    <span class="app-title">⬛ ASKESIS-MD</span>
+
+    <!-- File menu -->
+    <div class="menu-item" id="menu-file">
+      <button onclick="toggleMenu('menu-file')">Arquivo</button>
+      <div class="dropdown">
+        <div class="dropdown-item" onclick="newTab()">Nova aba <span class="kbd">Ctrl+T</span></div>
+        <div class="dropdown-item" onclick="openFileDialog()">Abrir… <span class="kbd">Ctrl+O</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="saveFile()">Salvar <span class="kbd">Ctrl+S</span></div>
+        <div class="dropdown-item" onclick="saveFileAs()">Salvar como… <span class="kbd">Ctrl+Shift+S</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="showExportDialog()">Exportar… <span class="kbd">Ctrl+E</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="closeTab()">Fechar aba <span class="kbd">Ctrl+W</span></div>
+        <div class="dropdown-item" onclick="openNewWindow()">Nova janela <span class="kbd">Ctrl+Shift+N</span></div>
+      </div>
+    </div>
+
+    <!-- Edit menu -->
+    <div class="menu-item" id="menu-edit">
+      <button onclick="toggleMenu('menu-edit')">Editar</button>
+      <div class="dropdown">
+        <div class="dropdown-item" onclick="doUndo()">Desfazer <span class="kbd">Ctrl+Z</span></div>
+        <div class="dropdown-item" onclick="doRedo()">Refazer <span class="kbd">Ctrl+Y</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="document.execCommand('cut')">Recortar <span class="kbd">Ctrl+X</span></div>
+        <div class="dropdown-item" onclick="document.execCommand('copy')">Copiar <span class="kbd">Ctrl+C</span></div>
+        <div class="dropdown-item" onclick="document.execCommand('paste')">Colar <span class="kbd">Ctrl+V</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="selectAll()">Selecionar tudo <span class="kbd">Ctrl+A</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="showFindDialog()">Buscar / Substituir <span class="kbd">Ctrl+F</span></div>
+      </div>
+    </div>
+
+    <!-- Insert menu -->
+    <div class="menu-item" id="menu-insert">
+      <button onclick="toggleMenu('menu-insert')">Inserir</button>
+      <div class="dropdown">
+        <div class="dropdown-item" onclick="insertWrap('**','**')">Negrito <span class="kbd">Ctrl+B</span></div>
+        <div class="dropdown-item" onclick="insertWrap('*','*')">Itálico <span class="kbd">Ctrl+I</span></div>
+        <div class="dropdown-item" onclick="insertWrap('`','`')">Código inline <span class="kbd">Ctrl+`</span></div>
+        <div class="dropdown-item" onclick="insertWrap('~~','~~')">Tachado</div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="insertHeading(1)">Título H1 <span class="kbd">Ctrl+1</span></div>
+        <div class="dropdown-item" onclick="insertHeading(2)">Título H2 <span class="kbd">Ctrl+2</span></div>
+        <div class="dropdown-item" onclick="insertHeading(3)">Título H3 <span class="kbd">Ctrl+3</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="insertLink()">Link <span class="kbd">Ctrl+L</span></div>
+        <div class="dropdown-item" onclick="insertImage()">Imagem</div>
+        <div class="dropdown-item" onclick="insertTable()">Tabela</div>
+        <div class="dropdown-item" onclick="insertCodeBlock()">Bloco de código</div>
+        <div class="dropdown-item" onclick="insertHR()">Linha horizontal</div>
+        <div class="dropdown-item" onclick="insertBlockquote()">Citação</div>
+      </div>
+    </div>
+
+    <!-- View menu -->
+    <div class="menu-item" id="menu-view">
+      <button onclick="toggleMenu('menu-view')">Visualizar</button>
+      <div class="dropdown">
+        <div class="dropdown-item" onclick="setView('split')">Editor + Preview <span class="kbd">Ctrl+Shift+P</span></div>
+        <div class="dropdown-item" onclick="setView('editor')">Apenas editor</div>
+        <div class="dropdown-item" onclick="setView('preview')">Apenas preview</div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="increaseFontSize()">Aumentar fonte <span class="kbd">Ctrl++</span></div>
+        <div class="dropdown-item" onclick="decreaseFontSize()">Diminuir fonte <span class="kbd">Ctrl+-</span></div>
+        <div class="dropdown-item" onclick="resetFontSize()">Tamanho padrão <span class="kbd">Ctrl+0</span></div>
+        <div class="dropdown-sep"></div>
+        <div class="dropdown-item" onclick="toggleWordWrap()">Quebra de linha</div>
+        <div class="dropdown-item" onclick="toggleFocus()">Modo foco</div>
+      </div>
+    </div>
+
+    <!-- Help menu -->
+    <div class="menu-item" id="menu-help">
+      <button onclick="toggleMenu('menu-help')">Ajuda</button>
+      <div class="dropdown">
+        <div class="dropdown-item" onclick="openCheatsheet()">Referência Markdown</div>
+        <div class="dropdown-item" onclick="openAbout()">Sobre o Askesis-MD</div>
+      </div>
+    </div>
+
+    <div class="menu-spacer"></div>
+
+    <!-- Toolbar: undo/redo -->
+    <div style="display:flex;align-items:center;gap:4px;padding:0 8px;border-left:1px solid var(--border);height:100%;">
+      <button class="tool-btn" onclick="doUndo()" title="Desfazer (Ctrl+Z)">↩</button>
+      <button class="tool-btn" onclick="doRedo()" title="Refazer (Ctrl+Y)">↪</button>
+    </div>
+
+    <!-- PWA install -->
+    <button id="pwa-install-btn" onclick="pwaInstall()" title="Instalar como app">
+      ⬇ Instalar app
+    </button>
+
+    <!-- Theme switcher -->
+    <div class="theme-switcher">
+      <button class="theme-btn active" id="btn-terminal" onclick="setTheme('terminal')" title="Tema Terminal (alto contraste)">TRM</button>
+      <button class="theme-btn" id="btn-light" onclick="setTheme('light')" title="Tema Thesis (claro editorial)">THX</button>
+      <button class="theme-btn" id="btn-soft" onclick="setTheme('soft')" title="Tema Suave">SFT</button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div id="toolbar">
+    <button class="tool-btn" onclick="insertHeading(1)" title="H1">H1</button>
+    <button class="tool-btn" onclick="insertHeading(2)" title="H2">H2</button>
+    <button class="tool-btn" onclick="insertHeading(3)" title="H3">H3</button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="insertWrap('**','**')" title="Negrito (Ctrl+B)"><b>B</b></button>
+    <button class="tool-btn" onclick="insertWrap('*','*')" title="Itálico (Ctrl+I)"><i>I</i></button>
+    <button class="tool-btn" onclick="insertWrap('~~','~~')" title="Tachado"><s>S</s></button>
+    <button class="tool-btn" onclick="insertWrap('`','`')" title="Código">&lt;&gt;</button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="insertLink()" title="Link (Ctrl+L)">🔗</button>
+    <button class="tool-btn" onclick="insertBlockquote()" title="Citação">"</button>
+    <button class="tool-btn" onclick="insertListUL()" title="Lista">☰</button>
+    <button class="tool-btn" onclick="insertListOL()" title="Lista numerada">1.</button>
+    <button class="tool-btn" onclick="insertCodeBlock()" title="Bloco de código">{ }</button>
+    <button class="tool-btn" onclick="insertTable()" title="Tabela">▦</button>
+    <button class="tool-btn" onclick="insertHR()" title="Linha horizontal">—</button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="doUndo()" title="Desfazer (Ctrl+Z)">↩</button>
+    <button class="tool-btn" onclick="doRedo()" title="Refazer (Ctrl+Y)">↪</button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" onclick="setView('split')" title="Split">⧉</button>
+    <button class="tool-btn" onclick="setView('editor')" title="Só editor">▤</button>
+    <button class="tool-btn" onclick="setView('preview')" title="Só preview">▣</button>
+  </div>
+
+  <!-- TAB BAR -->
+  <div id="tabbar">
+    <button class="tab-new" onclick="newTab()" title="Nova aba (Ctrl+T)">+</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="content">
+    <!-- Editor -->
+    <div id="editor-pane">
+      <div id="editor-wrap">
+        <div id="highlight" aria-hidden="true"></div>
+        <textarea id="editor" spellcheck="false" autocorrect="off" autocapitalize="off"
+          oninput="onEditorInput()" onscroll="syncScroll()"
+          onkeydown="onEditorKeydown(event)"
+          placeholder="Comece a escrever Markdown aqui..."></textarea>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div id="divider" onmousedown="startDrag(event)"></div>
+
+    <!-- Preview -->
+    <div id="preview-pane">
+      <div id="preview-header">
+        <span>PREVIEW</span>
+        <span id="preview-mode-label">Renderização HTML</span>
+      </div>
+      <div id="preview"></div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div id="statusbar">
+    <span class="status-item" id="status-pos">Ln 1, Col 1</span>
+    <span class="status-sep">·</span>
+    <span class="status-item" id="status-words">0 palavras</span>
+    <span class="status-sep">·</span>
+    <span class="status-item" id="status-chars">0 chars</span>
+    <span class="status-sep">·</span>
+    <span class="status-item" id="status-file">Novo arquivo</span>
+    <span id="status-msg"></span>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- EXPORT DIALOG -->
+<div class="dialog-overlay" id="export-dialog">
+  <div class="dialog">
+    <div class="dialog-title">EXPORTAR</div>
+    <div class="dialog-body">
+      <label>Formato</label>
+      <select id="export-format">
+        <option value="md">Markdown (.md)</option>
+        <option value="html">HTML (.html)</option>
+        <option value="html-askemata">HTML com tema Askemata</option>
+        <option value="pdf">PDF (.pdf)</option>
+        <option value="pdf-askemata">PDF com tema Askemata</option>
+        <option value="rtf">Rich Text (.rtf)</option>
+        <option value="fodt">Flat ODT (.fodt)</option>
+      </select>
+      <label>Nome do arquivo</label>
+      <input type="text" id="export-filename" placeholder="documento">
+    </div>
+    <div class="dialog-footer">
+      <button class="btn" onclick="closeDialog('export-dialog')">Cancelar</button>
+      <button class="btn primary" onclick="doExport()">Exportar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FIND/REPLACE DIALOG -->
+<div class="dialog-overlay" id="find-dialog">
+  <div class="dialog">
+    <div class="dialog-title">BUSCAR / SUBSTITUIR</div>
+    <div class="dialog-body">
+      <label>Buscar</label>
+      <input type="text" id="find-term" placeholder="texto a buscar…" oninput="findHighlight()">
+      <label>Substituir por</label>
+      <input type="text" id="replace-term" placeholder="substituição…">
+    </div>
+    <div class="dialog-footer">
+      <button class="btn" onclick="closeDialog('find-dialog')">Fechar</button>
+      <button class="btn" onclick="findNext()">Próximo</button>
+      <button class="btn primary" onclick="replaceAll()">Substituir tudo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT DIALOG -->
+<div class="dialog-overlay" id="about-dialog">
+  <div class="dialog">
+    <div class="dialog-title">SOBRE O ASKESIS-MD</div>
+    <div class="dialog-body" style="font-size:12px;line-height:1.7;color:var(--fg-main)">
+      <p style="color:var(--fg-accent);font-size:13px;margin-bottom:10px;letter-spacing:0.06em">⬛ ASKESIS-MD</p>
+      <p>Editor Markdown ultraleve, universal e minimalista.</p>
+      <br>
+      <p style="color:var(--fg-dim)">✓ Sem dependências externas obrigatórias</p>
+      <p style="color:var(--fg-dim)">✓ Múltiplas abas e janelas</p>
+      <p style="color:var(--fg-dim)">✓ Realce de sintaxe no editor</p>
+      <p style="color:var(--fg-dim)">✓ Três temas visuais</p>
+      <p style="color:var(--fg-dim)">✓ Exportação em múltiplos formatos</p>
+      <br>
+      <p style="color:var(--syn-italic);font-style:italic">Criado por <a href="https://askesis.hypotheses.org" target="_blank" style="color:var(--syn-link)">askesis.hypotheses.org</a></p>
+    </div>
+    <div class="dialog-footer">
+      <button class="btn primary" onclick="closeDialog('about-dialog')">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   ASKESIS-MD — Core Application
+   ════════════════════════════════════════════════════════════ */
+
+// ── State ──────────────────────────────────────────────────
+const WELCOME_CONTENT = `# Bem-vindo ao Askesis-MD
+
+> *"A escrita é o caminho pelo qual o pensamento se descobre a si mesmo."*
+> — Adaptado de Henri Bergson
+
+---
+
+## O que é o Askesis-MD?
+
+O **Askesis-MD** é um editor Markdown **ultraleve** e **universal** — projetado para funcionar em qualquer sistema, novo ou antigo, sem dependências pesadas.
+
+### Princípios
+
+- **Leveza** — um único arquivo HTML, sem instalação, sem servidor
+- **Universalidade** — compatível com qualquer navegador moderno ou legado
+- **Minimalismo** — interface inspirada nos terminais clássicos do Linux
+- **Acessibilidade** — funciona offline, em qualquer dispositivo
+
+---
+
+## Funcionalidades
+
+| Recurso | Descrição |
+|---|---|
+| Múltiplas abas | Edite vários documentos simultaneamente |
+| Realce de sintaxe | Visualização colorida diretamente no editor |
+| Temas | Terminal · Claro · Suave |
+| Exportação | .md · .html · .pdf · .fodt · .rtf |
+| Tema Askemata | Exportação com tipografia acadêmica |
+
+---
+
+## Atalhos essenciais
+
+\`Ctrl+S\` Salvar · \`Ctrl+T\` Nova aba · \`Ctrl+E\` Exportar
+\`Ctrl+B\` Negrito · \`Ctrl+I\` Itálico · \`Ctrl+Z\` Desfazer
+
+---
+
+*Criado por [askesis.hypotheses.org](https://askesis.hypotheses.org)*
+`;
+
+let tabs = [];
+let activeTab = null;
+let tabCounter = 0;
+let fontSize = 14;
+let wordWrap = true;
+let focusMode = false;
+let currentView = 'split';
+let isDragging = false;
+let dragStartX = 0;
+let dragStartW = 0;
+let historyStack = {};
+let redoStack = {};
+
+const editor = document.getElementById('editor');
+const highlight = document.getElementById('highlight');
+const preview = document.getElementById('preview');
+const tabbar = document.getElementById('tabbar');
+const tabNew = document.querySelector('.tab-new');
+
+// ── Tab Management ──────────────────────────────────────────
+function createTab(name, content, filename) {
+  const id = ++tabCounter;
+  const tab = {
+    id,
+    name: name || `Novo ${id}`,
+    content: content !== undefined ? content : '',
+    filename: filename || null,
+    modified: false,
+    cursor: 0
+  };
+  tabs.push(tab);
+  historyStack[id] = [tab.content];
+  redoStack[id] = [];
+  renderTabbar();
+  switchTab(id);
+  return tab;
+}
+
+function switchTab(id) {
+  if (activeTab) {
+    activeTab.content = editor.value;
+    activeTab.cursor = editor.selectionStart;
+  }
+  activeTab = tabs.find(t => t.id === id);
+  if (!activeTab) return;
+  editor.value = activeTab.content;
+  editor.setSelectionRange(activeTab.cursor, activeTab.cursor);
+  renderTabbar();
+  updateHighlight();
+  renderPreview();
+  updateStatusBar();
+  editor.focus();
+}
+
+function renderTabbar() {
+  // Remove old tabs (keep tab-new button)
+  Array.from(tabbar.querySelectorAll('.tab')).forEach(el => el.remove());
+  tabs.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (activeTab && activeTab.id === tab.id ? ' active' : '');
+    el.dataset.id = tab.id;
+    el.innerHTML = `
+      <span class="tab-name" title="${tab.filename || tab.name}">${tab.name}</span>
+      ${tab.modified ? '<span class="tab-modified">●</span>' : ''}
+      <button class="tab-close" onclick="closeTabById(${tab.id}, event)" title="Fechar">×</button>
+    `;
+    el.addEventListener('mousedown', e => { if (e.button === 0) switchTab(tab.id); });
+    tabbar.insertBefore(el, tabNew);
+  });
+}
+
+function newTab(content, name, filename) {
+  createTab(name, content, filename);
+}
+
+function closeTab() { if (activeTab) closeTabById(activeTab.id); }
+
+function closeTabById(id, e) {
+  if (e) { e.stopPropagation(); e.preventDefault(); }
+  const idx = tabs.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  const tab = tabs[idx];
+  if (tab.modified) {
+    if (!confirm(`"${tab.name}" tem alterações não salvas. Fechar mesmo assim?`)) return;
+  }
+  tabs.splice(idx, 1);
+  delete historyStack[id];
+  delete redoStack[id];
+  if (tabs.length === 0) {
+    activeTab = null;
+    editor.value = '';
+    renderTabbar();
+    newTab(WELCOME_CONTENT, 'Bem-vindo');
+    return;
+  }
+  const newActive = tabs[Math.min(idx, tabs.length - 1)];
+  activeTab = null;
+  renderTabbar();
+  switchTab(newActive.id);
+}
+
+// ── Editor ──────────────────────────────────────────────────
+function onEditorInput() {
+  if (!activeTab) return;
+  const val = editor.value;
+  activeTab.content = val;
+  activeTab.modified = true;
+
+  // History
+  const stack = historyStack[activeTab.id];
+  if (stack[stack.length - 1] !== val) {
+    stack.push(val);
+    if (stack.length > 200) stack.shift();
+    redoStack[activeTab.id] = [];
+  }
+
+  updateHighlight();
+  renderPreview();
+  updateStatusBar();
+  updateTabModified();
+}
+
+function updateTabModified() {
+  const el = tabbar.querySelector(`.tab[data-id="${activeTab.id}"] .tab-modified`);
+  const span = tabbar.querySelector(`.tab[data-id="${activeTab.id}"]`);
+  if (!span) return;
+  const existing = span.querySelector('.tab-modified');
+  if (activeTab.modified && !existing) {
+    const s = document.createElement('span');
+    s.className = 'tab-modified';
+    s.textContent = '●';
+    span.querySelector('.tab-name').after(s);
+  } else if (!activeTab.modified && existing) {
+    existing.remove();
+  }
+}
+
+function syncScroll() {
+  highlight.scrollTop = editor.scrollTop;
+  highlight.scrollLeft = editor.scrollLeft;
+}
+
+// ── Syntax Highlight ────────────────────────────────────────
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateHighlight() {
+  const text = editor.value;
+  const lines = text.split('\n');
+  const result = lines.map(line => highlightLine(line)).join('\n');
+  highlight.innerHTML = result + '\n';
+  syncScroll();
+}
+
+function highlightLine(raw) {
+  const line = escapeHtml(raw);
+  // Headings
+  const headingMatch = line.match(/^(#{1,6})\s/);
+  if (headingMatch) {
+    const n = headingMatch[1].length;
+    return `<span class="hl-h${n}">${line}</span>`;
+  }
+  // HR
+  if (/^([-*_]){3,}$/.test(raw.trim())) {
+    return `<span class="hl-hr">${line}</span>`;
+  }
+  // Blockquote
+  if (/^&gt;/.test(line) || /^>/.test(raw)) {
+    return `<span class="hl-quote">${line}</span>`;
+  }
+  // Unordered list
+  if (/^(\s*)([-*+])\s/.test(raw)) {
+    return `<span class="hl-list">${line}</span>`;
+  }
+  // Ordered list
+  if (/^\s*\d+\.\s/.test(raw)) {
+    return `<span class="hl-list">${line}</span>`;
+  }
+  // Code block fence
+  if (/^```/.test(raw) || /^~~~/.test(raw)) {
+    return `<span class="hl-codeblock">${line}</span>`;
+  }
+  // HTML tags
+  if (/^<[a-zA-Z]/.test(raw) || /^<\/[a-zA-Z]/.test(raw)) {
+    return `<span class="hl-html">${line}</span>`;
+  }
+  // Inline: apply on line text
+  return applyInline(line);
+}
+
+function applyInline(line) {
+  // Bold **text** or __text__
+  line = line.replace(/(\*\*|__)(.+?)\1/g, (m, d, t) =>
+    `<span class="hl-punct">${escOrNot(d)}</span><span class="hl-bold">${t}</span><span class="hl-punct">${escOrNot(d)}</span>`);
+  // Italic *text* or _text_
+  line = line.replace(/(\*|_)(.+?)\1/g, (m, d, t) =>
+    `<span class="hl-punct">${escOrNot(d)}</span><span class="hl-italic">${t}</span><span class="hl-punct">${escOrNot(d)}</span>`);
+  // Strikethrough
+  line = line.replace(/(~~)(.+?)\1/g, (m, d, t) =>
+    `<span class="hl-punct">${d}</span><span class="hl-comment" style="text-decoration:line-through">${t}</span><span class="hl-punct">${d}</span>`);
+  // Inline code
+  line = line.replace(/(`+)(.+?)\1/g, (m, d, t) =>
+    `<span class="hl-punct">${d}</span><span class="hl-code">${t}</span><span class="hl-punct">${d}</span>`);
+  // Image ![alt](url)
+  line = line.replace(/(!\[)([^\]]*?)(\]\()([^)]*?)(\))/g,
+    (m, a, alt, b, url, c) =>
+    `<span class="hl-punct">${a}</span><span class="hl-img">${alt}</span><span class="hl-punct">${b}</span><span class="hl-link">${url}</span><span class="hl-punct">${c}</span>`);
+  // Link [text](url)
+  line = line.replace(/(\[)([^\]]*?)(\]\()([^)]*?)(\))/g,
+    (m, a, txt, b, url, c) =>
+    `<span class="hl-punct">${a}</span><span class="hl-bold">${txt}</span><span class="hl-punct">${b}</span><span class="hl-link">${url}</span><span class="hl-punct">${c}</span>`);
+  return line;
+}
+
+function escOrNot(s) { return s; }
+
+// ── Markdown → HTML (renderer) ──────────────────────────────
+function markdownToHTML(md) {
+  let html = md;
+  // Escape HTML
+  // We do NOT escape — we allow HTML passthrough in preview
+
+  // Fenced code blocks
+  html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (m, lang, code) =>
+    `<pre><code class="language-${lang}">${escapeHtml(code.trim())}</code></pre>`);
+
+  // HR
+  html = html.replace(/^([-*_]){3,}\s*$/gm, '<hr>');
+
+  // Headings
+  html = html.replace(/^#{6}\s(.+)$/gm, '<h6>$1</h6>');
+  html = html.replace(/^#{5}\s(.+)$/gm, '<h5>$1</h5>');
+  html = html.replace(/^#{4}\s(.+)$/gm, '<h4>$1</h4>');
+  html = html.replace(/^#{3}\s(.+)$/gm, '<h3>$1</h3>');
+  html = html.replace(/^#{2}\s(.+)$/gm, '<h2>$1</h2>');
+  html = html.replace(/^#{1}\s(.+)$/gm, '<h1>$1</h1>');
+
+  // Blockquote
+  html = html.replace(/^>\s?(.+)$/gm, '<blockquote>$1</blockquote>');
+
+  // Bold & italic
+  html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+
+  // Strikethrough
+  html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  // Inline code
+  html = html.replace(/`(.+?)`/g, '<code>$1</code>');
+
+  // Images
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">');
+
+  // Links
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+  // Tables
+  html = html.replace(/^\|(.+)\|$/gm, (match, content) => {
+    const cells = content.split('|').map(c => c.trim());
+    return '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+  });
+  html = html.replace(/(<tr>.*<\/tr>\n?){2,}/g, m => `<table>${m}</table>`);
+  // Fix header row (first row before separator)
+  html = html.replace(/<table>(<tr>.*?<\/tr>)\n(<tr>(?:\s*<td>[-: |]+<\/td>\s*)+<\/tr>)/gs,
+    (m, header) => `<table><thead>${header.replace(/<td>/g,'<th>').replace(/<\/td>/g,'</th>')}</thead><tbody>`);
+
+  // Ordered list
+  html = html.replace(/(^\d+\..+$\n?)+/gm, m => {
+    const items = m.trim().split('\n').map(i => `<li>${i.replace(/^\d+\.\s*/,'')}</li>`).join('');
+    return `<ol>${items}</ol>`;
+  });
+
+  // Unordered list
+  html = html.replace(/(^[-*+]\s.+$\n?)+/gm, m => {
+    const items = m.trim().split('\n').map(i => `<li>${i.replace(/^[-*+]\s/,'')}</li>`).join('');
+    return `<ul>${items}</ul>`;
+  });
+
+  // Paragraphs
+  html = html.replace(/\n{2,}/g, '\n</p><p>\n');
+  html = `<p>${html}</p>`;
+
+  // Clean empty paragraphs
+  html = html.replace(/<p>\s*<\/p>/g, '');
+  html = html.replace(/<p>\s*(<(?:h[1-6]|ul|ol|blockquote|pre|hr|table)[^>]*>)/g, '$1');
+  html = html.replace(/(<\/(?:h[1-6]|ul|ol|blockquote|pre|hr|table)>)\s*<\/p>/g, '$1');
+
+  return html;
+}
+
+function renderPreview() {
+  if (!activeTab) return;
+  preview.innerHTML = markdownToHTML(activeTab.content);
+}
+
+// ── Status Bar ──────────────────────────────────────────────
+function updateStatusBar() {
+  if (!activeTab) return;
+  const text = editor.value;
+  const pos = editor.selectionStart;
+  const before = text.substring(0, pos);
+  const lines = before.split('\n');
+  const ln = lines.length;
+  const col = lines[lines.length - 1].length + 1;
+  document.getElementById('status-pos').textContent = `Ln ${ln}, Col ${col}`;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  document.getElementById('status-words').textContent = `${words} ${words === 1 ? 'palavra' : 'palavras'}`;
+  document.getElementById('status-chars').textContent = `${text.length} chars`;
+  document.getElementById('status-file').textContent = activeTab.filename
+    ? activeTab.filename.split('/').pop().split('\\').pop()
+    : (activeTab.name || 'Novo arquivo');
+}
+
+editor.addEventListener('keyup', updateStatusBar);
+editor.addEventListener('click', updateStatusBar);
+
+// ── File System Access API (salvar no mesmo arquivo) ─────────
+const hasFS = typeof window.showSaveFilePicker === 'function';
+const hasOpen = typeof window.showOpenFilePicker === 'function';
+
+async function saveFile() {
+  if (!activeTab) return;
+  activeTab.content = editor.value;
+
+  if (hasFS) {
+    try {
+      // Se já temos um fileHandle para esta aba, escreve direto
+      if (activeTab.fileHandle) {
+        const writable = await activeTab.fileHandle.createWritable();
+        await writable.write(activeTab.content);
+        await writable.close();
+        activeTab.modified = false;
+        updateTabModified();
+        showStatus('Salvo: ' + activeTab.name, 'ok');
+      } else {
+        // Sem handle → abre diálogo Salvar Como
+        await saveFileAs();
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') showStatus('Erro ao salvar: ' + err.message, 'err');
+    }
+  } else {
+    // Fallback: download (navegadores sem File System Access API)
+    const filename = activeTab.filename || (activeTab.name.endsWith('.md') ? activeTab.name : activeTab.name + '.md');
+    downloadFile(activeTab.content, filename, 'text/markdown');
+    activeTab.modified = false;
+    updateTabModified();
+    showStatus('Salvo (download): ' + filename, 'ok');
+  }
+}
+
+async function saveFileAs() {
+  if (!activeTab) return;
+  activeTab.content = editor.value;
+
+  if (hasFS) {
+    try {
+      const suggestedName = activeTab.filename
+        || (activeTab.name.endsWith('.md') ? activeTab.name : activeTab.name + '.md');
+      const handle = await window.showSaveFilePicker({
+        suggestedName,
+        types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } },
+                { description: 'Texto', accept: { 'text/plain': ['.txt'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(activeTab.content);
+      await writable.close();
+      activeTab.fileHandle = handle;
+      activeTab.filename = handle.name;
+      activeTab.name = handle.name;
+      activeTab.modified = false;
+      renderTabbar();
+      updateStatusBar();
+      showStatus('Salvo como: ' + handle.name, 'ok');
+    } catch (err) {
+      if (err.name !== 'AbortError') showStatus('Erro ao salvar: ' + err.message, 'err');
+    }
+  } else {
+    // Fallback sem API
+    const raw = prompt('Nome do arquivo:', activeTab.name || 'documento');
+    if (!raw) return;
+    const filename = raw.endsWith('.md') ? raw : raw + '.md';
+    activeTab.filename = filename;
+    activeTab.name = filename;
+    activeTab.modified = false;
+    downloadFile(activeTab.content, filename, 'text/markdown');
+    renderTabbar();
+    updateStatusBar();
+    showStatus('Salvo como: ' + filename, 'ok');
+  }
+}
+
+async function openFileDialog() {
+  if (hasOpen) {
+    try {
+      const [handle] = await window.showOpenFilePicker({
+        types: [{ description: 'Markdown / Texto',
+                  accept: { 'text/markdown': ['.md','.markdown'], 'text/plain': ['.txt'] } }],
+        multiple: false
+      });
+      const file = await handle.getFile();
+      const text = await file.text();
+      const tab = createTab(file.name, text, file.name);
+      tab.fileHandle = handle;   // guarda o handle para salvar no mesmo arquivo
+    } catch (err) {
+      if (err.name !== 'AbortError') showStatus('Erro ao abrir: ' + err.message, 'err');
+    }
+  } else {
+    // Fallback
+    const inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.md,.txt,.markdown';
+    inp.onchange = e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => newTab(ev.target.result, file.name, file.name);
+      reader.readAsText(file);
+    };
+    inp.click();
+  }
+}
+
+function downloadFile(content, filename, mime) {
+  const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── Export ──────────────────────────────────────────────────
+function showExportDialog() {
+  if (!activeTab) return;
+  const name = (activeTab.filename || activeTab.name || 'documento').replace(/\.md$/,'');
+  document.getElementById('export-filename').value = name;
+  openDialog('export-dialog');
+}
+
+function doExport() {
+  const format = document.getElementById('export-format').value;
+  const name = document.getElementById('export-filename').value || 'documento';
+  const content = activeTab ? activeTab.content : editor.value;
+  const htmlBody = markdownToHTML(content);
+
+  closeDialog('export-dialog');
+
+  if (format === 'md') {
+    downloadFile(content, name + '.md', 'text/markdown');
+  } else if (format === 'html') {
+    const fullHtml = buildHTML(htmlBody, name, false);
+    downloadFile(fullHtml, name + '.html', 'text/html');
+  } else if (format === 'html-askemata') {
+    const fullHtml = buildHTML(htmlBody, name, true);
+    downloadFile(fullHtml, name + '.html', 'text/html');
+  } else if (format === 'pdf') {
+    printAsPDF(htmlBody, name, false);
+  } else if (format === 'pdf-askemata') {
+    printAsPDF(htmlBody, name, true);
+  } else if (format === 'rtf') {
+    const rtf = buildRTF(content);
+    downloadFile(rtf, name + '.rtf', 'application/rtf');
+  } else if (format === 'fodt') {
+    const fodt = buildFODT(content, name);
+    downloadFile(fodt, name + '.fodt', 'application/vnd.oasis.opendocument.text');
+  }
+  showStatus('Exportado: ' + name, 'ok');
+}
+
+function buildHTML(body, title, askemata) {
+  if (askemata) {
+    return `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(title)}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+/* Computer Modern via CDNJS */
+@import url('https://cdn.jsdelivr.net/npm/computer-modern@0.1.2/cmu-serif.min.css');
+:root {
+  --text: #1a1a1a;
+  --bg: #f8f6f2;
+  --accent: #3a3a6a;
+  --border: #ccc;
+  --code-bg: #f0ede8;
+}
+body {
+  font-family: "Computer Modern Serif", "CMU Serif", "Source Serif 4", Georgia, serif;
+  font-size: 18px;
+  line-height: 1.85;
+  color: var(--text);
+  background: var(--bg);
+  max-width: 720px;
+  margin: 60px auto;
+  padding: 0 32px 80px;
+}
+h1,h2,h3,h4,h5,h6 { font-family: inherit; color: var(--accent); margin-top:1.6em; margin-bottom:0.4em; line-height:1.3; }
+h1 { font-size:2em; border-bottom: 1px solid var(--border); padding-bottom:0.2em; }
+h2 { font-size:1.5em; }
+h3 { font-size:1.2em; }
+blockquote { border-left: 3px solid var(--accent); margin:1.5em 0; padding:0.5em 1.5em; color:#555; font-style:italic; }
+code { font-family: "Courier New", monospace; font-size:0.85em; background: var(--code-bg); padding:2px 5px; }
+pre { background: var(--code-bg); border:1px solid var(--border); padding:16px 20px; overflow-x:auto; margin:1.5em 0; }
+pre code { background:none; padding:0; }
+a { color: var(--accent); }
+table { border-collapse:collapse; width:100%; margin:1.5em 0; }
+th,td { border:1px solid var(--border); padding:8px 12px; text-align:left; }
+th { background:#eee; }
+hr { border:none; border-top:1px solid var(--border); margin:2em 0; }
+img { max-width:100%; }
+p { margin-bottom:1em; }
+</style>
+</head>
+<body>
+${body}
+<hr>
+<footer style="font-size:0.8em;color:#888;text-align:center;margin-top:2em">
+Criado com <a href="https://askesis.hypotheses.org">Askesis-MD</a>
+</footer>
+</body></html>`;
+  }
+
+  return `<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${escapeHtml(title)}</title>
+<style>
+body { font-family: Georgia, 'Times New Roman', serif; font-size:17px; line-height:1.75; color:#1a1a1a; max-width:750px; margin:40px auto; padding:0 24px 60px; background:#fff; }
+h1,h2,h3,h4 { margin-top:1.4em; margin-bottom:0.4em; }
+h1 { font-size:2em; border-bottom:1px solid #ccc; padding-bottom:0.2em; }
+blockquote { border-left:3px solid #888; margin:1em 0; padding:0.3em 1em; color:#555; font-style:italic; }
+code { font-family:monospace; background:#f5f5f5; padding:1px 4px; font-size:0.88em; }
+pre { background:#f5f5f5; border:1px solid #ddd; padding:12px; overflow-x:auto; }
+pre code { background:none; }
+a { color:#1a4a8a; }
+table { border-collapse:collapse; width:100%; }
+th,td { border:1px solid #ccc; padding:6px 10px; }
+th { background:#eee; }
+hr { border:none; border-top:1px solid #ccc; margin:1.5em 0; }
+img { max-width:100%; }
+</style>
+</head>
+<body>${body}</body></html>`;
+}
+
+function printAsPDF(body, title, askemata) {
+  const html = buildHTML(body, title, askemata);
+  const win = window.open('', '_blank');
+  if (!win) { showStatus('Permita popups para exportar PDF', 'err'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 600);
+}
+
+function buildRTF(md) {
+  const plain = md.replace(/\*\*(.+?)\*\*/g, '$1')
+                   .replace(/\*(.+?)\*/g, '$1')
+                   .replace(/#{1,6}\s/g, '')
+                   .replace(/`(.+?)`/g, '$1')
+                   .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  return `{\\rtf1\\ansi\\deff0\n{\\fonttbl{\\f0 Times New Roman;}}\n{\\f0\\fs24 ${plain.replace(/\n/g,'\\par\n')}}\n}`;
+}
+
+function buildFODT(md, title) {
+  const plain = md.replace(/[<>&'"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','\'':'&apos;','"':'&quot;'}[c]));
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+<office:body><office:text>
+<text:p text:style-name="Standard">${plain.replace(/\n/g, '</text:p><text:p text:style-name="Standard">')}</text:p>
+</office:text></office:body></office:document>`;
+}
+
+// ── Undo / Redo ─────────────────────────────────────────────
+function doUndo() {
+  if (!activeTab) return;
+  const stack = historyStack[activeTab.id];
+  if (stack.length < 2) return;
+  const current = stack.pop();
+  redoStack[activeTab.id].push(current);
+  const prev = stack[stack.length - 1];
+  editor.value = prev;
+  activeTab.content = prev;
+  activeTab.modified = true;
+  updateHighlight();
+  renderPreview();
+  updateStatusBar();
+}
+
+function doRedo() {
+  if (!activeTab) return;
+  const rstack = redoStack[activeTab.id];
+  if (!rstack.length) return;
+  const next = rstack.pop();
+  historyStack[activeTab.id].push(next);
+  editor.value = next;
+  activeTab.content = next;
+  activeTab.modified = true;
+  updateHighlight();
+  renderPreview();
+  updateStatusBar();
+}
+
+// ── Insert Helpers ──────────────────────────────────────────
+function insertWrap(before, after) {
+  const start = editor.selectionStart;
+  const end = editor.selectionEnd;
+  const selected = editor.value.substring(start, end);
+  const replacement = before + (selected || 'texto') + after;
+  editor.setRangeText(replacement, start, end, 'select');
+  editor.focus();
+  onEditorInput();
+}
+
+function insertAtCursor(text) {
+  const start = editor.selectionStart;
+  editor.setRangeText(text, start, start, 'end');
+  editor.focus();
+  onEditorInput();
+}
+
+function insertLine(text) {
+  const val = editor.value;
+  const pos = editor.selectionStart;
+  const lineStart = val.lastIndexOf('\n', pos - 1) + 1;
+  const beforeLine = val.substring(0, lineStart);
+  const afterCursor = val.substring(pos);
+  const newVal = beforeLine + text + '\n' + afterCursor;
+  editor.value = newVal;
+  editor.selectionStart = editor.selectionEnd = lineStart + text.length + 1;
+  editor.focus();
+  onEditorInput();
+}
+
+function insertHeading(n) {
+  const pos = editor.selectionStart;
+  const val = editor.value;
+  const lineStart = val.lastIndexOf('\n', pos - 1) + 1;
+  const lineEnd = val.indexOf('\n', pos);
+  const line = val.substring(lineStart, lineEnd === -1 ? undefined : lineEnd);
+  const cleanLine = line.replace(/^#+\s/, '');
+  const newLine = '#'.repeat(n) + ' ' + (cleanLine || 'Título');
+  editor.value = val.substring(0, lineStart) + newLine + (lineEnd === -1 ? '' : val.substring(lineEnd));
+  editor.selectionStart = editor.selectionEnd = lineStart + newLine.length;
+  editor.focus();
+  onEditorInput();
+}
+
+function insertLink() {
+  const sel = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+  insertWrap('[' + (sel || 'texto do link'), '](https://)');
+}
+
+function insertImage() { insertAtCursor('![alt text](url-da-imagem)'); }
+function insertHR() { insertLine('\n---'); }
+function insertBlockquote() { insertLine('> '); }
+function insertListUL() { insertLine('- '); }
+function insertListOL() { insertLine('1. '); }
+function insertCodeBlock() { insertAtCursor('\n```\n\n```\n'); }
+function insertTable() {
+  insertAtCursor('\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|---|---|---|\n| Dado | Dado | Dado |\n');
+}
+
+function selectAll() { editor.select(); }
+
+// ── Keyboard Shortcuts ──────────────────────────────────────
+function onEditorKeydown(e) {
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (ctrl) {
+    switch(e.key) {
+      case 's': e.preventDefault(); e.shiftKey ? saveFileAs() : saveFile(); return;
+      case 'z': e.preventDefault(); doUndo(); return;
+      case 'y': e.preventDefault(); doRedo(); return;
+      case 'b': e.preventDefault(); insertWrap('**','**'); return;
+      case 'i': e.preventDefault(); insertWrap('*','*'); return;
+      case 'l': e.preventDefault(); insertLink(); return;
+      case '`': e.preventDefault(); insertWrap('`','`'); return;
+      case 'e': e.preventDefault(); showExportDialog(); return;
+      case 'f': e.preventDefault(); showFindDialog(); return;
+      case 't': e.preventDefault(); newTab(); return;
+      case 'w': e.preventDefault(); closeTab(); return;
+      case '1': e.preventDefault(); insertHeading(1); return;
+      case '2': e.preventDefault(); insertHeading(2); return;
+      case '3': e.preventDefault(); insertHeading(3); return;
+      case '+': case '=': e.preventDefault(); increaseFontSize(); return;
+      case '-': e.preventDefault(); decreaseFontSize(); return;
+      case '0': e.preventDefault(); resetFontSize(); return;
+    }
+    if (e.shiftKey) {
+      if (e.key === 'P') { e.preventDefault(); setView('split'); return; }
+      if (e.key === 'N') { e.preventDefault(); openNewWindow(); return; }
+    }
+  }
+  // Tab key → indent
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    editor.setRangeText('  ', start, end, 'end');
+    onEditorInput();
+  }
+}
+
+document.addEventListener('keydown', e => {
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (ctrl && e.key === 'o') { e.preventDefault(); openFileDialog(); }
+  if (ctrl && e.key === 't') { e.preventDefault(); newTab(); }
+  if (ctrl && e.key === 'w') { e.preventDefault(); closeTab(); }
+});
+
+// ── Menu ────────────────────────────────────────────────────
+function toggleMenu(id) {
+  const el = document.getElementById(id);
+  const wasOpen = el.classList.contains('open');
+  document.querySelectorAll('.menu-item.open').forEach(m => m.classList.remove('open'));
+  if (!wasOpen) el.classList.add('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.menu-item')) {
+    document.querySelectorAll('.menu-item.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+// ── Themes ──────────────────────────────────────────────────
+function setTheme(name) {
+  document.body.setAttribute('data-theme', name);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + name).classList.add('active');
+  localStorage.setItem('askesis-theme', name);
+}
+
+// ── View ────────────────────────────────────────────────────
+function setView(mode) {
+  currentView = mode;
+  const app = document.getElementById('app');
+  app.classList.remove('view-editor', 'view-preview', 'view-split');
+  if (mode !== 'split') app.classList.add('view-' + mode);
+  renderPreview();
+}
+
+// ── Font size ───────────────────────────────────────────────
+function increaseFontSize() { fontSize = Math.min(fontSize + 1, 24); applyFontSize(); }
+function decreaseFontSize() { fontSize = Math.max(fontSize - 1, 10); applyFontSize(); }
+function resetFontSize() { fontSize = 14; applyFontSize(); }
+function applyFontSize() {
+  document.documentElement.style.setProperty('--font-size', fontSize + 'px');
+}
+
+// ── Word wrap ───────────────────────────────────────────────
+function toggleWordWrap() {
+  wordWrap = !wordWrap;
+  editor.style.whiteSpace = wordWrap ? 'pre-wrap' : 'pre';
+  highlight.style.whiteSpace = wordWrap ? 'pre-wrap' : 'pre';
+  showStatus(wordWrap ? 'Quebra de linha: ativa' : 'Quebra de linha: desativada');
+}
+
+// ── Focus mode ──────────────────────────────────────────────
+function toggleFocus() {
+  focusMode = !focusMode;
+  document.getElementById('toolbar').style.display = focusMode ? 'none' : '';
+  document.getElementById('menubar').style.display = focusMode ? 'none' : '';
+  document.getElementById('tabbar').style.display = focusMode ? 'none' : '';
+  document.getElementById('statusbar').style.display = focusMode ? 'none' : '';
+  showStatus(focusMode ? 'Modo foco: ativo (F11 para sair)' : 'Modo foco: desativado');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'F11') { e.preventDefault(); toggleFocus(); }
+  if (e.key === 'Escape' && focusMode) toggleFocus();
+});
+
+// ── Pane Resize ─────────────────────────────────────────────
+function startDrag(e) {
+  isDragging = true;
+  dragStartX = e.clientX;
+  const pp = document.getElementById('preview-pane');
+  dragStartW = pp.offsetWidth;
+  document.getElementById('divider').classList.add('dragging');
+  e.preventDefault();
+}
+
+document.addEventListener('mousemove', e => {
+  if (!isDragging) return;
+  const pp = document.getElementById('preview-pane');
+  const content = document.getElementById('content');
+  const delta = dragStartX - e.clientX;
+  const newW = Math.max(150, Math.min(dragStartW + delta, content.offsetWidth - 200));
+  pp.style.width = newW + 'px';
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+  document.getElementById('divider').classList.remove('dragging');
+});
+
+// ── Find / Replace ──────────────────────────────────────────
+let findIdx = -1;
+let findMatches = [];
+
+function showFindDialog() { openDialog('find-dialog'); document.getElementById('find-term').focus(); }
+
+function findHighlight() {
+  findIdx = -1; findMatches = [];
+  const term = document.getElementById('find-term').value;
+  if (!term) return;
+  const text = editor.value;
+  let i = 0;
+  while ((i = text.indexOf(term, i)) !== -1) {
+    findMatches.push(i);
+    i += term.length;
+  }
+}
+
+function findNext() {
+  findHighlight();
+  if (!findMatches.length) { showStatus('Não encontrado', 'err'); return; }
+  findIdx = (findIdx + 1) % findMatches.length;
+  const pos = findMatches[findIdx];
+  editor.focus();
+  editor.setSelectionRange(pos, pos + document.getElementById('find-term').value.length);
+  showStatus(`${findIdx + 1} de ${findMatches.length}`);
+}
+
+function replaceAll() {
+  const term = document.getElementById('find-term').value;
+  const rep = document.getElementById('replace-term').value;
+  if (!term) return;
+  const count = (editor.value.match(new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), 'g')) || []).length;
+  editor.value = editor.value.split(term).join(rep);
+  onEditorInput();
+  showStatus(`${count} substituição(ões) feita(s)`, 'ok');
+  closeDialog('find-dialog');
+}
+
+// ── Dialogs ─────────────────────────────────────────────────
+function openDialog(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeDialog(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.dialog-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.dialog-overlay.open').forEach(d => d.classList.remove('open'));
+  }
+});
+
+// ── Status messages ─────────────────────────────────────────
+let statusTimer;
+function showStatus(msg, type) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = type || '';
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => { el.textContent = ''; el.className = ''; }, 3000);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Cheatsheet & About ───────────────────────────────────────
+function openCheatsheet() {
+  const md = `# Referência Markdown
+
+## Títulos
+\`# H1\`  \`## H2\`  \`### H3\`
+
+## Ênfase
+**negrito** → \`**negrito**\`
+*itálico* → \`*itálico*\`
+~~tachado~~ → \`~~tachado~~\`
+
+## Listas
+\`- item\` ou \`* item\` (não numerada)
+\`1. item\` (numerada)
+
+## Links e imagens
+\`[texto](url)\`
+\`![alt](url)\`
+
+## Código
+Inline: \\\`código\\\`
+Bloco: \\\`\\\`\\\`linguagem ... \\\`\\\`\\\`
+
+## Citação
+\`> texto citado\`
+
+## Tabela
+\`| Col 1 | Col 2 |\`
+\`|---|---|\`
+\`| val | val |\`
+
+## Linha horizontal
+\`---\` ou \`***\`
+`;
+  newTab(md, 'Referência Markdown.md');
+}
+
+function openAbout() { openDialog('about-dialog'); }
+
+// ── New Window ───────────────────────────────────────────────
+function openNewWindow() {
+  const win = window.open(window.location.href, '_blank');
+  if (!win) showStatus('Permita popups para abrir nova janela', 'err');
+}
+
+
+// ── PWA Install prompt ───────────────────────────────────────
+let _pwaPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.classList.add('visible');
+});
+window.addEventListener('appinstalled', () => {
+  _pwaPrompt = null;
+  const btn = document.getElementById('pwa-install-btn');
+  if (btn) btn.classList.remove('visible');
+  showStatus('Askesis-MD instalado com sucesso!', 'ok');
+});
+function pwaInstall() {
+  if (!_pwaPrompt) {
+    showStatus('Use Chrome/Edge: menu ⋮ → Instalar Askesis-MD', 'ok');
+    return;
+  }
+  _pwaPrompt.prompt();
+  _pwaPrompt.userChoice.then(r => {
+    if (r.outcome === 'accepted') showStatus('Instalando…', 'ok');
+    _pwaPrompt = null;
+    const btn = document.getElementById('pwa-install-btn');
+    if (btn) btn.classList.remove('visible');
+  });
+}
+
+// ── Autosave ─────────────────────────────────────────────────
+async function autosave() {
+  const toSave = tabs.filter(t => t.modified && t.fileHandle);
+  if (!toSave.length) return;
+  let count = 0;
+  for (const tab of toSave) {
+    try {
+      const writable = await tab.fileHandle.createWritable();
+      await writable.write(tab.content);
+      await writable.close();
+      tab.modified = false;
+      count++;
+      if (activeTab && activeTab.id === tab.id) updateTabModified();
+    } catch(e) { /* silencioso */ }
+  }
+  if (count) showStatus('Salvo automaticamente (' + count + ' aba' + (count > 1 ? 's' : '') + ')', 'ok');
+}
+
+// ── Electron IPC bridge ──────────────────────────────────────
+// Quando rodando dentro do Electron, usa IPC nativo em vez de
+// File System Access API / downloads.
+(function wireElectron() {
+  const el = window.electronAPI;
+  if (!el) return; // Não está no Electron — ignora
+
+  // Sobrescreve saveFile para usar IPC
+  saveFile = async function() {
+    if (!activeTab) return;
+    activeTab.content = editor.value;
+    if (activeTab.nativePath) {
+      const r = await el.saveFile(activeTab.nativePath, activeTab.content);
+      if (r.ok) {
+        activeTab.modified = false;
+        updateTabModified();
+        showStatus('Salvo: ' + activeTab.name, 'ok');
+      } else {
+        showStatus('Erro ao salvar: ' + r.error, 'err');
+      }
+    } else {
+      await saveFileAs();
+    }
+  };
+
+  // Sobrescreve saveFileAs para usar diálogo nativo do SO
+  saveFileAs = async function() {
+    if (!activeTab) return;
+    activeTab.content = editor.value;
+    const suggested = activeTab.filename || (activeTab.name.endsWith('.md') ? activeTab.name : activeTab.name + '.md');
+    const r = await el.saveDialog(suggested, activeTab.content);
+    if (r.canceled) return;
+    activeTab.nativePath = r.filePath;
+    activeTab.filename   = r.filePath.split(/[\/]/).pop();
+    activeTab.name       = activeTab.filename;
+    activeTab.modified   = false;
+    renderTabbar();
+    updateStatusBar();
+    showStatus('Salvo como: ' + activeTab.name, 'ok');
+  };
+
+  // Recebe arquivo aberto via menu nativo ou duplo clique
+  el.onOpenFile(({ path: fp, content }) => {
+    const name = fp.split(/[\/]/).pop();
+    const tab = createTab(name, content, name);
+    tab.nativePath = fp;
+  });
+
+  // Comandos do menu nativo
+  el.onMenu(cmd => {
+    switch(cmd) {
+      case 'new-tab':    newTab(); break;
+      case 'save':       saveFile(); break;
+      case 'save-as':    saveFileAs(); break;
+      case 'export':     showExportDialog(); break;
+      case 'close-tab':  closeTab(); break;
+      case 'undo':       doUndo(); break;
+      case 'redo':       doRedo(); break;
+      case 'find':       showFindDialog(); break;
+      case 'cheatsheet': openCheatsheet(); break;
+      case 'about':      openDialog('about-dialog'); break;
+    }
+  });
+
+  // Inserções via menu nativo
+  el.onInsert(type => {
+    switch(type) {
+      case 'bold':      insertWrap('**','**'); break;
+      case 'italic':    insertWrap('*','*'); break;
+      case 'code':      insertWrap('`','`'); break;
+      case 'h1':        insertHeading(1); break;
+      case 'h2':        insertHeading(2); break;
+      case 'h3':        insertHeading(3); break;
+      case 'link':      insertLink(); break;
+      case 'table':     insertTable(); break;
+      case 'codeblock': insertCodeBlock(); break;
+      case 'hr':        insertHR(); break;
+      case 'blockquote':insertBlockquote(); break;
+    }
+  });
+
+  // Visualização
+  el.onView(mode => setView(mode));
+
+  // Tema
+  el.onTheme(t => setTheme(t));
+
+  // Fonte
+  el.onFont(cmd => {
+    if (cmd === '+') increaseFontSize();
+    else if (cmd === '-') decreaseFontSize();
+    else resetFontSize();
+  });
+
+  // Autosave Electron: sobrescreve função para usar IPC nativo
+  autosave = async function() {
+    const toSave = tabs.filter(t => t.modified && t.nativePath);
+    if (!toSave.length) return;
+    let count = 0;
+    for (const tab of toSave) {
+      const r = await el.saveFile(tab.nativePath, tab.content);
+      if (r.ok) {
+        tab.modified = false;
+        count++;
+        if (activeTab && activeTab.id === tab.id) updateTabModified();
+      }
+    }
+    if (count) showStatus('Salvo automaticamente (' + count + ' aba' + (count > 1 ? 's' : '') + ')', 'ok');
+  };
+})();
+
+
+// ── PWA: Manifest embutido via blob ──────────────────────────
+(function injectManifest() {
+  const manifest = {
+    "name": "Askesis-MD",
+    "short_name": "Askesis-MD",
+    "description": "Editor Markdown ultraleve e universal — askesis.hypotheses.org",
+    "start_url": "./",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "any",
+    "lang": "pt-BR",
+    "icons": [
+      {
+        "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='20' fill='%23000'/%3E%3Ctext x='22' y='148' font-size='140' fill='%2350fa7b' font-family='monospace' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E",
+        "sizes": "192x192",
+        "type": "image/svg+xml",
+        "purpose": "any maskable"
+      },
+      {
+        "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='40' fill='%23000'/%3E%3Ctext x='55' y='400' font-size='380' fill='%2350fa7b' font-family='monospace' font-weight='bold'%3EM%3C/text%3E%3C/svg%3E",
+        "sizes": "512x512",
+        "type": "image/svg+xml",
+        "purpose": "any maskable"
+      }
+    ],
+    "prefer_related_applications": false
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel   = 'manifest';
+  link.href  = url;
+  document.head.appendChild(link);
+})();
+
+// ── PWA: Service Worker embutido via blob ────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    const swCode = `
+const CACHE='askesis-md-v2';
+self.addEventListener('install',e=>{self.skipWaiting();});
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==CACHE).map(n=>caches.delete(n)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  e.respondWith(
+    caches.match(e.request).then(c=>{
+      if(c)return c;
+      return fetch(e.request).then(r=>{
+        if(r&&r.status===200){
+          const cl=r.clone();
+          caches.open(CACHE).then(ca=>ca.put(e.request,cl));
+        }
+        return r;
+      }).catch(()=>caches.match(e.request));
+    })
+  );
+});
+`;
+    const blob = new Blob([swCode], {type: 'text/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl, {scope: './'})
+      .then(reg => {
+        // Cache this page itself on first install
+        if (reg.installing) {
+          caches.open('askesis-md-v2').then(cache => {
+            cache.add(window.location.href);
+          });
+        }
+      })
+      .catch(() => {});
+  });
+}
+
+
+// ── Init ─────────────────────────────────────────────────────
+(function init() {
+  // Restore theme
+  const savedTheme = localStorage.getItem('askesis-theme') || 'terminal';
+  setTheme(savedTheme);
+
+  // Create welcome tab
+  newTab(WELCOME_CONTENT, 'Bem-vindo.md');
+
+  // Init highlight
+  updateHighlight();
+  renderPreview();
+  updateStatusBar();
+
+  // Autosave a cada 60 segundos (só abas com fileHandle, i.e. já salvas no disco)
+  setInterval(autosave, 60000);
+})();
+</script>
+</body>
+</html>
