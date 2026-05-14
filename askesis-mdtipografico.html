@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -22,64 +22,103 @@
 /* Fontes elegantes via Google Fonts — sem base64, fáceis de trocar */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
 
-/* ── VARIÁVEIS — Scriptorium (claro, padrão) ── */
+/* ── VARIÁVEIS — Carta (branco, tema principal) ── */
 :root {
   /* Fontes */
-  --fm: 'EB Garamond', 'Cormorant Garamond', 'Cardo', Georgia, serif;
+  --fm: 'Courier New', 'Lucida Console', 'DejaVu Sans Mono', monospace;
   --fu: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
   --fc: 'Courier New', 'Lucida Console', monospace;
   --tr: 0.16s ease;
 
-  /* Editor: tipografia generosa */
-  --efs: 18px;
-  --elh: 1.85;
+  /* Editor */
+  --efs: 14.5px;
+  --elh: 1.7;
   --epv: 28px;
-  --eph: 44px;
+  --eph: 40px;
 
-  /* Scriptorium: pergaminho claro, quase branco-marfim */
-  --bg0: #fdfaf4;   /* fundo do editor */
-  --bg1: #f5f0e6;   /* menubar, fmtbar */
-  --bg2: #ece6d8;   /* hover, secundário */
-  --bg3: #e0d8c8;   /* pressed, terceiro */
-  --bga: #4a3520;   /* accent principal (marrom-tinta) */
-  --bd:  #c8bfaa;   /* bordas */
-  --bd2: #ddd6c4;   /* bordas suaves */
-  --t0:  #1e1408;   /* texto principal */
-  --t1:  #4a3c28;   /* texto secundário */
-  --t2:  #8a7860;   /* texto terciário */
-  --ta:  #6b4c2a;   /* accent de texto */
-  --cur: #2a1a08;   /* cursor */
-  --scr: #c0b89a;   /* scrollbar thumb */
+  /* Carta: branco limpo, tipografia pura */
+  --bg0: #ffffff;
+  --bg1: #f8f8f8;
+  --bg2: #efefef;
+  --bg3: #e4e4e4;
+  --bga: #2c4a7c;
+  --bd:  #d0d0d0;
+  --bd2: #e4e4e4;
+  --t0:  #111111;
+  --t1:  #444444;
+  --t2:  #888888;
+  --ta:  #2c4a7c;
+  --cur: #1a1a1a;
+  --scr: #cccccc;
 
-  /* Sintaxe: tons discretos, sem saturação excessiva */
-  --sh: #1a0a00;    /* headings */
-  --sb: #6b2500;    /* bold */
-  --si: #003a5a;    /* italic */
-  --sc: #1a4a1a;    /* code */
-  --sl: #1a3a6a;    /* links */
-  --sq: #6a5a40;    /* blockquote */
-  --sm: #6b2500;    /* list markers */
-  --sr: #b0a890;    /* HR */
-  --ss: #8a8070;    /* strikethrough */
-  --sg: #003a5a;    /* images */
-  --st: #2a1a00;    /* table */
+  --sh: #111111;
+  --sb: #1a1a1a;
+  --si: #2a4a6a;
+  --sc: #1a4a1a;
+  --sl: #2c4a7c;
+  --sq: #666666;
+  --sm: #333333;
+  --sr: #bbbbbb;
+  --ss: #888888;
+  --sg: #2a4a6a;
+  --st: #333333;
 
-  /* Abas */
+  --tbg:  #f4f4f4;
+  --tabg: #ffffff;
+  --tbd:  #d0d0d0;
+  --tt:   #888888;
+  --tat:  #111111;
+
+  --sbg: #f0f0f0;
+  --st2: #888888;
+
+  --ask-rule:   #d0d0d0;
+  --ask-cap:    #111111;
+  --ask-accent: #2c4a7c;
+  --ask-drop:   rgba(0,0,0,.08);
+}
+
+/* ── Tema Scriptorium — pergaminho sépia ── */
+.theme-scriptorium {
+  --bg0: #fdfaf4;
+  --bg1: #f5f0e6;
+  --bg2: #ece6d8;
+  --bg3: #e0d8c8;
+  --bga: #4a3520;
+  --bd:  #c8bfaa;
+  --bd2: #ddd6c4;
+  --t0:  #1e1408;
+  --t1:  #4a3c28;
+  --t2:  #8a7860;
+  --ta:  #6b4c2a;
+  --cur: #2a1a08;
+  --scr: #c0b89a;
+
+  --sh: #1a0a00;
+  --sb: #6b2500;
+  --si: #003a5a;
+  --sc: #1a4a1a;
+  --sl: #1a3a6a;
+  --sq: #6a5a40;
+  --sm: #6b2500;
+  --sr: #b0a890;
+  --ss: #8a8070;
+  --sg: #003a5a;
+  --st: #2a1a00;
+
   --tbg:  #ede8df;
   --tabg: #fdfaf4;
   --tbd:  #c8bfaa;
   --tt:   #7a6a50;
   --tat:  #1e1408;
 
-  /* Status bar */
   --sbg: #ece6d8;
   --st2: #8a7860;
 
-  /* Específicos Typographica */
-  --ask-rule:   #b0a080;   /* linhas, separadores */
-  --ask-cap:    #2a1a08;   /* letras de destaque, logo */
-  --ask-accent: #6b4c2a;   /* botões ativos, links */
-  --ask-drop:   rgba(0,0,0,.06);  /* sombra de dropdown */
+  --ask-rule:   #b0a080;
+  --ask-cap:    #2a1a08;
+  --ask-accent: #6b4c2a;
+  --ask-drop:   rgba(0,0,0,.06);
 }
 
 /* ── Tema Vellum — pergaminho escuro / tinta sobre noite ── */
@@ -227,6 +266,7 @@ svg.ic {
 }
 .tdot:hover { transform: scale(1.2); }
 .tdot.on { border-color: var(--ask-accent); }
+.d-w { background: radial-gradient(circle at 35% 35%, #ffffff, #e0e0e0); border-color: #c0c0c0 !important; }
 .d-t { background: radial-gradient(circle at 35% 35%, #f5f0e0, #c8b888); }
 .d-c { background: radial-gradient(circle at 35% 35%, #3a3228, #1a1610); }
 
@@ -471,23 +511,26 @@ svg.ic {
 .ssep { color: var(--ask-rule); font-style: normal; }
 
 /* ── SINTAXE ── */
-.h1 { color: var(--sh); font-weight: 600; font-size: 1.05em; }
-.h2 { color: var(--sh); font-weight: 600; }
-.h3 { color: var(--sh); font-style: italic; }
+/* REGRA CRÍTICA: nenhuma classe de sintaxe altera font-size,
+   font-family, font-weight ou font-style — qualquer mudança de
+   métrica de glifo causa desalinhamento entre highlight e cursor */
+.h1  { color: var(--sh); }
+.h2  { color: var(--sh); }
+.h3  { color: var(--sh); }
 .h4, .h5, .h6 { color: var(--sh); opacity: .8; }
-.mk { color: var(--t2); }
-.bd2 { color: var(--sb); font-weight: 600; }
-.it  { color: var(--si); font-style: italic; }
-.cd  { color: var(--sc); font-family: var(--fc); font-size: .92em; }
-.cb  { color: var(--sc); font-family: var(--fc); font-size: .92em; }
+.mk  { color: var(--t2); }
+.bd2 { color: var(--sb); }
+.it  { color: var(--si); }
+.cd  { color: var(--sc); }
+.cb  { color: var(--sc); }
 .lk  { color: var(--sl); }
 .im  { color: var(--sg); }
-.bq  { color: var(--sq); font-style: italic; }
+.bq  { color: var(--sq); }
 .li  { color: var(--sm); }
 .hr  { color: var(--sr); }
 .st  { color: var(--ss); text-decoration: line-through; }
 .hl-tb { color: var(--st); }
-.fm  { color: var(--t2); font-style: italic; }
+.fm  { color: var(--t2); }
 
 /* ── MODAIS ── */
 .ov {
@@ -657,7 +700,8 @@ svg.ic {
       <div class="mc" onclick="adjFont(-1)"><span class="lb">Diminuir fonte</span><span class="ks">Ctrl+–</span></div>
       <div class="mc" onclick="adjFont(1)"><span class="lb">Aumentar fonte</span><span class="ks">Ctrl+=</span></div>
       <hr>
-      <div class="mc" onclick="setTheme('scriptorium')"><span class="lb">◉ Scriptorium (claro)</span></div>
+      <div class="mc" onclick="setTheme('carta')"><span class="lb">◉ Carta (branco)</span></div>
+      <div class="mc" onclick="setTheme('scriptorium')"><span class="lb">◉ Scriptorium (sépia)</span></div>
       <div class="mc" onclick="setTheme('vellum')"><span class="lb">◉ Vellum (escuro)</span></div>
     </div>
   </div>
@@ -717,7 +761,8 @@ svg.ic {
     <div class="tsep"></div>
     <!-- Theme dots -->
     <div class="tdots">
-      <div class="tdot d-t on" id="dot-scr"  title="Scriptorium (claro)" onclick="setTheme('scriptorium')"></div>
+      <div class="tdot d-w on" id="dot-carta" title="Carta (branco)"      onclick="setTheme('carta')"></div>
+      <div class="tdot d-t"   id="dot-scr"   title="Scriptorium (sépia)" onclick="setTheme('scriptorium')"></div>
       <div class="tdot d-c"   id="dot-vel"   title="Vellum (escuro)"     onclick="setTheme('vellum')"></div>
     </div>
   </div>
@@ -1069,13 +1114,16 @@ function syncHeight() {
   const hl = HL(), wrap = WRAP(), inner = document.getElementById('editor-inner');
   if (!hl || !wrap || !inner) return;
 
-  // The highlight pre renders in-flow: its offsetHeight is reliable.
-  // We only need to ensure inner is at least as tall as the wrap viewport.
-  const contentH = hl.offsetHeight;
+  // Reset min-height so scrollHeight reflects true content
+  inner.style.minHeight = '';
+
+  // hl.scrollHeight: total height of the in-flow <pre> including content
+  // wrap.clientHeight: visible viewport of the scrollable container
+  // We take the max so the textarea always fills at least the viewport
+  const contentH = hl.scrollHeight;
   const wrapH    = wrap.clientHeight;
   const minH     = Math.max(contentH, wrapH);
 
-  // Set inner's min-height so the textarea (height:100%) fills the view
   inner.style.minHeight = minH + 'px';
 }
 
@@ -1445,7 +1493,7 @@ function setView(v) {
     updatePreview(activeTab()?.content || '');
   } else {
     document.getElementById('vb-editor').classList.add('on');
-  setTheme('scriptorium');
+  setTheme('carta');
     sm.textContent = 'EDITOR';
   }
   closeAllMenus();
@@ -1455,8 +1503,8 @@ function setView(v) {
 
 // ── THEME ──────────────────────────────────────────────────
 function setTheme(t) {
-  document.body.className = t === 'terminal' ? '' : `theme-${t}`;
-  ['scr','vel'].forEach(n =>
+  document.body.className = t === 'carta' ? '' : `theme-${t}`;
+  ['carta','scr','vel'].forEach(n =>
     document.getElementById(`dot-${n}`).classList.toggle('on', n === t));
   closeAllMenus();
   requestAnimationFrame(syncHeight);
@@ -1930,7 +1978,7 @@ window.addEventListener('resize', syncHeight);
 // ── INIT ───────────────────────────────────────────────────
 (function init() {
   document.getElementById('vb-editor').classList.add('on');
-  setTheme('scriptorium');
+  setTheme('carta');
   newTab(WELCOME, 'boas-vindas.md');
   // Push initial state into undo stack after content is set
   setTimeout(() => {
