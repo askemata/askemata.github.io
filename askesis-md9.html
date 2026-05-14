@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Askesis-MD</title>
+<style>
+/* ============================================================
+   ASKESIS-MD v3 — Ultralight Markdown Editor for Linux
+   Themes: Terminal · Carta · Aurora
+   ============================================================
+
+   SCROLL/ALIGNMENT STRATEGY (critical)
+   ─────────────────────────────────────
+   The classic approach (two absolute layers sharing a scrolling
+   parent) fails when the highlight <pre> height and textarea
+   height diverge even by 1px, because the <pre> is
+   position:absolute and its scrollHeight is unreliable before
+   layout. The fix used here:
+
+   1. #editor-wrap  → overflow:auto  (sole scroll container)
+   2. #editor-highlight → position:absolute, width:100%,
+      pointer-events:none, z-index:1
+   3. #editor-textarea  → position:absolute, width:100%,
+      overflow:hidden (NEVER scrolls), z-index:2
+   4. Both share EVERY typographic property via .ed-layer.
+   5. syncHeight() runs AFTER the highlight innerHTML is set,
+      using a two-rAF fence so the browser finishes layout
+      before we read scrollHeight. Then textarea height is set
+      to max(hl.scrollHeight, wrap.clientHeight).
+   6. window resize → syncHeight() again.
+
+   This guarantees pixel-perfect vertical alignment for any
+   document length and any window size.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
+
+/* ── VARIABLES ── */
+:root {
+  --fm: 'IBM Plex Mono', 'DejaVu Sans Mono', 'Courier New', monospace;
+  --fu: 'IBM Plex Sans', 'Liberation Sans', sans-serif;
+  --tr: 0.14s ease;
+
+  /* Editor typographic constants — MUST match on both layers */
+  --efs: 16px;        /* font-size: 16px for comfortable reading */
+  --elh: 1.72;        /* line-height */
+  --epv: 24px;        /* padding top/bottom */
+  --eph: 32px;        /* padding left/right */
+
+  /* Terminal (dark) theme */
+  --bg0:#0d1117; --bg1:#161b22; --bg2:#21262d; --bg3:#30363d;
+  --bga:#1f6feb; --bd:#30363d; --bd2:#21262d;
+  --t0:#c9d1d9; --t1:#8b949e; --t2:#484f58; --ta:#79c0ff;
+  --cur:#58a6ff; --scr:#30363d;
+  /* syntax */
+  --sh:#79c0ff; --sb:#ffa657; --si:#d2a8ff; --sc:#7ee787;
+  --sl:#58a6ff; --sq:#8b949e; --sm:#ffa657; --sr:#484f58;
+  --ss:#6e7681; --sg:#d2a8ff; --st:#79c0ff;
+  /* tabs */
+  --tbg:#0d1117; --tabg:#161b22; --tbd:#30363d; --tt:#8b949e; --tat:#c9d1d9;
+  /* statusbar */
+  --sbg:#010409; --st2:#484f58;
+}
+.theme-carta {
+  --bg0:#ffffff; --bg1:#f6f8fa; --bg2:#eaeef2; --bg3:#e1e4e8;
+  --bga:#0969da; --bd:#d0d7de; --bd2:#eaeef2;
+  --t0:#24292f; --t1:#57606a; --t2:#8c959f; --ta:#0969da;
+  --cur:#0969da; --scr:#d0d7de;
+  --sh:#0550ae; --sb:#953800; --si:#6639ba; --sc:#116329;
+  --sl:#0969da; --sq:#57606a; --sm:#953800; --sr:#d0d7de;
+  --ss:#8c959f; --sg:#6639ba; --st:#0550ae;
+  --tbg:#f6f8fa; --tabg:#ffffff; --tbd:#d0d7de; --tt:#57606a; --tat:#24292f;
+  --sbg:#eaeef2; --st2:#8c959f;
+}
+.theme-aurora {
+  --bg0:#f0f4f8; --bg1:#e2ecf6; --bg2:#ccddf0; --bg3:#b8cfe8;
+  --bga:#2e6da4; --bd:#b8cfe8; --bd2:#ccddf0;
+  --t0:#1a2e42; --t1:#4a6a8a; --t2:#7a9ab8; --ta:#2e6da4;
+  --cur:#2e6da4; --scr:#b8cfe8;
+  --sh:#1a5276; --sb:#7d3c10; --si:#5b2c8a; --sc:#186a3b;
+  --sl:#2e6da4; --sq:#4a6a8a; --sm:#7d3c10; --sr:#b8cfe8;
+  --ss:#7a9ab8; --sg:#5b2c8a; --st:#1a5276;
+  --tbg:#e2ecf6; --tabg:#f0f4f8; --tbd:#b8cfe8; --tt:#4a6a8a; --tat:#1a2e42;
+  --sbg:#ccddf0; --st2:#7a9ab8;
+}
+
+/* ── RESET ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:var(--fm); background:var(--bg0); color:var(--t0);
+  user-select:none; display:flex; flex-direction:column;
+}
+
+/* ── SVG ICON BASE ── */
+svg.ic{
+  fill:none; stroke:currentColor; stroke-width:1.9;
+  stroke-linecap:round; stroke-linejoin:round;
+  flex-shrink:0; pointer-events:none; display:block;
+}
+
+/* ════════════════════════════════════════
+   MENU BAR
+════════════════════════════════════════ */
+#menubar{
+  display:flex; align-items:center;
+  background:var(--bg1); border-bottom:1px solid var(--bd);
+  height:32px; padding:0 8px; flex-shrink:0;
+  position:relative; z-index:1000; gap:2px;
+}
+#logo{
+  font-family:var(--fm); font-size:12px; font-weight:500;
+  color:var(--ta); letter-spacing:.09em;
+  padding:0 14px 0 2px; white-space:nowrap;
+  display:flex; align-items:center; gap:6px;
+}
+.mi{position:relative}
+.mt{
+  display:flex; align-items:center;
+  height:28px; padding:0 10px;
+  font-family:var(--fu); font-size:13px;
+  color:var(--t1); cursor:pointer; border-radius:3px;
+  transition:background var(--tr),color var(--tr); white-space:nowrap;
+}
+.mt:hover,.mi.open>.mt{background:var(--bg3);color:var(--t0)}
+.md{
+  display:none; position:absolute; top:calc(100% + 3px); left:0;
+  background:var(--bg1); border:1px solid var(--bd); border-radius:5px;
+  min-width:238px; box-shadow:0 12px 32px rgba(0,0,0,.48);
+  z-index:2000; padding:4px 0;
+}
+.mi.open>.md{display:block}
+.md hr{border:none;border-top:1px solid var(--bd);margin:4px 0}
+.mc{
+  display:flex; align-items:center;
+  padding:6px 12px 6px 10px;
+  font-family:var(--fu); font-size:13px;
+  color:var(--t0); cursor:pointer;
+  transition:background var(--tr); gap:8px;
+}
+.mc .lb{flex:1}
+.mc:hover{background:var(--bg3)}
+.mc.dis{color:var(--t2);pointer-events:none}
+.ks{font-size:11px;color:var(--t2);font-family:var(--fm);white-space:nowrap;margin-left:auto}
+
+/* ── RIGHT TOOLBAR ── */
+#toolbar{display:flex;align-items:center;gap:1px;margin-left:auto}
+.tsep{width:1px;height:18px;background:var(--bd);margin:0 5px}
+.tb{
+  display:flex;align-items:center;justify-content:center;
+  width:30px;height:26px;border-radius:4px;cursor:pointer;
+  color:var(--t1);transition:background var(--tr),color var(--tr);
+  position:relative;
+}
+.tb:hover{background:var(--bg3);color:var(--t0)}
+.tb.on{background:var(--bga);color:#fff}
+.tb.dis{color:var(--t2);pointer-events:none;opacity:.38}
+/* tooltip */
+.tb[title]:hover::after,.tdot[title]:hover::after{
+  content:attr(title);
+  position:absolute;top:calc(100%+7px);left:50%;
+  transform:translateX(-50%);
+  background:var(--bg2);border:1px solid var(--bd);
+  color:var(--t0);font-family:var(--fu);font-size:11px;
+  padding:3px 8px;border-radius:3px;white-space:nowrap;
+  pointer-events:none;z-index:9999;
+}
+/* theme dots */
+.tdots{display:flex;align-items:center;gap:6px;margin-left:4px}
+.tdot{
+  width:14px;height:14px;border-radius:50%;cursor:pointer;
+  border:2px solid transparent;
+  transition:border-color var(--tr),transform var(--tr);
+  position:relative;
+}
+.tdot:hover{transform:scale(1.3)}
+.tdot.on{border-color:var(--ta)}
+.d-t{background:#1f6feb}
+.d-c{background:#0969da}
+.d-a{background:#2e6da4}
+
+/* ════════════════════════════════════════
+   FORMAT BAR
+════════════════════════════════════════ */
+#fmtbar{
+  display:flex;align-items:center;
+  background:var(--bg0);border-bottom:1px solid var(--bd2);
+  height:34px;padding:0 12px;gap:2px;flex-shrink:0;
+}
+.fb{
+  display:flex;align-items:center;justify-content:center;
+  height:26px;min-width:28px;padding:0 5px;
+  border-radius:3px;cursor:pointer;color:var(--t1);
+  font-family:var(--fm);font-size:12px;font-weight:500;
+  transition:background var(--tr),color var(--tr);
+  position:relative;
+}
+.fb:hover{background:var(--bg2);color:var(--t0)}
+.fb[title]:hover::after{
+  content:attr(title);
+  position:absolute;top:calc(100%+6px);left:50%;
+  transform:translateX(-50%);
+  background:var(--bg2);border:1px solid var(--bd);
+  color:var(--t0);font-family:var(--fu);font-size:11px;
+  padding:2px 7px;border-radius:3px;white-space:nowrap;
+  pointer-events:none;z-index:9999;
+}
+.fsep{width:1px;height:18px;background:var(--bd);margin:0 4px}
+
+/* ════════════════════════════════════════
+   TAB BAR
+════════════════════════════════════════ */
+#tabbar{
+  display:flex;align-items:flex-end;
+  background:var(--tbg);border-bottom:1px solid var(--tbd);
+  height:34px;padding:0 6px;
+  flex-shrink:0;overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;
+}
+#tabbar::-webkit-scrollbar{display:none}
+.tab{
+  display:flex;align-items:center;gap:6px;
+  padding:0 10px 0 12px;height:30px;
+  font-family:var(--fu);font-size:12.5px;
+  color:var(--tt);cursor:pointer;
+  border-radius:4px 4px 0 0;
+  border:1px solid transparent;border-bottom:none;
+  transition:all var(--tr);white-space:nowrap;
+  flex-shrink:0;max-width:210px;
+}
+.tab:hover{background:var(--bg2);color:var(--tat)}
+.tab.on{background:var(--tabg);color:var(--tat);border-color:var(--tbd);border-bottom-color:var(--tabg)}
+.tab-name{overflow:hidden;text-overflow:ellipsis;max-width:148px}
+.tab-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--ta);flex-shrink:0;display:none;
+}
+.tab.mod .tab-dot{display:block}
+.tab-x{
+  width:18px;height:18px;border-radius:3px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--t2);flex-shrink:0;
+  transition:background var(--tr),color var(--tr);
+}
+.tab-x:hover{background:var(--bg3);color:var(--t0)}
+.tab-add{
+  display:flex;align-items:center;justify-content:center;
+  width:28px;height:28px;border-radius:4px;cursor:pointer;
+  color:var(--t2);flex-shrink:0;margin-left:2px;
+  transition:all var(--tr);
+}
+.tab-add:hover{background:var(--bg2);color:var(--t0)}
+
+/* ════════════════════════════════════════
+   SEARCH BAR
+════════════════════════════════════════ */
+#searchbar{
+  display:none;align-items:center;
+  background:var(--bg1);border-bottom:1px solid var(--bd);
+  padding:6px 14px;gap:7px;flex-shrink:0;
+}
+#searchbar.show{display:flex}
+.sinp{
+  background:var(--bg0);border:1px solid var(--bd);border-radius:4px;
+  color:var(--t0);font-family:var(--fm);font-size:13px;
+  padding:5px 10px;outline:none;
+}
+.sinp:focus{border-color:var(--ta)}
+#s-find{width:210px}
+#s-repl{width:180px}
+.sbtn{
+  padding:5px 13px;border-radius:3px;cursor:pointer;
+  font-family:var(--fu);font-size:12.5px;font-weight:500;
+  background:var(--bg2);border:1px solid var(--bd);color:var(--t0);
+  transition:background var(--tr);display:flex;align-items:center;gap:5px;
+}
+.sbtn:hover{background:var(--bg3)}
+.sbtn.pri{background:var(--bga);border-color:var(--bga);color:#fff}
+#s-res{font-family:var(--fm);font-size:11px;color:var(--t2);min-width:90px}
+
+/* ════════════════════════════════════════
+   MAIN
+════════════════════════════════════════ */
+#main{display:flex;flex:1;overflow:hidden;min-height:0}
+#editor-pane{display:flex;flex-direction:column;flex:1;overflow:hidden;min-width:0}
+
+/* ── EDITOR WRAP: sole scrollable container ── */
+#editor-wrap{
+  flex:1;position:relative;overflow:auto;
+  background:var(--bg0);
+}
+#editor-wrap::-webkit-scrollbar{width:11px;height:11px}
+#editor-wrap::-webkit-scrollbar-track{background:transparent}
+#editor-wrap::-webkit-scrollbar-thumb{
+  background:var(--scr);border-radius:6px;
+  border:3px solid var(--bg0);
+}
+
+/*
+  .ed-layer — applied to BOTH the highlight <pre> and the <textarea>.
+  Every typographic property must be identical between the two,
+  otherwise lines drift apart on long documents.
+*/
+.ed-layer{
+  font-family:var(--fm);
+  font-size:var(--efs);
+  line-height:var(--elh);
+  padding:var(--epv) var(--eph);
+  tab-size:4;
+  white-space:pre-wrap;
+  word-break:break-word;
+  overflow-wrap:break-word;
+  /* NO border, NO outline, NO margin — any difference misaligns */
+  border:none;outline:none;margin:0;
+  /* Prevent any sub-pixel rendering difference */
+  letter-spacing:normal;word-spacing:normal;
+  text-rendering:optimizeSpeed;
+}
+
+/* Highlight layer */
+#editor-highlight{
+  position:absolute;top:0;left:0;
+  width:100%;
+  /* min-height:100% keeps the layer covering the wrap even when empty */
+  min-height:100%;
+  color:var(--t0);pointer-events:none;z-index:1;
+}
+
+/* Textarea — transparent ink, visible caret, NO internal scroll */
+#editor-textarea{
+  position:absolute;top:0;left:0;
+  width:100%;
+  /* height controlled entirely by syncHeight() — no CSS height here */
+  min-height:100%;
+  background:transparent;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  caret-color:var(--cur);
+  resize:none;z-index:2;
+  overflow:hidden; /* NEVER scrolls — parent does */
+}
+
+/* ── RESIZE HANDLE ── */
+#resize-handle{
+  width:5px;cursor:col-resize;background:var(--bd);
+  flex-shrink:0;transition:background var(--tr);display:none;
+}
+#resize-handle:hover,#resize-handle.drag{background:var(--ta)}
+#resize-handle.show{display:block}
+
+/* ── PREVIEW ── */
+#preview-pane{
+  width:50%;display:none;overflow-y:auto;
+  background:var(--bg0);padding:30px 38px;
+  font-family:var(--fu);font-size:16px;line-height:1.78;
+  color:var(--t0);min-width:0;
+}
+#preview-pane.show{display:block}
+#preview-pane::-webkit-scrollbar{width:9px}
+#preview-pane::-webkit-scrollbar-thumb{background:var(--scr);border-radius:5px}
+#preview-pane h1,#preview-pane h2,#preview-pane h3,
+#preview-pane h4,#preview-pane h5,#preview-pane h6{
+  color:var(--sh);font-weight:500;margin:1.3em 0 .5em;line-height:1.3;
+}
+#preview-pane h1{font-size:1.75em;border-bottom:1px solid var(--bd);padding-bottom:.3em}
+#preview-pane h2{font-size:1.4em;border-bottom:1px solid var(--bd2);padding-bottom:.2em}
+#preview-pane h3{font-size:1.18em}
+#preview-pane p{margin:.75em 0}
+#preview-pane a{color:var(--sl);text-decoration:none}
+#preview-pane a:hover{text-decoration:underline}
+#preview-pane code{
+  font-family:var(--fm);font-size:.875em;
+  background:var(--bg2);padding:.1em .4em;border-radius:3px;color:var(--sc);
+}
+#preview-pane pre{
+  background:var(--bg1);border:1px solid var(--bd);border-radius:6px;
+  padding:16px 20px;overflow-x:auto;margin:1em 0;
+}
+#preview-pane pre code{background:none;padding:0;font-size:.9em;color:var(--t0)}
+#preview-pane blockquote{
+  border-left:3px solid var(--sq);margin:1em 0;
+  padding:.4em 0 .4em 1.2em;color:var(--sq);font-style:italic;
+}
+#preview-pane ul,#preview-pane ol{margin:.6em 0 .6em 1.8em}
+#preview-pane li{margin:.28em 0}
+#preview-pane hr{border:none;border-top:1px solid var(--bd);margin:1.6em 0}
+#preview-pane table{border-collapse:collapse;width:100%;margin:1em 0;font-size:.93em}
+#preview-pane th,#preview-pane td{border:1px solid var(--bd);padding:7px 13px;text-align:left}
+#preview-pane th{background:var(--bg1);color:var(--st);font-weight:500}
+#preview-pane img{max-width:100%;border-radius:4px}
+#preview-pane strong{color:var(--sb);font-weight:500}
+#preview-pane em{color:var(--si)}
+#preview-pane del{color:var(--ss)}
+
+/* ════════════════════════════════════════
+   STATUS BAR
+════════════════════════════════════════ */
+#statusbar{
+  display:flex;align-items:center;
+  background:var(--sbg);border-top:1px solid var(--bd);
+  height:24px;padding:0 14px;flex-shrink:0;
+  font-family:var(--fm);font-size:11px;color:var(--st2);gap:0;
+}
+.sm{
+  color:var(--ta);font-size:10px;font-weight:500;letter-spacing:.07em;
+  background:color-mix(in srgb,var(--ta) 13%,transparent);
+  padding:1px 7px;border-radius:2px;margin-right:10px;
+}
+.sf{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr2{display:flex;align-items:center;gap:13px;margin-left:auto}
+.ssep{color:var(--bd)}
+
+/* ════════════════════════════════════════
+   SYNTAX HIGHLIGHT SPANS
+════════════════════════════════════════ */
+.h1{color:var(--sh);font-weight:500}
+.h2{color:var(--sh);font-weight:500;opacity:.92}
+.h3{color:var(--sh);opacity:.85}
+.h4,.h5,.h6{color:var(--sh);opacity:.72}
+.mk{color:var(--t2)}
+.bd2{color:var(--sb);font-weight:500}
+.it{color:var(--si);font-style:italic}
+.cd{color:var(--sc);background:color-mix(in srgb,var(--sc) 9%,transparent);border-radius:2px}
+.cb{color:var(--sc)}
+.lk{color:var(--sl)}
+.im{color:var(--sg)}
+.bq{color:var(--sq);font-style:italic}
+.li{color:var(--sm)}
+.hr{color:var(--sr)}
+.st{color:var(--ss);text-decoration:line-through}
+.tb{color:var(--st)}
+.fm{color:var(--t2);font-style:italic}
+
+/* ════════════════════════════════════════
+   MODALS / OVERLAYS
+════════════════════════════════════════ */
+.ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.58);z-index:5000;
+  align-items:center;justify-content:center;
+}
+.ov.show{display:flex}
+.modal{
+  background:var(--bg1);border:1px solid var(--bd);border-radius:9px;
+  padding:28px 32px;min-width:360px;max-width:560px;width:92vw;
+  box-shadow:0 24px 64px rgba(0,0,0,.52);
+  max-height:90vh;overflow-y:auto;
+}
+.modal h3{
+  font-family:var(--fu);font-size:15px;font-weight:500;
+  color:var(--t0);margin-bottom:16px;
+  display:flex;align-items:center;gap:9px;
+}
+.modal p{font-family:var(--fu);font-size:13.5px;color:var(--t1);margin-bottom:14px;line-height:1.65}
+.modal input{
+  width:100%;background:var(--bg0);border:1px solid var(--bd);border-radius:4px;
+  color:var(--t0);font-family:var(--fm);font-size:13px;
+  padding:9px 11px;margin-bottom:14px;outline:none;
+}
+.modal input:focus{border-color:var(--ta)}
+.mbtns{display:flex;gap:9px;justify-content:flex-end;margin-top:6px}
+.btn{
+  padding:8px 20px;border-radius:5px;cursor:pointer;
+  font-family:var(--fu);font-size:13px;font-weight:500;
+  border:1px solid var(--bd);background:var(--bg2);color:var(--t0);
+  transition:all var(--tr);display:flex;align-items:center;gap:6px;
+}
+.btn:hover{background:var(--bg3)}
+.btn.pri{background:var(--bga);border-color:var(--bga);color:#fff}
+.btn.pri:hover{opacity:.84}
+/* export grid */
+.egrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.eopt{
+  padding:13px 15px;border:1px solid var(--bd);border-radius:7px;
+  cursor:pointer;background:var(--bg0);text-align:center;
+  transition:all var(--tr);display:flex;flex-direction:column;align-items:center;gap:4px;
+}
+.eopt:hover{border-color:var(--ta);background:var(--bg2)}
+.eopt .ext{font-family:var(--fm);font-size:13px;font-weight:500;color:var(--ta)}
+.eopt .dsc{font-family:var(--fu);font-size:11px;color:var(--t2)}
+.eopt.sp{grid-column:span 2;border-color:var(--si)}
+.eopt.sp .ext{color:var(--si)}
+.eopt.sp:hover{border-color:var(--si);background:color-mix(in srgb,var(--si) 8%,var(--bg0))}
+/* shortcuts */
+.scg{display:grid;grid-template-columns:auto 1fr;gap:4px 22px;font-family:var(--fm);font-size:12px;line-height:2.1}
+.sck{color:var(--ta);white-space:nowrap}
+.scd{color:var(--t1)}
+
+/* user-select unlock for editor only */
+#editor-textarea{user-select:text}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     MENU BAR
+══════════════════════════════════════════ -->
+<div id="menubar">
+  <span id="logo">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24">
+      <polygon points="12,2 22,12 12,22 2,12"/>
+    </svg>
+    Askesis-MD
+  </span>
+
+  <!-- Arquivo -->
+  <div class="mi" id="mi-arq">
+    <div class="mt" onclick="toggleMenu('mi-arq')">Arquivo</div>
+    <div class="md">
+      <div class="mc" onclick="newTab()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        <span class="lb">Nova aba</span><span class="ks">Ctrl+N</span>
+      </div>
+      <div class="mc" onclick="newWindow()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span class="lb">Nova janela</span><span class="ks">Ctrl+Shift+N</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="openFile()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+        <span class="lb">Abrir…</span><span class="ks">Ctrl+O</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="saveFile()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span class="lb">Salvar</span><span class="ks">Ctrl+S</span>
+      </div>
+      <div class="mc" onclick="saveFileAs()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><line x1="9" y1="7" x2="15" y2="7"/></svg>
+        <span class="lb">Salvar como…</span><span class="ks">Ctrl+Shift+S</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="openExport()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="lb">Exportar…</span><span class="ks">Ctrl+E</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="closeTab(activeId)">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <span class="lb">Fechar aba</span><span class="ks">Ctrl+W</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Editar -->
+  <div class="mi" id="mi-edit">
+    <div class="mt" onclick="toggleMenu('mi-edit')">Editar</div>
+    <div class="md">
+      <div class="mc" onclick="doUndo()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        <span class="lb">Desfazer</span><span class="ks">Ctrl+Z</span>
+      </div>
+      <div class="mc" onclick="doRedo()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+        <span class="lb">Refazer</span><span class="ks">Ctrl+Y</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="selAll()"><span class="lb">Selecionar tudo</span><span class="ks">Ctrl+A</span></div>
+      <hr>
+      <div class="mc" onclick="toggleSearch()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <span class="lb">Buscar / Substituir</span><span class="ks">Ctrl+F</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="wrapSel('**','**')"><span class="lb">Negrito</span><span class="ks">Ctrl+B</span></div>
+      <div class="mc" onclick="wrapSel('*','*')"><span class="lb">Itálico</span><span class="ks">Ctrl+I</span></div>
+      <div class="mc" onclick="wrapSel('`','`')"><span class="lb">Código inline</span><span class="ks">Ctrl+`</span></div>
+      <div class="mc" onclick="wrapSel('[','](url)')"><span class="lb">Link</span><span class="ks">Ctrl+K</span></div>
+    </div>
+  </div>
+
+  <!-- Visualizar -->
+  <div class="mi" id="mi-vis">
+    <div class="mt" onclick="toggleMenu('mi-vis')">Visualizar</div>
+    <div class="md">
+      <div class="mc" onclick="setView('editor')">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <span class="lb">Apenas editor</span><span class="ks">Ctrl+1</span>
+      </div>
+      <div class="mc" onclick="setView('split')">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+        <span class="lb">Dividido</span><span class="ks">Ctrl+2</span>
+      </div>
+      <div class="mc" onclick="setView('preview')">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="lb">Apenas prévia</span><span class="ks">Ctrl+3</span>
+      </div>
+      <hr>
+      <div class="mc" onclick="adjFont(-1)"><span class="lb">Diminuir fonte</span><span class="ks">Ctrl+–</span></div>
+      <div class="mc" onclick="adjFont(1)"><span class="lb">Aumentar fonte</span><span class="ks">Ctrl+=</span></div>
+      <hr>
+      <div class="mc" onclick="setTheme('terminal')"><span class="lb">◉ Tema Terminal</span></div>
+      <div class="mc" onclick="setTheme('carta')"><span class="lb">◉ Tema Carta</span></div>
+      <div class="mc" onclick="setTheme('aurora')"><span class="lb">◉ Tema Aurora</span></div>
+    </div>
+  </div>
+
+  <!-- Ajuda -->
+  <div class="mi" id="mi-hlp">
+    <div class="mt" onclick="toggleMenu('mi-hlp')">Ajuda</div>
+    <div class="md">
+      <div class="mc" onclick="showAbout()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span class="lb">Sobre o Askesis-MD</span>
+      </div>
+      <div class="mc" onclick="showWelcome()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="lb">Arquivo de boas-vindas</span>
+      </div>
+      <div class="mc" onclick="showShortcuts()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>
+        <span class="lb">Atalhos de teclado</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toolbar direito -->
+  <div id="toolbar">
+    <!-- Undo / Redo -->
+    <div class="tb dis" id="btn-undo" title="Desfazer (Ctrl+Z)" onclick="doUndo()">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+    </div>
+    <div class="tb dis" id="btn-redo" title="Refazer (Ctrl+Y)" onclick="doRedo()">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+    </div>
+    <div class="tsep"></div>
+    <!-- Save / Export -->
+    <div class="tb" title="Salvar (Ctrl+S)" onclick="saveFile()">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    </div>
+    <div class="tb" title="Exportar (Ctrl+E)" onclick="openExport()">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </div>
+    <div class="tsep"></div>
+    <!-- View modes -->
+    <div class="tb on" id="vb-editor" title="Apenas editor (Ctrl+1)" onclick="setView('editor')">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </div>
+    <div class="tb" id="vb-split" title="Dividido (Ctrl+2)" onclick="setView('split')">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="3" x2="12" y2="21"/></svg>
+    </div>
+    <div class="tb" id="vb-preview" title="Prévia (Ctrl+3)" onclick="setView('preview')">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+    </div>
+    <div class="tsep"></div>
+    <!-- Search -->
+    <div class="tb" title="Buscar / Substituir (Ctrl+F)" onclick="toggleSearch()">
+      <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <div class="tsep"></div>
+    <!-- Theme dots -->
+    <div class="tdots">
+      <div class="tdot d-t on" id="dot-terminal" title="Terminal (escuro)"></div>
+      <div class="tdot d-c"   id="dot-carta"    title="Carta (claro)"></div>
+      <div class="tdot d-a"   id="dot-aurora"   title="Aurora (azul)"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FORMAT BAR
+══════════════════════════════════════════ -->
+<div id="fmtbar">
+  <!-- Bold -->
+  <div class="fb" title="Negrito (Ctrl+B)" onclick="wrapSel('**','**')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M6 4h8a4 4 0 010 8H6zM6 12h9a4 4 0 010 8H6z" stroke-width="2.2"/></svg>
+  </div>
+  <!-- Italic -->
+  <div class="fb" title="Itálico (Ctrl+I)" onclick="wrapSel('*','*')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><line x1="19" y1="4" x2="10" y2="4"/><line x1="14" y1="20" x2="5" y2="20"/><line x1="15" y1="4" x2="9" y2="20"/></svg>
+  </div>
+  <!-- Strikethrough -->
+  <div class="fb" title="Riscado (~~texto~~)" onclick="wrapSel('~~','~~')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><path d="M16 6c0 0-1.5-2-4-2S8 5.8 8 8c0 2 1.5 3 4 4"/><path d="M8 18c0 0 1.5 2 4 2s4-1.8 4-4c0-2-1.5-3-4-4"/></svg>
+  </div>
+  <div class="fsep"></div>
+  <!-- Code inline -->
+  <div class="fb" title="Código inline (Ctrl+`)" onclick="wrapSel('`','`')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+  </div>
+  <!-- Code block -->
+  <div class="fb" title="Bloco de código" onclick="insertCodeBlock()">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M8 10l-3 2 3 2M16 10l3 2-3 2" stroke-width="1.9"/></svg>
+  </div>
+  <div class="fsep"></div>
+  <!-- Link -->
+  <div class="fb" title="Link (Ctrl+K)" onclick="wrapSel('[','](url)')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+  </div>
+  <!-- Image -->
+  <div class="fb" title="Imagem (![alt](url))" onclick="wrapSel('![','](url)')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+  </div>
+  <div class="fsep"></div>
+  <!-- Headings -->
+  <div class="fb" title="Título H1" onclick="insertHeading(1)" style="gap:0;letter-spacing:-.5px">H1</div>
+  <div class="fb" title="Título H2" onclick="insertHeading(2)" style="gap:0;letter-spacing:-.5px">H2</div>
+  <div class="fb" title="Título H3" onclick="insertHeading(3)" style="gap:0;letter-spacing:-.5px">H3</div>
+  <div class="fsep"></div>
+  <!-- Lists -->
+  <div class="fb" title="Lista com marcadores (- item)" onclick="insertLinePrefix('- ')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><line x1="9" y1="6" x2="20" y2="6"/><line x1="9" y1="12" x2="20" y2="12"/><line x1="9" y1="18" x2="20" y2="18"/><circle cx="4" cy="6" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.5" fill="currentColor" stroke="none"/></svg>
+  </div>
+  <div class="fb" title="Lista numerada (1. item)" onclick="insertLinePrefix('1. ')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><line x1="10" y1="6" x2="21" y2="6"/><line x1="10" y1="12" x2="21" y2="12"/><line x1="10" y1="18" x2="21" y2="18"/><path d="M4 6h1v4M4 10h2M3 18h3M5 18v-2a1 1 0 00-1-1H3" stroke-width="1.6"/></svg>
+  </div>
+  <!-- Blockquote -->
+  <div class="fb" title="Citação (> texto)" onclick="insertLinePrefix('> ')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"/><path d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"/></svg>
+  </div>
+  <!-- HR -->
+  <div class="fb" title="Linha horizontal (---)" onclick="insertAtNewLine('---')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12" stroke-width="2.2"/></svg>
+  </div>
+  <div class="fsep"></div>
+  <!-- Table -->
+  <div class="fb" title="Inserir tabela" onclick="insertTable()">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+  </div>
+  <!-- Task list -->
+  <div class="fb" title="Lista de tarefas (- [ ] item)" onclick="insertLinePrefix('- [ ] ')">
+    <svg class="ic" style="width:14px;height:14px" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TAB BAR
+══════════════════════════════════════════ -->
+<div id="tabbar">
+  <div class="tab-add" title="Nova aba (Ctrl+N)" onclick="newTab()">
+    <svg class="ic" style="width:15px;height:15px" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SEARCH BAR
+══════════════════════════════════════════ -->
+<div id="searchbar">
+  <svg class="ic" style="width:15px;height:15px;color:var(--t2)" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input class="sinp" type="text" id="s-find"
+    placeholder="buscar…"
+    oninput="doSearch()" onkeydown="searchNav(event)">
+  <svg class="ic" style="width:15px;height:15px;color:var(--t2);margin-left:4px" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  <input class="sinp" type="text" id="s-repl" placeholder="substituir por…">
+  <div class="sbtn pri" onclick="doReplace()">Substituir</div>
+  <div class="sbtn" onclick="doReplaceAll()">Todos</div>
+  <span id="s-res"></span>
+  <div class="sbtn" style="margin-left:auto" onclick="toggleSearch()">
+    <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    Fechar
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<div id="main">
+  <div id="editor-pane">
+    <div id="editor-wrap">
+      <pre  id="editor-highlight" class="ed-layer" aria-hidden="true"></pre>
+      <textarea id="editor-textarea" class="ed-layer"
+        spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off"
+        oninput="onInput()" onkeydown="onKey(event)"
+        onclick="updateStatus()" onkeyup="updateStatus()"></textarea>
+    </div>
+  </div>
+  <div id="resize-handle"></div>
+  <div id="preview-pane"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PWA INSTALL BANNER
+══════════════════════════════════════════ -->
+<div id="pwa-banner" style="display:none;align-items:center;gap:10px;
+  padding:6px 14px;background:color-mix(in srgb,var(--bga) 14%,var(--bg1));
+  border-bottom:1px solid var(--bd);font-family:var(--fu);font-size:12.5px;
+  color:var(--t0);flex-shrink:0;z-index:50;">
+  <svg class="ic" style="width:16px;height:16px;stroke:var(--ta);flex-shrink:0" viewBox="0 0 24 24">
+    <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+  </svg>
+  <span>Instalar o <strong>Askesis-MD</strong> como aplicativo neste computador?</span>
+  <div id="pwa-install-btn" onclick="pwaDoPWA()" style="
+    padding:4px 14px;border-radius:4px;cursor:pointer;
+    background:var(--bga);color:#fff;font-size:12px;font-weight:500;
+    white-space:nowrap;flex-shrink:0;">
+    Instalar
+  </div>
+  <div onclick="pwaDismiss()" style="
+    margin-left:auto;cursor:pointer;color:var(--t2);padding:2px 6px;
+    border-radius:3px;font-size:18px;line-height:1;flex-shrink:0;"
+    title="Dispensar">×</div>
+</div>
+
+
+<div id="statusbar">
+  <span class="sm" id="st-mode">EDITOR</span>
+  <span class="sf" id="st-file">sem título</span>
+  <div class="sr2">
+    <span id="st-words">0 palavras</span>
+    <span class="ssep">│</span>
+    <span id="st-chars">0 chars</span>
+    <span class="ssep">│</span>
+    <span id="st-pos">L 1 : C 1</span>
+    <span class="ssep">│</span>
+    <span style="color:var(--t2)">UTF-8</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+
+<!-- Export -->
+<div class="ov" id="ov-export">
+  <div class="modal">
+    <h3>
+      <svg class="ic" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar documento
+    </h3>
+    <div class="egrid">
+      <div class="eopt" onclick="exportAs('md')"><span class="ext">.md</span><span class="dsc">Markdown puro</span></div>
+      <div class="eopt" onclick="exportAs('html')"><span class="ext">.html</span><span class="dsc">HTML padrão</span></div>
+      <div class="eopt" onclick="exportAs('pdf')"><span class="ext">.pdf</span><span class="dsc">PDF via impressão</span></div>
+      <div class="eopt" onclick="exportAs('txt')"><span class="ext">.txt</span><span class="dsc">Texto simples</span></div>
+      <div class="eopt" onclick="exportAs('rtf')"><span class="ext">.rtf</span><span class="dsc">Rich Text Format</span></div>
+      <div class="eopt" onclick="exportAs('fodt')"><span class="ext">.fodt</span><span class="dsc">OpenDocument Texto</span></div>
+      <div class="eopt sp" onclick="exportAsk('html')">
+        <span class="ext">✦ HTML Askemata</span>
+        <span class="dsc">Estilo askemata.github.io · Computer Modern</span>
+      </div>
+      <div class="eopt sp" onclick="exportAsk('pdf')">
+        <span class="ext">✦ PDF Askemata</span>
+        <span class="dsc">Impressão com tipografia Askemata</span>
+      </div>
+    </div>
+    <div class="mbtns"><div class="btn" onclick="closeOv('ov-export')">Cancelar</div></div>
+  </div>
+</div>
+
+<!-- Save As -->
+<div class="ov" id="ov-saveas">
+  <div class="modal">
+    <h3>
+      <svg class="ic" style="width:16px;height:16px" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg>
+      Salvar como
+    </h3>
+    <p>Nome do arquivo (ex: <code style="font-size:12px;background:var(--bg2);padding:1px 5px;border-radius:3px">notas.md</code>):</p>
+    <input type="text" id="saveas-name" placeholder="documento.md"
+      onkeydown="if(event.key==='Enter')confirmSaveAs()">
+    <div class="mbtns">
+      <div class="btn" onclick="closeOv('ov-saveas')">Cancelar</div>
+      <div class="btn pri" onclick="confirmSaveAs()">
+        <svg class="ic" style="width:13px;height:13px" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        Salvar
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- About -->
+<div class="ov" id="ov-about">
+  <div class="modal" style="max-width:450px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+      <svg class="ic" style="width:38px;height:38px;stroke:var(--ta);stroke-width:1.3;flex-shrink:0" viewBox="0 0 24 24">
+        <polygon points="12,2 22,12 12,22 2,12"/>
+      </svg>
+      <div>
+        <div style="font-size:21px;font-weight:500;color:var(--ta);letter-spacing:.07em;font-family:var(--fm)">Askesis-MD</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:3px;font-family:var(--fu)">Editor Markdown ultraleve · v3.0 · Linux</div>
+      </div>
+    </div>
+    <p>Interface minimalista, múltiplas abas, realce de sintaxe e exportação em múltiplos formatos. Projetado para funcionar em qualquer sistema Linux — antigos e novos — sem dependências externas.</p>
+    <p>Criado por <strong><a href="https://askesis.hypotheses.org" target="_blank" style="color:var(--ta)">askesis.hypotheses.org</a></strong> — um espaço dedicado ao exercício filosófico, à escrita e ao pensamento livre.</p>
+    <div class="mbtns" style="margin-top:20px"><div class="btn pri" onclick="closeOv('ov-about')">Fechar</div></div>
+  </div>
+</div>
+
+<!-- Shortcuts -->
+<div class="ov" id="ov-shorts">
+  <div class="modal" style="max-width:500px">
+    <h3>
+      <svg class="ic" style="width:16px;height:16px" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg>
+      Atalhos de teclado
+    </h3>
+    <div class="scg">
+      <span class="sck">Ctrl+N</span><span class="scd">Nova aba</span>
+      <span class="sck">Ctrl+Shift+N</span><span class="scd">Nova janela</span>
+      <span class="sck">Ctrl+O</span><span class="scd">Abrir arquivo</span>
+      <span class="sck">Ctrl+S</span><span class="scd">Salvar</span>
+      <span class="sck">Ctrl+Shift+S</span><span class="scd">Salvar como</span>
+      <span class="sck">Ctrl+E</span><span class="scd">Exportar</span>
+      <span class="sck">Ctrl+W</span><span class="scd">Fechar aba</span>
+      <span class="sck">Ctrl+Z</span><span class="scd">Desfazer</span>
+      <span class="sck">Ctrl+Y</span><span class="scd">Refazer</span>
+      <span class="sck">Ctrl+F</span><span class="scd">Buscar / Substituir</span>
+      <span class="sck">Ctrl+B</span><span class="scd">Negrito</span>
+      <span class="sck">Ctrl+I</span><span class="scd">Itálico</span>
+      <span class="sck">Ctrl+K</span><span class="scd">Link</span>
+      <span class="sck">Ctrl+`</span><span class="scd">Código inline</span>
+      <span class="sck">Ctrl+1</span><span class="scd">Apenas editor</span>
+      <span class="sck">Ctrl+2</span><span class="scd">Vista dividida</span>
+      <span class="sck">Ctrl+3</span><span class="scd">Apenas prévia</span>
+      <span class="sck">Ctrl+– / =</span><span class="scd">Diminuir / aumentar fonte</span>
+      <span class="sck">Tab / Shift+Tab</span><span class="scd">Indentar / desindentar</span>
+      <span class="sck">Escape</span><span class="scd">Fechar painéis e menus</span>
+    </div>
+    <div class="mbtns" style="margin-top:20px"><div class="btn pri" onclick="closeOv('ov-shorts')">Fechar</div></div>
+  </div>
+</div>
+
+<input type="file" id="file-inp" accept=".md,.txt,.markdown" style="display:none" onchange="onFileOpen(event)">
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+'use strict';
+/* ============================================================
+   ASKESIS-MD v3 — Application Logic
+
+   SCROLL/ALIGNMENT (the hard problem)
+   ─────────────────────────────────────
+   Root cause of misalignment in v2:
+     • After setting HL innerHTML, the browser hasn't finished
+       layout yet when syncHeight() reads scrollHeight.
+     • Result: textarea gets a stale height → gap opens.
+
+   Fix:
+     • doHighlight() sets innerHTML, then schedules syncHeight()
+       inside a double-rAF (two animation frames) so the browser
+       fully resolves the pre's block-formatting-context height
+       before we read it.
+     • syncHeight() sets ta.style.height = max(hl.scrollHeight,
+       wrap.clientHeight) with a small +1px buffer to prevent
+       1px rounding gaps on fractional-DPI screens.
+     • window.resize → syncHeight().
+     • adjFont() and setView() also call syncHeight() after layout.
+============================================================ */
+
+// ── WELCOME CONTENT ────────────────────────────────────────
+const WELCOME = `# Bem-vindo ao Askesis-MD
+
+*Um editor de Markdown ultraleve, feito para Linux — antigos e novos.*
+
+---
+
+## O que é o Askesis-MD?
+
+O **Askesis-MD** foi concebido para funcionar em qualquer máquina Linux, de sistemas modestos com recursos limitados às mais modernas estações de trabalho. Sem dependências pesadas, sem telemetria, sem distrações: apenas você e o texto.
+
+- ✦ Interface minimalista com três temas: **Terminal**, **Carta** e **Aurora**
+- ✦ Realce de sintaxe Markdown dentro do próprio editor (headings, negrito, código, links…)
+- ✦ Múltiplas abas e múltiplas janelas independentes
+- ✦ Barra de formatação com ícones para H1–H3, negrito, itálico, código, link, tabela…
+- ✦ Exportação para \`.md\`, \`.html\`, \`.pdf\`, \`.fodt\`, \`.rtf\` e estilo **Askemata**
+
+---
+
+## Exemplos de formatação
+
+**Negrito**, *itálico*, ~~riscado~~, \`código inline\`, [link](https://askesis.hypotheses.org).
+
+> *"Nenhum vento sopra a favor de quem não sabe para onde vai."*
+> — Sêneca, *Cartas a Lucílio*
+
+\`\`\`python
+# bloco de código com realce de sintaxe
+def askesis(texto):
+    return texto.strip()
+\`\`\`
+
+| Recurso          | Descrição                            |
+|------------------|--------------------------------------|
+| Múltiplas abas   | Edite vários arquivos ao mesmo tempo |
+| Temas            | Terminal · Carta · Aurora            |
+| Exportação       | md · html · pdf · rtf · fodt         |
+
+---
+
+## Como começar
+
+- **Ctrl+2** → divide a tela: editor à esquerda, prévia à direita
+- **Ctrl+E** → exportar em vários formatos
+- **Ctrl+F** → buscar e substituir texto
+- **Barra de formatação** acima → ícones para inserir elementos rapidamente
+
+---
+
+*Criado por [askesis.hypotheses.org](https://askesis.hypotheses.org) — exercício filosófico, escrita e pensamento livre.*
+`;
+
+// ── STATE ──────────────────────────────────────────────────
+let tabs = [], activeId = null, tabCtr = 0;
+let curView = 'editor', edFS = 16;
+const US = {}, RS = {}; // undo/redo per tab id
+
+// ── DOM SHORTCUTS ──────────────────────────────────────────
+const TA   = () => document.getElementById('editor-textarea');
+const HL   = () => document.getElementById('editor-highlight');
+const WRAP = () => document.getElementById('editor-wrap');
+
+// ── SYNC HEIGHT ────────────────────────────────────────────
+// Called after innerHTML is settled (via double-rAF in doHighlight)
+// and after window resize / font change / view change.
+function syncHeight() {
+  const ta = TA(), hl = HL(), wrap = WRAP();
+  if (!ta || !hl || !wrap) return;
+
+  // Reset heights so scrollHeight gives the true content measurement
+  ta.style.height  = '0';
+  hl.style.height  = '0';
+
+  // Read the true content height from the highlight layer
+  // ceil() is critical: sub-pixel heights (e.g. 1024.3px on 1.25× DPI)
+  // truncated to 1024px cause a 1-line drift on long documents.
+  const contentH = Math.ceil(hl.scrollHeight);
+  const wrapH    = Math.ceil(wrap.clientHeight);
+  // +4px buffer: absorbs fractional-pixel rounding on any DPI / zoom level
+  const finalH   = Math.max(contentH, wrapH) + 4;
+
+  ta.style.height = finalH + 'px';
+  hl.style.height = finalH + 'px';
+}
+
+// ResizeObserver watches the editor-wrap so syncHeight fires whenever
+// the pane is resized (e.g. dragging the split handle, sidebar opening).
+// This covers cases window.resize misses.
+let _ro = null;
+function initResizeObserver() {
+  if (typeof ResizeObserver === 'undefined') return;
+  _ro = new ResizeObserver(() => syncHeight());
+  const wrap = WRAP();
+  if (wrap) _ro.observe(wrap);
+}
+
+// ── HIGHLIGHT ──────────────────────────────────────────────
+// Sets highlight HTML, then fires syncHeight after TWO animation
+// frames so the browser has finished block-layout on the <pre>.
+function doHighlight(raw) {
+  HL().innerHTML = buildHighlight(raw);
+  // Double rAF: first frame commits the DOM mutation,
+  // second frame fires after layout/paint.
+  requestAnimationFrame(() => requestAnimationFrame(syncHeight));
+}
+
+// ── INPUT ──────────────────────────────────────────────────
+let preTimer = null;
+
+function onInput() {
+  const txt = TA().value;
+  const tab = activeTab();
+  if (tab) {
+    tab.content = txt;
+    if (!tab.modified) { tab.modified = true; renderTabs(); }
+    clearTimeout(tab._ut);
+    tab._ut = setTimeout(() => pushUndo(tab.id, txt), 600);
+  }
+  doHighlight(txt);
+  clearTimeout(preTimer);
+  preTimer = setTimeout(() => updatePreview(txt), 130);
+  updateStatus();
+  updateUndoBtns();
+}
+
+function setContent(txt) {
+  TA().value = txt;
+  doHighlight(txt); // syncHeight called inside after double-rAF
+  updatePreview(txt);
+  updateStatus();
+}
+
+// ── KEYBOARD ───────────────────────────────────────────────
+function onKey(e) {
+  const ta = TA();
+  const s = ta.selectionStart, en = ta.selectionEnd, v = ta.value;
+
+  // Tab / Shift+Tab indentation
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    if (e.shiftKey) {
+      const ls = v.lastIndexOf('\n', s - 1) + 1;
+      const m  = v.substring(ls, s).match(/^( {1,4}|\t)/);
+      if (m) {
+        ta.value = v.substring(0, ls) + v.substring(ls + m[0].length);
+        ta.selectionStart = ta.selectionEnd = s - m[0].length;
+      }
+    } else {
+      ta.value = v.substring(0, s) + '    ' + v.substring(en);
+      ta.selectionStart = ta.selectionEnd = s + 4;
+    }
+    onInput(); return;
+  }
+
+  // Auto-continue lists on Enter
+  if (e.key === 'Enter') {
+    const ls   = v.lastIndexOf('\n', s - 1) + 1;
+    const line = v.substring(ls, s);
+    const lm   = line.match(/^(\s*)([-*+]|\d+\.)\s+/);
+    if (lm) {
+      // Empty list item → break the list
+      if (line.trim() === lm[0].trim()) {
+        e.preventDefault();
+        ta.value = v.substring(0, ls) + '\n' + v.substring(s);
+        ta.selectionStart = ta.selectionEnd = ls + 1;
+        onInput(); return;
+      }
+      e.preventDefault();
+      let next = lm[0];
+      if (/\d+\./.test(lm[2])) next = lm[1] + (parseInt(lm[2]) + 1) + '. ';
+      const ins = '\n' + next;
+      ta.value = v.substring(0, s) + ins + v.substring(en);
+      ta.selectionStart = ta.selectionEnd = s + ins.length;
+      onInput();
+    }
+  }
+}
+
+// Global shortcuts
+document.addEventListener('keydown', e => {
+  const ctrl = e.ctrlKey || e.metaKey;
+  if (e.key === 'Escape') {
+    closeAllMenus();
+    document.querySelectorAll('.ov.show').forEach(o => o.classList.remove('show'));
+    const sb = document.getElementById('searchbar');
+    if (sb.classList.contains('show')) toggleSearch();
+    return;
+  }
+  if (!ctrl) return;
+  switch (e.key.toLowerCase()) {
+    case 'n': e.preventDefault(); e.shiftKey ? newWindow() : newTab(); break;
+    case 'o': e.preventDefault(); openFile(); break;
+    case 's': e.preventDefault(); e.shiftKey ? saveFileAs() : saveFile(); break;
+    case 'e': e.preventDefault(); openExport(); break;
+    case 'w': e.preventDefault(); if (activeId) closeTab(activeId); break;
+    case 'z': e.preventDefault(); doUndo(); break;
+    case 'y': e.preventDefault(); doRedo(); break;
+    case 'f': e.preventDefault(); toggleSearch(); break;
+    case 'b': e.preventDefault(); wrapSel('**','**'); break;
+    case 'i': e.preventDefault(); wrapSel('*','*'); break;
+    case 'k': e.preventDefault(); wrapSel('[','](url)'); break;
+    case '`': e.preventDefault(); wrapSel('`','`'); break;
+    case '1': e.preventDefault(); setView('editor'); break;
+    case '2': e.preventDefault(); setView('split'); break;
+    case '3': e.preventDefault(); setView('preview'); break;
+    case '-': e.preventDefault(); adjFont(-1); break;
+    case '=': case '+': e.preventDefault(); adjFont(1); break;
+  }
+});
+
+// ── UNDO / REDO ────────────────────────────────────────────
+function pushUndo(id, txt) {
+  if (!US[id]) US[id] = [];
+  if (!RS[id]) RS[id] = [];
+  if (US[id][US[id].length - 1] === txt) return;
+  US[id].push(txt);
+  if (US[id].length > 400) US[id].shift();
+  RS[id] = [];
+}
+
+function doUndo() {
+  const tab = activeTab(); if (!tab) return;
+  const st = US[tab.id] || [];
+  if (st.length <= 1) return;
+  const cur = st.pop();
+  (RS[tab.id] = RS[tab.id] || []).push(cur);
+  tab.content = st[st.length - 1] || '';
+  setContent(tab.content); updateUndoBtns();
+}
+
+function doRedo() {
+  const tab = activeTab(); if (!tab) return;
+  const st = RS[tab.id] || [];
+  if (!st.length) return;
+  const c = st.pop();
+  (US[tab.id] = US[tab.id] || []).push(c);
+  tab.content = c; setContent(c); updateUndoBtns();
+}
+
+function updateUndoBtns() {
+  const tab = activeTab();
+  const cu = tab && (US[tab.id] || []).length > 1;
+  const cr = tab && (RS[tab.id] || []).length > 0;
+  document.getElementById('btn-undo').classList.toggle('dis', !cu);
+  document.getElementById('btn-redo').classList.toggle('dis', !cr);
+}
+
+// ── TABS ───────────────────────────────────────────────────
+function activeTab() { return tabs.find(t => t.id === activeId); }
+
+function newTab(content, name, filename) {
+  const prev = activeTab();
+  if (prev) prev.content = TA().value;
+  const id = ++tabCtr;
+  const tab = { id, name: name || 'sem título', content: content || '', filename: filename || null, modified: false };
+  tabs.push(tab);
+  US[id] = [tab.content]; RS[id] = [];
+  activateTab(id);
+  setTimeout(() => TA().focus(), 50);
+}
+
+function activateTab(id) {
+  const prev = activeTab();
+  if (prev) prev.content = TA().value;
+  activeId = id;
+  const tab = activeTab(); if (!tab) return;
+  setContent(tab.content);
+  renderTabs();
+  document.getElementById('st-file').textContent = tab.filename || tab.name;
+  updateUndoBtns();
+}
+
+function closeTab(id, ev) {
+  if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+  const idx = tabs.findIndex(t => t.id === id);
+  if (idx === -1) return;
+  if (tabs[idx].modified && !confirm(`"${tabs[idx].name}" tem alterações não salvas. Fechar?`)) return;
+  tabs.splice(idx, 1);
+  delete US[id]; delete RS[id];
+  if (!tabs.length) { newTab(WELCOME, 'boas-vindas.md'); return; }
+  activateTab(tabs[Math.min(idx, tabs.length - 1)].id);
+  renderTabs();
+}
+
+function renderTabs() {
+  const bar = document.getElementById('tabbar');
+  const addBtn = bar.querySelector('.tab-add');
+  bar.querySelectorAll('.tab').forEach(el => el.remove());
+  tabs.forEach(tab => {
+    const el = document.createElement('div');
+    el.className = 'tab' +
+      (tab.id === activeId ? ' on' : '') +
+      (tab.modified ? ' mod' : '');
+    el.innerHTML =
+      `<span class="tab-dot"></span>` +
+      `<span class="tab-name" title="${esc(tab.name)}">${esc(tab.name)}</span>` +
+      `<span class="tab-x" onclick="closeTab(${tab.id},event)">` +
+        `<svg class="ic" style="width:10px;height:10px" viewBox="0 0 24 24">` +
+          `<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>` +
+        `</svg></span>`;
+    el.addEventListener('click', ev => { if (!ev.target.closest('.tab-x')) activateTab(tab.id); });
+    bar.insertBefore(el, addBtn);
+  });
+}
+
+// ── SYNTAX HIGHLIGHT ───────────────────────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function buildHighlight(raw) {
+  const lines = raw.split('\n');
+  let inFence = false, fence = '';
+  const out = lines.map(line => {
+    const e = esc(line);
+
+    // Code fence toggle
+    const fm = line.match(/^(`{3,}|~{3,})/);
+    if (fm) {
+      if (!inFence) { inFence = true; fence = fm[1]; return `<span class="cb mk">${e}</span>`; }
+      if (line.startsWith(fence)) { inFence = false; fence = ''; return `<span class="cb mk">${e}</span>`; }
+    }
+    if (inFence) return `<span class="cb">${e}</span>`;
+
+    // Heading
+    const hm = line.match(/^(#{1,6})(\s+)(.*)/);
+    if (hm) {
+      const lvl = hm[1].length;
+      return `<span class="h${lvl}"><span class="mk">${esc(hm[1])}</span>${esc(hm[2])}${inlineHL(esc(hm[3]))}</span>`;
+    }
+    // HR
+    if (/^(\*{3,}|-{3,}|_{3,})\s*$/.test(line)) return `<span class="hr">${e}</span>`;
+    // Blockquote
+    if (/^\s*>/.test(line)) return `<span class="bq">${e}</span>`;
+    // List item
+    const lm2 = line.match(/^(\s*)([-*+]|\d+\.)(\s+)(.*)/);
+    if (lm2) return `<span class="li"><span class="mk">${esc(lm2[1]+lm2[2]+lm2[3])}</span>${inlineHL(esc(lm2[4]))}</span>`;
+    // Table row
+    if (/^\|/.test(line.trim())) return `<span class="tb">${inlineHL(e)}</span>`;
+
+    return inlineHL(e);
+  });
+  return out.join('\n') + '\n';
+}
+
+function inlineHL(s) {
+  // Strikethrough
+  s = s.replace(/(~~)([^~\n]+)(~~)/g, '<span class="st">$1$2$3</span>');
+  // Bold+italic ***
+  s = s.replace(/(\*\*\*)([^*\n]+)(\*\*\*)/g, '<span class="bd2 it">$1$2$3</span>');
+  // Bold **
+  s = s.replace(/(\*\*)([^*\n]+)(\*\*)/g, '<span class="bd2">$1$2$3</span>');
+  // Bold __
+  s = s.replace(/(__)([^_\n]+)(__)/g, '<span class="bd2">$1$2$3</span>');
+  // Italic *
+  s = s.replace(/(?<!\*)\*(?!\*)([^*\n]+)(?<!\*)\*(?!\*)/g, '<span class="it">*$1*</span>');
+  // Italic _
+  s = s.replace(/(?<!_)_(?!_)([^_\n]+)(?<!_)_(?!_)/g, '<span class="it">_$1_</span>');
+  // Code
+  s = s.replace(/(`+)([^`\n]+?)(`+)/g, '<span class="cd">$1$2$3</span>');
+  // Image (before link)
+  s = s.replace(/(!\[)([^\]\n]*?)(\]\([^)\n]*?\))/g, '<span class="im">$1$2$3</span>');
+  // Link
+  s = s.replace(/(\[)([^\]\n]*?)(\]\([^)\n]*?\))/g, '<span class="lk">$1$2$3</span>');
+  return s;
+}
+
+// ── PREVIEW ────────────────────────────────────────────────
+function updatePreview(txt) {
+  const pp = document.getElementById('preview-pane');
+  if (!pp.classList.contains('show')) return;
+  pp.innerHTML = mdToHtml(txt);
+}
+
+function mdToHtml(md) {
+  let h = md.replace(/^---[\s\S]*?---\n?/, '');
+  // Fenced code blocks
+  h = h.replace(/```([^\n]*)\n([\s\S]*?)```/gm, (_, lang, code) =>
+    `<pre><code>${esc(code.trim())}</code></pre>`);
+  // HR
+  h = h.replace(/^(\*{3,}|-{3,}|_{3,})\s*$/gm, '<hr>');
+  // Headings h6→h1
+  for (let i = 6; i >= 1; i--)
+    h = h.replace(new RegExp(`^${'#'.repeat(i)}\\s+(.+)$`, 'gm'), `<h${i}>$1</h${i}>`);
+  // Blockquote
+  h = h.replace(/^>\s?(.+)$/gm, '<blockquote>$1</blockquote>');
+  // Tables
+  h = h.replace(/^\|(.+)\|\s*\n\|[-:| ]+\|\s*\n((?:\|.+\|\n?)*)/gm, (_, hdr, rows) => {
+    const ths = hdr.split('|').filter(s => s.trim()).map(s => `<th>${s.trim()}</th>`).join('');
+    const trs = rows.trim().split('\n').map(r =>
+      `<tr>${r.split('|').filter(s => s.trim()).map(s => `<td>${s.trim()}</td>`).join('')}</tr>`
+    ).join('');
+    return `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+  });
+  // Ordered lists
+  h = h.replace(/((?:^\d+\..+(?:\n|$))+)/gm, m =>
+    `<ol>${m.trim().split('\n').map(l => `<li>${l.replace(/^\d+\.\s+/, '')}</li>`).join('')}</ol>`);
+  // Unordered lists (including task lists)
+  h = h.replace(/((?:^[-*+]\s.+(?:\n|$))+)/gm, m =>
+    `<ul>${m.trim().split('\n').map(l => {
+      const task = l.match(/^[-*+]\s\[([ x])\]\s+(.*)/i);
+      if (task) {
+        const checked = task[1].toLowerCase() === 'x';
+        return `<li><input type="checkbox" ${checked ? 'checked' : ''} disabled> ${task[2]}</li>`;
+      }
+      return `<li>${l.replace(/^[-*+]\s+/, '')}</li>`;
+    }).join('')}</ul>`);
+  // Inline
+  h = h.replace(/~~(.+?)~~/g, '<del>$1</del>');
+  h = h.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+  h = h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  h = h.replace(/__(.+?)__/g, '<strong>$1</strong>');
+  h = h.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  h = h.replace(/_(.+?)_/g, '<em>$1</em>');
+  h = h.replace(/`(.+?)`/g, '<code>$1</code>');
+  h = h.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">');
+  h = h.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+  // Paragraphs
+  return h.split(/\n\n+/).map(b => {
+    const t = b.trim(); if (!t) return '';
+    if (/^<(h[1-6]|pre|blockquote|ul|ol|hr|table|div)/.test(t)) return t;
+    return `<p>${t.replace(/\n/g, '<br>')}</p>`;
+  }).join('\n');
+}
+
+// ── VIEW ───────────────────────────────────────────────────
+function setView(v) {
+  curView = v;
+  const ep = document.getElementById('editor-pane');
+  const pp = document.getElementById('preview-pane');
+  const rh = document.getElementById('resize-handle');
+  const sm = document.getElementById('st-mode');
+
+  ep.style.display = 'flex'; ep.style.flex = '1';
+  pp.classList.remove('show'); pp.style.width = '';
+  rh.classList.remove('show');
+  ['vb-editor','vb-split','vb-preview'].forEach(id => document.getElementById(id).classList.remove('on'));
+
+  if (v === 'split') {
+    pp.classList.add('show'); pp.style.width = '50%';
+    rh.classList.add('show');
+    document.getElementById('vb-split').classList.add('on');
+    sm.textContent = 'DIVIDIDO';
+    updatePreview(TA().value);
+  } else if (v === 'preview') {
+    ep.style.display = 'none';
+    pp.classList.add('show'); pp.style.width = '100%';
+    document.getElementById('vb-preview').classList.add('on');
+    sm.textContent = 'PRÉVIA';
+    updatePreview(activeTab()?.content || '');
+  } else {
+    document.getElementById('vb-editor').classList.add('on');
+    sm.textContent = 'EDITOR';
+  }
+  closeAllMenus();
+  // Re-sync after layout settles
+  setTimeout(() => { syncHeight(); if (v !== 'preview') TA().focus(); }, 60);
+}
+
+// ── THEME ──────────────────────────────────────────────────
+function setTheme(t) {
+  document.body.className = t === 'terminal' ? '' : `theme-${t}`;
+  ['terminal','carta','aurora'].forEach(n =>
+    document.getElementById(`dot-${n}`).classList.toggle('on', n === t));
+  closeAllMenus();
+  requestAnimationFrame(syncHeight);
+}
+
+// ── FONT SIZE ──────────────────────────────────────────────
+function adjFont(d) {
+  edFS = Math.max(11, Math.min(26, edFS + d));
+  document.documentElement.style.setProperty('--efs', edFS + 'px');
+  // Wait two frames for CSS variable to propagate before measuring
+  requestAnimationFrame(() => requestAnimationFrame(syncHeight));
+  closeAllMenus();
+}
+
+// ── STATUS ─────────────────────────────────────────────────
+function updateStatus() {
+  const txt = TA().value;
+  const words = txt.trim() ? txt.trim().split(/\s+/).length : 0;
+  const before = txt.substring(0, TA().selectionStart);
+  const lns = before.split('\n');
+  document.getElementById('st-words').textContent = `${words} palavras`;
+  document.getElementById('st-chars').textContent = `${txt.length} chars`;
+  document.getElementById('st-pos').textContent   = `L ${lns.length} : C ${lns[lns.length - 1].length + 1}`;
+}
+
+// ── FILE OPERATIONS ────────────────────────────────────────
+function openFile() { document.getElementById('file-inp').click(); closeAllMenus(); }
+
+function onFileOpen(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => newTab(e.target.result, f.name, f.name);
+  r.readAsText(f); ev.target.value = '';
+}
+
+function saveFile() {
+  const tab = activeTab(); if (!tab) return;
+  tab.content = TA().value;
+  const needsName = !tab.filename || tab.filename === 'boas-vindas.md';
+  if (needsName) { saveFileAs(); return; }
+  dl(tab.content, tab.filename, 'text/markdown');
+  tab.modified = false; renderTabs(); closeAllMenus();
+}
+
+function saveFileAs() {
+  const tab = activeTab();
+  document.getElementById('saveas-name').value = tab?.filename || 'documento.md';
+  openOv('ov-saveas'); closeAllMenus();
+  setTimeout(() => document.getElementById('saveas-name').select(), 80);
+}
+
+function confirmSaveAs() {
+  const name = document.getElementById('saveas-name').value.trim() || 'documento.md';
+  const tab = activeTab(); if (!tab) return;
+  tab.content = TA().value; tab.filename = name; tab.name = name; tab.modified = false;
+  dl(tab.content, name, 'text/markdown');
+  renderTabs(); document.getElementById('st-file').textContent = name; closeOv('ov-saveas');
+}
+
+function newWindow() { window.open(window.location.href, '_blank'); closeAllMenus(); }
+
+function dl(content, filename, mime) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+  a.download = filename; a.click();
+}
+
+// ── EXPORT ─────────────────────────────────────────────────
+function openExport() { openOv('ov-export'); closeAllMenus(); }
+
+function exportAs(fmt) {
+  const tab = activeTab(); if (!tab) return;
+  const md   = tab.content || TA().value;
+  const base = (tab.filename || 'documento').replace(/\.[^.]+$/, '');
+  if      (fmt === 'md')   dl(md, base + '.md', 'text/markdown');
+  else if (fmt === 'txt')  dl(md, base + '.txt', 'text/plain');
+  else if (fmt === 'html') dl(buildHtml(md, base, false), base + '.html', 'text/html');
+  else if (fmt === 'pdf')  printHtml(md, base, false);
+  else if (fmt === 'rtf')  dl(buildRtf(md), base + '.rtf', 'application/rtf');
+  else if (fmt === 'fodt') dl(buildFodt(md, base), base + '.fodt', 'application/vnd.oasis.opendocument.text');
+  closeOv('ov-export');
+}
+
+function exportAsk(fmt) {
+  const tab = activeTab(); if (!tab) return;
+  const md   = tab.content || TA().value;
+  const base = (tab.filename || 'documento').replace(/\.[^.]+$/, '');
+  if (fmt === 'html') dl(buildHtml(md, base, true), base + '-askemata.html', 'text/html');
+  else printHtml(md, base, true);
+  closeOv('ov-export');
+}
+
+function buildHtml(md, title, ask) {
+  return `<!DOCTYPE html><html lang="pt-BR"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title><style>${ask ? cssAsk() : cssStd()}</style>
+</head><body><article class="content">${mdToHtml(md)}</article></body></html>`;
+}
+
+function printHtml(md, base, ask) {
+  const w = window.open('', '_blank');
+  w.document.write(buildHtml(md, base, ask)); w.document.close();
+  w.addEventListener('load', () => w.print());
+}
+
+function cssStd() {
+  return `body{font-family:Georgia,serif;max-width:720px;margin:40px auto;padding:0 24px;
+color:#222;line-height:1.8;font-size:17px}
+h1,h2,h3,h4,h5,h6{color:#1a1a2e;font-weight:normal;margin:1.4em 0 .5em}
+h1{font-size:2em;border-bottom:1px solid #ddd;padding-bottom:.3em}h2{font-size:1.5em}
+code{font-family:'Courier New',monospace;background:#f4f4f4;padding:2px 5px;border-radius:3px;font-size:.88em}
+pre{background:#f4f4f4;padding:16px;border-radius:6px;overflow-x:auto}
+blockquote{border-left:3px solid #aaa;margin:1em 0;padding:.4em 1em;color:#555;font-style:italic}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:8px}th{background:#f0f0f0}
+a{color:#0969da}img{max-width:100%}hr{border:none;border-top:1px solid #ddd;margin:1.6em 0}`;
+}
+
+function cssAsk() {
+  return `@font-face{font-family:'CMU';src:url('https://cdn.rawgit.com/dreampulse/computer-modern-web-font/master/fonts/Serif/cmun-serif.woff2')format('woff2')}
+body{font-family:'CMU',Georgia,serif;max-width:680px;margin:52px auto;padding:0 28px;
+color:#1a1a1a;line-height:1.9;font-size:17.5px;background:#fafaf8}
+h1,h2,h3,h4{font-weight:normal;color:#111}
+h1{font-size:2.1em;text-align:center;border-bottom:1px solid #ccc;padding-bottom:.4em;margin-bottom:.7em}
+h2{font-size:1.45em;margin-top:2em}h3{font-size:1.15em}
+code{font-family:'Courier New',monospace;font-size:.87em;background:#f0f0ec;padding:1px 5px;border-radius:2px}
+pre{background:#f0f0ec;padding:16px;border-radius:4px;overflow-x:auto}
+blockquote{border-left:2px solid #999;margin:1.4em 0;padding:.5em 1.4em;color:#444;font-style:italic}
+a{color:#2a5799;text-decoration:none}a:hover{text-decoration:underline}
+table{border-collapse:collapse;width:100%;margin:1.2em 0}th,td{border:1px solid #ccc;padding:7px 13px}
+th{background:#f0f0ec;font-weight:500}img{max-width:100%;display:block;margin:1em auto}
+p{text-align:justify;hyphens:auto}hr{border:none;border-top:1px solid #ccc;margin:1.8em 0}`;
+}
+
+function buildRtf(md) {
+  const t = md
+    .replace(/^#{1,6}\s+(.+)$/gm, '\\b $1\\b0\\par')
+    .replace(/\*\*(.+?)\*\*/g, '\\b $1\\b0')
+    .replace(/\*(.+?)\*/g, '\\i $1\\i0')
+    .replace(/`(.+?)`/g, '$1')
+    .replace(/^[-*+]\s+(.+)$/gm, '\\bullet $1\\par')
+    .replace(/\n\n/g, '\\par ').replace(/\n/g, '\\par ');
+  return `{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Times New Roman;}}\\f0\\fs28 ${t}}`;
+}
+
+function buildFodt(md, title) {
+  const body = md.split('\n').map(line => {
+    const hm = line.match(/^(#{1,6})\s+(.+)$/);
+    if (hm) return `<text:h text:style-name="Heading_20_${hm[1].length}" text:outline-level="${hm[1].length}">${esc(hm[2])}</text:h>`;
+    if (!line.trim()) return '<text:p text:style-name="Text_20_Body"/>';
+    return `<text:p text:style-name="Text_20_Body">${esc(line)}</text:p>`;
+  }).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+office:version="1.3" office:mimetype="application/vnd.oasis.opendocument.text">
+<office:meta><dc:title xmlns:dc="http://purl.org/dc/elements/1.1/">${esc(title)}</dc:title></office:meta>
+<office:styles>
+<style:style style:name="Text_20_Body" style:family="paragraph"><style:text-properties fo:font-size="12pt" fo:font-family="Times New Roman"/></style:style>
+<style:style style:name="Heading_20_1" style:family="paragraph"><style:text-properties fo:font-size="22pt" fo:font-weight="bold"/></style:style>
+<style:style style:name="Heading_20_2" style:family="paragraph"><style:text-properties fo:font-size="18pt" fo:font-weight="bold"/></style:style>
+<style:style style:name="Heading_20_3" style:family="paragraph"><style:text-properties fo:font-size="14pt" fo:font-weight="bold"/></style:style>
+</office:styles>
+<office:body><office:text>${body}</office:text></office:body>
+</office:document>`;
+}
+
+// ── SEARCH / REPLACE ───────────────────────────────────────
+let sM = [], sI = 0;
+
+function toggleSearch() {
+  const bar = document.getElementById('searchbar');
+  bar.classList.toggle('show');
+  if (bar.classList.contains('show')) {
+    const f = document.getElementById('s-find'); f.focus(); f.select();
+  } else {
+    document.getElementById('s-res').textContent = '';
+  }
+}
+
+function doSearch() {
+  const q = document.getElementById('s-find').value;
+  const ta = TA(), res = document.getElementById('s-res');
+  if (!q) { res.textContent = ''; return; }
+  const low = ta.value.toLowerCase(), ql = q.toLowerCase();
+  sM = []; let p = 0;
+  while ((p = low.indexOf(ql, p)) !== -1) { sM.push(p); p++; }
+  res.textContent = sM.length ? `${sM.length} resultado(s)` : 'Não encontrado';
+  if (sM.length) { sI = 0; ta.setSelectionRange(sM[0], sM[0] + q.length); ta.focus(); }
+}
+
+function searchNav(e) {
+  if (e.key !== 'Enter') return;
+  const q = document.getElementById('s-find').value;
+  if (!q || !sM.length) return;
+  e.shiftKey ? sI-- : sI++;
+  if (sI < 0) sI = sM.length - 1;
+  if (sI >= sM.length) sI = 0;
+  TA().setSelectionRange(sM[sI], sM[sI] + q.length);
+  TA().focus();
+}
+
+function doReplace() {
+  const q = document.getElementById('s-find').value;
+  const r = document.getElementById('s-repl').value;
+  if (!q) return;
+  const ta = TA(), s = ta.selectionStart, e2 = ta.selectionEnd;
+  if (ta.value.substring(s, e2).toLowerCase() === q.toLowerCase()) {
+    ta.value = ta.value.substring(0, s) + r + ta.value.substring(e2);
+    ta.setSelectionRange(s, s + r.length); onInput();
+  }
+  doSearch();
+}
+
+function doReplaceAll() {
+  const q = document.getElementById('s-find').value;
+  const r = document.getElementById('s-repl').value;
+  if (!q) return;
+  TA().value = TA().value.replace(
+    new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), r);
+  onInput();
+}
+
+// ── FORMAT HELPERS ─────────────────────────────────────────
+function wrapSel(before, after) {
+  const ta = TA(), s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.substring(s, e) || 'texto';
+  ta.value = ta.value.substring(0, s) + before + sel + after + ta.value.substring(e);
+  ta.selectionStart = s + before.length;
+  ta.selectionEnd   = s + before.length + sel.length;
+  ta.focus(); onInput();
+}
+
+function insertCodeBlock() {
+  const ta = TA(), s = ta.selectionStart, e = ta.selectionEnd;
+  const sel = ta.value.substring(s, e) || 'código';
+  const ins = '```\n' + sel + '\n```';
+  ta.value = ta.value.substring(0, s) + ins + ta.value.substring(e);
+  ta.selectionStart = 4; ta.selectionEnd = 4 + sel.length;
+  ta.focus(); onInput();
+}
+
+function insertLinePrefix(pfx) {
+  const ta = TA(), s = ta.selectionStart;
+  const ls = ta.value.lastIndexOf('\n', s - 1) + 1;
+  ta.value = ta.value.substring(0, ls) + pfx + ta.value.substring(ls);
+  ta.selectionStart = ta.selectionEnd = s + pfx.length;
+  ta.focus(); onInput();
+}
+
+function insertAtNewLine(txt) {
+  const ta = TA(), s = ta.selectionStart;
+  const ins = '\n' + txt + '\n';
+  ta.value = ta.value.substring(0, s) + ins + ta.value.substring(s);
+  ta.selectionStart = ta.selectionEnd = s + ins.length;
+  ta.focus(); onInput();
+}
+
+function insertHeading(lvl) {
+  const ta = TA(), s = ta.selectionStart;
+  const ls = ta.value.lastIndexOf('\n', s - 1) + 1;
+  const le = ta.value.indexOf('\n', s);
+  const end = le === -1 ? ta.value.length : le;
+  const clean = ta.value.substring(ls, end).replace(/^#+\s*/, '');
+  const pfx = '#'.repeat(lvl) + ' ';
+  ta.value = ta.value.substring(0, ls) + pfx + clean + ta.value.substring(end);
+  ta.selectionStart = ta.selectionEnd = ls + pfx.length + clean.length;
+  ta.focus(); onInput();
+}
+
+function insertTable() {
+  const t = '\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| célula   | célula   | célula   |\n';
+  const ta = TA(), s = ta.selectionStart;
+  ta.value = ta.value.substring(0, s) + t + ta.value.substring(s);
+  ta.selectionStart = ta.selectionEnd = s + t.length;
+  ta.focus(); onInput();
+}
+
+function selAll() { TA().select(); }
+
+// ── MENUS ──────────────────────────────────────────────────
+function toggleMenu(id) {
+  const el = document.getElementById(id), open = el.classList.contains('open');
+  closeAllMenus(); if (!open) el.classList.add('open');
+}
+function closeAllMenus() {
+  document.querySelectorAll('.mi.open').forEach(el => el.classList.remove('open'));
+}
+document.addEventListener('click', e => { if (!e.target.closest('.mi')) closeAllMenus(); });
+
+// ── OVERLAYS ───────────────────────────────────────────────
+function openOv(id)  { document.getElementById(id).classList.add('show'); }
+function closeOv(id) { document.getElementById(id).classList.remove('show'); }
+document.querySelectorAll('.ov').forEach(el =>
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('show'); }));
+function showAbout()     { openOv('ov-about');  closeAllMenus(); }
+function showShortcuts() { openOv('ov-shorts'); closeAllMenus(); }
+function showWelcome()   { newTab(WELCOME, 'boas-vindas.md'); closeAllMenus(); }
+
+// ── RESIZE HANDLE ──────────────────────────────────────────
+(function () {
+  const h = document.getElementById('resize-handle');
+  const m = document.getElementById('main');
+  let d = false, sx = 0, sw = 0;
+  h.addEventListener('mousedown', e => {
+    d = true; sx = e.clientX;
+    sw = document.getElementById('preview-pane').offsetWidth;
+    h.classList.add('drag'); e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!d) return;
+    const nw = Math.max(220, Math.min(m.offsetWidth - 220, sw + (sx - e.clientX)));
+    document.getElementById('preview-pane').style.width = nw + 'px';
+  });
+  document.addEventListener('mouseup', () => { d = false; h.classList.remove('drag'); });
+})();
+
+
+// ── PWA INSTALL ────────────────────────────────────────────
+// Registers an inline Service Worker (via blob URL) so the page can
+// be installed as a PWA from any browser that supports it.
+// The user sees a banner at the top the first time they open the file.
+// After install the banner stays hidden.
+
+let _pwaPrompt = null;
+
+function pwaInit() {
+  // Don't show banner if already dismissed or installed
+  if (localStorage.getItem('pwa-dismissed')) return;
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+
+  // 1. Register a minimal Service Worker using a blob URL
+  //    (works even when the file is opened directly from disk in some browsers)
+  const swCode = `
+self.addEventListener('install', e => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+self.addEventListener('fetch', e => {
+  // Network first, cache as fallback — keeps the app up-to-date
+  e.respondWith(
+    caches.open('askesis-md-v1').then(cache =>
+      fetch(e.request).then(res => { cache.put(e.request, res.clone()); return res; })
+        .catch(() => caches.match(e.request))
+    )
+  );
+});`;
+
+  if ('serviceWorker' in navigator) {
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl, { scope: '/' })
+      .catch(() => {}); // SW may fail if file:// protocol; that's fine
+  }
+
+  // 2. Listen for the browser's beforeinstallprompt event
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _pwaPrompt = e;
+    const banner = document.getElementById('pwa-banner');
+    if (banner) banner.style.display = 'flex';
+  });
+
+  // 3. If already installed, hide the banner
+  window.addEventListener('appinstalled', () => {
+    pwaDismiss();
+  });
+}
+
+function pwaDoPWA() {
+  if (!_pwaPrompt) return;
+  _pwaPrompt.prompt();
+  _pwaPrompt.userChoice.then(r => {
+    if (r.outcome === 'accepted') pwaDismiss();
+    _pwaPrompt = null;
+  });
+}
+
+function pwaDismiss() {
+  const banner = document.getElementById('pwa-banner');
+  if (banner) banner.style.display = 'none';
+  try { localStorage.setItem('pwa-dismissed', '1'); } catch(e) {}
+}
+
+// Inject manifest dynamically so the browser recognises this as a PWA
+// even when served from file:// (Chromium-based browsers support this)
+function pwaInjectManifest() {
+  const manifest = {
+    name: 'Askesis-MD',
+    short_name: 'Askesis-MD',
+    description: 'Editor Markdown ultraleve para Linux e outros sistemas',
+    start_url: window.location.href,
+    display: 'standalone',
+    background_color: '#0d1117',
+    theme_color: '#161b22',
+    icons: [{
+      src: "data:image/svg+xml," + encodeURIComponent(`
+        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
+          <rect width='512' height='512' rx='96' fill='%23161b22'/>
+          <polygon points='256,80 432,256 256,432 80,256' fill='none' stroke='%2358a6ff' stroke-width='32'/>
+          <text x='256' y='296' text-anchor='middle' font-family='monospace' font-size='140' font-weight='700' fill='%2358a6ff'>MD</text>
+        </svg>`),
+      sizes: '512x512',
+      type: 'image/svg+xml',
+      purpose: 'any maskable'
+    }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = url;
+  document.head.appendChild(link);
+}
+
+pwaInjectManifest();
+pwaInit();
+
+
+window.addEventListener('resize', syncHeight);
+
+// ── INIT ───────────────────────────────────────────────────
+(function init() {
+  document.getElementById('vb-editor').classList.add('on');
+  newTab(WELCOME, 'boas-vindas.md');
+  // Push initial state into undo stack after content is set
+  setTimeout(() => {
+    const tab = activeTab();
+    if (tab) pushUndo(tab.id, tab.content);
+    updateUndoBtns();
+    syncHeight(); // ensure correct height from the start
+    initResizeObserver(); // start watching wrap for size changes
+    TA().focus();
+  }, 150);
+})()
+</script>
+</body>
+</html>
