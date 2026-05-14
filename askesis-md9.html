@@ -12,26 +12,24 @@
 
    SCROLL/ALIGNMENT STRATEGY (critical)
    ─────────────────────────────────────
-   The classic approach (two absolute layers sharing a scrolling
-   parent) fails when the highlight <pre> height and textarea
-   height diverge even by 1px, because the <pre> is
-   position:absolute and its scrollHeight is unreliable before
-   layout. The fix used here:
+   Architecture: in-flow highlight + absolute textarea.
 
-   1. #editor-wrap  → overflow:auto  (sole scroll container)
-   2. #editor-highlight → position:absolute, width:100%,
-      pointer-events:none, z-index:1
-   3. #editor-textarea  → position:absolute, width:100%,
-      overflow:hidden (NEVER scrolls), z-index:2
-   4. Both share EVERY typographic property via .ed-layer.
-   5. syncHeight() runs AFTER the highlight innerHTML is set,
-      using a two-rAF fence so the browser finishes layout
-      before we read scrollHeight. Then textarea height is set
-      to max(hl.scrollHeight, wrap.clientHeight).
-   6. window resize → syncHeight() again.
+   #editor-wrap  → overflow:auto  (sole scroll container)
+   #editor-inner → in-flow block, min-height:100% of wrap
+   #editor-highlight (<pre>) → in-flow, normal height, sets
+     the true content height of #editor-inner
+   #editor-textarea → position:absolute top:0 left:0
+     width:100% height:100% — sits exactly over the pre,
+     overflow:hidden (NEVER scrolls independently)
 
-   This guarantees pixel-perfect vertical alignment for any
-   document length and any window size.
+   syncHeight() only needs to ensure #editor-inner is at
+   least as tall as the wrap viewport (so the textarea
+   fills the screen even on short documents).
+   It reads hl.offsetHeight (reliable for in-flow elements)
+   and sets inner.style.minHeight.
+
+   No height resets, no double-rAF, no scrollHeight hacks.
+   Works correctly on any document length, DPI, or zoom.
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap');
@@ -289,12 +287,25 @@ svg.ic{
 #editor-wrap{
   flex:1;position:relative;overflow:auto;
   background:var(--bg0);
+  min-height:0;
 }
 #editor-wrap::-webkit-scrollbar{width:11px;height:11px}
 #editor-wrap::-webkit-scrollbar-track{background:transparent}
 #editor-wrap::-webkit-scrollbar-thumb{
   background:var(--scr);border-radius:6px;
   border:3px solid var(--bg0);
+}
+
+/*
+  #editor-inner — in-flow block that grows to fit content.
+  This is what gives #editor-wrap its scrollHeight.
+  The two layers sit absolute inside it.
+  min-height:100% ensures it fills the wrap even when empty.
+*/
+#editor-inner{
+  position:relative;
+  min-height:100%;
+  width:100%;
 }
 
 /*
@@ -316,23 +327,25 @@ svg.ic{
   /* Prevent any sub-pixel rendering difference */
   letter-spacing:normal;word-spacing:normal;
   text-rendering:optimizeSpeed;
+  box-sizing:border-box;
 }
 
-/* Highlight layer */
+/* Highlight layer — in-flow, NOT absolute, is the size reference */
 #editor-highlight{
-  position:absolute;top:0;left:0;
+  display:block;
   width:100%;
-  /* min-height:100% keeps the layer covering the wrap even when empty */
-  min-height:100%;
-  color:var(--t0);pointer-events:none;z-index:1;
+  min-height:var(--wrap-h, 100px);
+  color:var(--t0);pointer-events:none;
+  user-select:none;
+  /* invisible but present — sets the in-flow height */
 }
 
-/* Textarea — transparent ink, visible caret, NO internal scroll */
+/* Textarea — absolute, sits exactly on top of the highlight */
 #editor-textarea{
-  position:absolute;top:0;left:0;
+  position:absolute;
+  top:0;left:0;
   width:100%;
-  /* height controlled entirely by syncHeight() — no CSS height here */
-  min-height:100%;
+  height:100%;
   background:transparent;
   color:transparent;
   -webkit-text-fill-color:transparent;
@@ -429,7 +442,7 @@ svg.ic{
 .li{color:var(--sm)}
 .hr{color:var(--sr)}
 .st{color:var(--ss);text-decoration:line-through}
-.tb{color:var(--st)}
+.hl-tb{color:var(--st)}
 .fm{color:var(--t2);font-style:italic}
 
 /* ════════════════════════════════════════
@@ -758,11 +771,13 @@ svg.ic{
 <div id="main">
   <div id="editor-pane">
     <div id="editor-wrap">
-      <pre  id="editor-highlight" class="ed-layer" aria-hidden="true"></pre>
-      <textarea id="editor-textarea" class="ed-layer"
-        spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off"
-        oninput="onInput()" onkeydown="onKey(event)"
-        onclick="updateStatus()" onkeyup="updateStatus()"></textarea>
+      <div id="editor-inner">
+        <pre  id="editor-highlight" class="ed-layer" aria-hidden="true"></pre>
+        <textarea id="editor-textarea" class="ed-layer"
+          spellcheck="false" autocorrect="off" autocapitalize="off" autocomplete="off"
+          oninput="onInput()" onkeydown="onKey(event)"
+          onclick="updateStatus()" onkeyup="updateStatus()"></textarea>
+      </div>
     </div>
   </div>
   <div id="resize-handle"></div>
@@ -919,23 +934,13 @@ svg.ic{
 /* ============================================================
    ASKESIS-MD v3 — Application Logic
 
-   SCROLL/ALIGNMENT (the hard problem)
+   SCROLL/ALIGNMENT
    ─────────────────────────────────────
-   Root cause of misalignment in v2:
-     • After setting HL innerHTML, the browser hasn't finished
-       layout yet when syncHeight() reads scrollHeight.
-     • Result: textarea gets a stale height → gap opens.
-
-   Fix:
-     • doHighlight() sets innerHTML, then schedules syncHeight()
-       inside a double-rAF (two animation frames) so the browser
-       fully resolves the pre's block-formatting-context height
-       before we read it.
-     • syncHeight() sets ta.style.height = max(hl.scrollHeight,
-       wrap.clientHeight) with a small +1px buffer to prevent
-       1px rounding gaps on fractional-DPI screens.
-     • window.resize → syncHeight().
-     • adjFont() and setView() also call syncHeight() after layout.
+   #editor-highlight is in-flow. Its natural height drives
+   #editor-inner. #editor-textarea is absolute height:100%
+   over the inner div. syncHeight() just keeps inner tall
+   enough to fill the viewport on short documents.
+   No hacks, no double-rAF, no scrollHeight resets.
 ============================================================ */
 
 // ── WELCOME CONTENT ────────────────────────────────────────
@@ -1001,31 +1006,27 @@ const HL   = () => document.getElementById('editor-highlight');
 const WRAP = () => document.getElementById('editor-wrap');
 
 // ── SYNC HEIGHT ────────────────────────────────────────────
-// Called after innerHTML is settled (via double-rAF in doHighlight)
-// and after window resize / font change / view change.
+// Architecture: #editor-highlight is in-flow (not absolute).
+// Its natural height drives #editor-inner's height.
+// #editor-textarea is absolute top:0 left:0 width:100% height:100%
+// so it always matches the inner div exactly.
+// syncHeight just ensures the inner div is tall enough for both
+// the content AND the visible wrap area.
 function syncHeight() {
-  const ta = TA(), hl = HL(), wrap = WRAP();
-  if (!ta || !hl || !wrap) return;
+  const hl = HL(), wrap = WRAP(), inner = document.getElementById('editor-inner');
+  if (!hl || !wrap || !inner) return;
 
-  // Reset heights so scrollHeight gives the true content measurement
-  ta.style.height  = '0';
-  hl.style.height  = '0';
+  // The highlight pre renders in-flow: its offsetHeight is reliable.
+  // We only need to ensure inner is at least as tall as the wrap viewport.
+  const contentH = hl.offsetHeight;
+  const wrapH    = wrap.clientHeight;
+  const minH     = Math.max(contentH, wrapH);
 
-  // Read the true content height from the highlight layer
-  // ceil() is critical: sub-pixel heights (e.g. 1024.3px on 1.25× DPI)
-  // truncated to 1024px cause a 1-line drift on long documents.
-  const contentH = Math.ceil(hl.scrollHeight);
-  const wrapH    = Math.ceil(wrap.clientHeight);
-  // +4px buffer: absorbs fractional-pixel rounding on any DPI / zoom level
-  const finalH   = Math.max(contentH, wrapH) + 4;
-
-  ta.style.height = finalH + 'px';
-  hl.style.height = finalH + 'px';
+  // Set inner's min-height so the textarea (height:100%) fills the view
+  inner.style.minHeight = minH + 'px';
 }
 
-// ResizeObserver watches the editor-wrap so syncHeight fires whenever
-// the pane is resized (e.g. dragging the split handle, sidebar opening).
-// This covers cases window.resize misses.
+// ResizeObserver watches editor-wrap for size changes (split drag, window resize).
 let _ro = null;
 function initResizeObserver() {
   if (typeof ResizeObserver === 'undefined') return;
@@ -1035,13 +1036,11 @@ function initResizeObserver() {
 }
 
 // ── HIGHLIGHT ──────────────────────────────────────────────
-// Sets highlight HTML, then fires syncHeight after TWO animation
-// frames so the browser has finished block-layout on the <pre>.
+// Sets highlight HTML then calls syncHeight after one rAF
+// (browser finishes in-flow layout before we read offsetHeight).
 function doHighlight(raw) {
   HL().innerHTML = buildHighlight(raw);
-  // Double rAF: first frame commits the DOM mutation,
-  // second frame fires after layout/paint.
-  requestAnimationFrame(() => requestAnimationFrame(syncHeight));
+  requestAnimationFrame(syncHeight);
 }
 
 // ── INPUT ──────────────────────────────────────────────────
@@ -1065,7 +1064,7 @@ function onInput() {
 
 function setContent(txt) {
   TA().value = txt;
-  doHighlight(txt); // syncHeight called inside after double-rAF
+  doHighlight(txt); // syncHeight called inside after rAF
   updatePreview(txt);
   updateStatus();
 }
@@ -1279,7 +1278,7 @@ function buildHighlight(raw) {
     const lm2 = line.match(/^(\s*)([-*+]|\d+\.)(\s+)(.*)/);
     if (lm2) return `<span class="li"><span class="mk">${esc(lm2[1]+lm2[2]+lm2[3])}</span>${inlineHL(esc(lm2[4]))}</span>`;
     // Table row
-    if (/^\|/.test(line.trim())) return `<span class="tb">${inlineHL(e)}</span>`;
+    if (/^\|/.test(line.trim())) return `<span class="hl-tb">${inlineHL(e)}</span>`;
 
     return inlineHL(e);
   });
@@ -1413,8 +1412,7 @@ function setTheme(t) {
 function adjFont(d) {
   edFS = Math.max(11, Math.min(26, edFS + d));
   document.documentElement.style.setProperty('--efs', edFS + 'px');
-  // Wait two frames for CSS variable to propagate before measuring
-  requestAnimationFrame(() => requestAnimationFrame(syncHeight));
+  requestAnimationFrame(syncHeight);
   closeAllMenus();
 }
 
