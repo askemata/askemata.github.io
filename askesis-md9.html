@@ -664,9 +664,9 @@ svg.ic{
     <div class="tsep"></div>
     <!-- Theme dots -->
     <div class="tdots">
-      <div class="tdot d-t on" id="dot-terminal" title="Terminal (escuro)"></div>
-      <div class="tdot d-c"   id="dot-carta"    title="Carta (claro)"></div>
-      <div class="tdot d-a"   id="dot-aurora"   title="Aurora (azul)"></div>
+      <div class="tdot d-t on" id="dot-terminal" title="Terminal (escuro)" onclick="setTheme('terminal')"></div>
+      <div class="tdot d-c"   id="dot-carta"    title="Carta (claro)"   onclick="setTheme('carta')"></div>
+      <div class="tdot d-a"   id="dot-aurora"   title="Aurora (azul)"   onclick="setTheme('aurora')"></div>
     </div>
   </div>
 </div>
@@ -791,19 +791,20 @@ svg.ic{
   padding:6px 14px;background:color-mix(in srgb,var(--bga) 14%,var(--bg1));
   border-bottom:1px solid var(--bd);font-family:var(--fu);font-size:12.5px;
   color:var(--t0);flex-shrink:0;z-index:50;">
-  <svg class="ic" style="width:16px;height:16px;stroke:var(--ta);flex-shrink:0" viewBox="0 0 24 24">
+  <svg style="width:15px;height:15px;flex-shrink:0;fill:none;stroke:var(--ta);stroke-width:2;stroke-linecap:round;stroke-linejoin:round" viewBox="0 0 24 24">
     <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
   </svg>
-  <span>Instalar o <strong>Askesis-MD</strong> como aplicativo neste computador?</span>
-  <div id="pwa-install-btn" onclick="pwaDoPWA()" style="
+  <span>Instalar <strong>Askesis-MD</strong> como aplicativo neste computador</span>
+  <div onclick="pwaDoPWA()" style="
     padding:4px 14px;border-radius:4px;cursor:pointer;
     background:var(--bga);color:#fff;font-size:12px;font-weight:500;
-    white-space:nowrap;flex-shrink:0;">
+    white-space:nowrap;flex-shrink:0;user-select:none;">
     Instalar
   </div>
   <div onclick="pwaDismiss()" style="
-    margin-left:auto;cursor:pointer;color:var(--t2);padding:2px 6px;
-    border-radius:3px;font-size:18px;line-height:1;flex-shrink:0;"
+    margin-left:auto;cursor:pointer;color:var(--t2);
+    width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+    border-radius:3px;font-size:17px;line-height:1;flex-shrink:0;user-select:none;"
     title="Dispensar">×</div>
 </div>
 
@@ -1727,96 +1728,143 @@ function showWelcome()   { newTab(WELCOME, 'boas-vindas.md'); closeAllMenus(); }
 // The user sees a banner at the top the first time they open the file.
 // After install the banner stays hidden.
 
+// ── PWA ────────────────────────────────────────────────────
+// Strategy:
+//  1. Inject a <link rel=manifest> with a blob: manifest URL.
+//     start_url = current page URL (must be http/https for install).
+//  2. Register a Service Worker via blob URL.
+//     NOTE: blob SW only works when page is on http/https.
+//     On file:// the SW registration fails (silently); the editor
+//     still works, but PWA install won't be offered by the browser.
+//  3. Listen for beforeinstallprompt — show our custom banner.
+//  4. Provide a manual install button inside the banner.
+
 let _pwaPrompt = null;
 
-function pwaInit() {
-  // Don't show banner if already dismissed or installed
-  if (localStorage.getItem('pwa-dismissed')) return;
-  if (window.matchMedia('(display-mode: standalone)').matches) return;
+function pwaInjectManifest() {
+  // Icon as a data-URI PNG (96×96, generated inline)
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  // Background
+  ctx.fillStyle = '#161b22';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 256, 256, 40);
+  ctx.fill();
+  // Diamond outline
+  ctx.strokeStyle = '#58a6ff';
+  ctx.lineWidth = 18;
+  ctx.beginPath();
+  ctx.moveTo(128, 28); ctx.lineTo(228, 128);
+  ctx.lineTo(128, 228); ctx.lineTo(28, 128);
+  ctx.closePath();
+  ctx.stroke();
+  // Text
+  ctx.fillStyle = '#58a6ff';
+  ctx.font = 'bold 72px monospace';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('MD', 128, 135);
+  const iconDataUrl = canvas.toDataURL('image/png');
 
-  // 1. Register a minimal Service Worker using a blob URL
-  //    (works even when the file is opened directly from disk in some browsers)
-  const swCode = `
-self.addEventListener('install', e => self.skipWaiting());
+  const manifest = {
+    name: 'Askesis-MD',
+    short_name: 'Askesis-MD',
+    description: 'Editor Markdown ultraleve',
+    // start_url must be the actual page URL for the browser to accept it
+    start_url: window.location.href,
+    display: 'standalone',
+    background_color: '#0d1117',
+    theme_color: '#161b22',
+    icons: [
+      { src: iconDataUrl, sizes: '256x256', type: 'image/png', purpose: 'any maskable' }
+    ]
+  };
+
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const url  = URL.createObjectURL(blob);
+  const link = Object.assign(document.createElement('link'), { rel: 'manifest', href: url });
+  document.head.appendChild(link);
+}
+
+function pwaRegisterSW() {
+  if (!('serviceWorker' in navigator)) return;
+  // Service worker code — cache-first strategy for offline use
+  const sw = `
+const CACHE = 'askesis-md-v1';
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll([self.location.href.replace(/\\/[^\\/]*$/, '/') || '/']))
+      .catch(() => {})
+  );
+});
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
 self.addEventListener('fetch', e => {
-  // Network first, cache as fallback — keeps the app up-to-date
   e.respondWith(
-    caches.open('askesis-md-v1').then(cache =>
-      fetch(e.request).then(res => { cache.put(e.request, res.clone()); return res; })
-        .catch(() => caches.match(e.request))
-    )
+    caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    }))
   );
 });`;
 
-  if ('serviceWorker' in navigator) {
-    const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl, { scope: '/' })
-      .catch(() => {}); // SW may fail if file:// protocol; that's fine
-  }
+  const blob  = new Blob([sw], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(blob);
 
-  // 2. Listen for the browser's beforeinstallprompt event
+  // scope must be within the SW script origin (blob:); can only be '/'
+  // This works on http/https origins. On file:// it fails quietly.
+  navigator.serviceWorker.register(swUrl, { scope: './' })
+    .then(() => {})
+    .catch(() => {});
+}
+
+function pwaInit() {
+  // Already installed as standalone app — hide everything
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
+
+  pwaRegisterSW();
+
+  // beforeinstallprompt fires when the browser decides the page is
+  // installable (needs SW + manifest + https/localhost).
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     _pwaPrompt = e;
-    const banner = document.getElementById('pwa-banner');
-    if (banner) banner.style.display = 'flex';
+    // Only show if not previously dismissed in this session
+    if (!sessionStorage.getItem('pwa-dismissed')) {
+      const banner = document.getElementById('pwa-banner');
+      if (banner) banner.style.display = 'flex';
+    }
   });
 
-  // 3. If already installed, hide the banner
-  window.addEventListener('appinstalled', () => {
-    pwaDismiss();
-  });
+  window.addEventListener('appinstalled', pwaDismiss);
 }
 
 function pwaDoPWA() {
-  if (!_pwaPrompt) return;
-  _pwaPrompt.prompt();
-  _pwaPrompt.userChoice.then(r => {
-    if (r.outcome === 'accepted') pwaDismiss();
-    _pwaPrompt = null;
-  });
+  if (_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then(() => { _pwaPrompt = null; });
+  } else {
+    // Fallback: guide the user to the browser's manual install
+    alert('Para instalar:\n\n• Chrome/Edge: clique no ícone ⊕ ou ⋮ na barra de endereços\n• Ou acesse este arquivo via http://localhost para instalação automática\n\nVeja o arquivo askesis-md-pwa-setup.html para instruções completas.');
+  }
 }
 
 function pwaDismiss() {
   const banner = document.getElementById('pwa-banner');
   if (banner) banner.style.display = 'none';
-  try { localStorage.setItem('pwa-dismissed', '1'); } catch(e) {}
+  sessionStorage.setItem('pwa-dismissed', '1');
 }
 
-// Inject manifest dynamically so the browser recognises this as a PWA
-// even when served from file:// (Chromium-based browsers support this)
-function pwaInjectManifest() {
-  const manifest = {
-    name: 'Askesis-MD',
-    short_name: 'Askesis-MD',
-    description: 'Editor Markdown ultraleve para Linux e outros sistemas',
-    start_url: window.location.href,
-    display: 'standalone',
-    background_color: '#0d1117',
-    theme_color: '#161b22',
-    icons: [{
-      src: "data:image/svg+xml," + encodeURIComponent(`
-        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'>
-          <rect width='512' height='512' rx='96' fill='%23161b22'/>
-          <polygon points='256,80 432,256 256,432 80,256' fill='none' stroke='%2358a6ff' stroke-width='32'/>
-          <text x='256' y='296' text-anchor='middle' font-family='monospace' font-size='140' font-weight='700' fill='%2358a6ff'>MD</text>
-        </svg>`),
-      sizes: '512x512',
-      type: 'image/svg+xml',
-      purpose: 'any maskable'
-    }]
-  };
-  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
-  const url  = URL.createObjectURL(blob);
-  const link = document.createElement('link');
-  link.rel = 'manifest'; link.href = url;
-  document.head.appendChild(link);
-}
-
+// Run immediately so manifest is injected before first paint
 pwaInjectManifest();
-pwaInit();
+// pwaInit after DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', pwaInit);
+} else {
+  pwaInit();
+}
 
 
 window.addEventListener('resize', syncHeight);
