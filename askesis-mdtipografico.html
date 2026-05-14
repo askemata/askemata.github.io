@@ -1530,32 +1530,121 @@ function updateStatus() {
 }
 
 // ── FILE OPERATIONS ────────────────────────────────────────
-function openFile() { document.getElementById('file-inp').click(); closeAllMenus(); }
+// ── FILE SYSTEM ACCESS API ─────────────────────────────────
+// Suportada no Chrome/Edge 86+ e em PWAs instaladas.
+// Quando disponível: abre/salva no arquivo real sem downloads.
+// Fallback: comportamento antigo com <a download>.
+const hasFSA = typeof window.showOpenFilePicker === 'function';
+
+function openFile() {
+  if (hasFSA) { openFSA(); } else { document.getElementById('file-inp').click(); }
+  closeAllMenus();
+}
+
+async function openFSA() {
+  try {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md','.markdown','.txt'] } }],
+      multiple: false
+    });
+    const file = await handle.getFile();
+    const text = await file.text();
+    newTab(text, file.name, file.name);
+    activeTab().fileHandle = handle;   // guarda handle para salvar depois
+  } catch (e) {
+    if (e.name !== 'AbortError') console.error(e);
+  }
+}
 
 function onFileOpen(ev) {
+  // Fallback: input[type=file] quando FSA não disponível
   const f = ev.target.files[0]; if (!f) return;
   const r = new FileReader();
   r.onload = e => newTab(e.target.result, f.name, f.name);
   r.readAsText(f); ev.target.value = '';
 }
 
-function saveFile() {
+async function saveFile() {
   const tab = activeTab(); if (!tab) return;
   tab.content = TA().value;
-  const needsName = !tab.filename || tab.filename === 'boas-vindas.md';
-  if (needsName) { saveFileAs(); return; }
-  dl(tab.content, tab.filename, 'text/markdown');
-  tab.modified = false; renderTabs(); closeAllMenus();
+
+  const isNew = !tab.filename || tab.filename === 'boas-vindas.md';
+  if (isNew) { saveFileAs(); return; }
+
+  if (hasFSA) {
+    // Tem handle do arquivo original → grava diretamente
+    if (tab.fileHandle) {
+      try {
+        // Verificar permissão (necessário após suspensão da PWA)
+        const perm = await tab.fileHandle.requestPermission({ mode: 'readwrite' });
+        if (perm !== 'granted') { saveFileAs(); return; }
+        const writable = await tab.fileHandle.createWritable();
+        await writable.write(tab.content);
+        await writable.close();
+        tab.modified = false; renderTabs();
+        showSavedToast(tab.filename);
+        closeAllMenus(); return;
+      } catch (e) {
+        // Handle inválido (arquivo movido/deletado) → pedir novo caminho
+        tab.fileHandle = null;
+      }
+    }
+    // Sem handle → abre seletor "Salvar como" do sistema
+    await saveWithPicker(tab);
+  } else {
+    // Fallback download
+    dl(tab.content, tab.filename, 'text/markdown');
+    tab.modified = false; renderTabs(); closeAllMenus();
+  }
 }
 
 function saveFileAs() {
-  const tab = activeTab();
-  document.getElementById('saveas-name').value = tab?.filename || 'documento.md';
-  openOv('ov-saveas'); closeAllMenus();
-  setTimeout(() => document.getElementById('saveas-name').select(), 80);
+  if (hasFSA) {
+    const tab = activeTab(); if (!tab) return;
+    tab.content = TA().value;
+    saveWithPicker(tab).then(() => closeAllMenus());
+  } else {
+    // Fallback: modal com campo de nome
+    const tab = activeTab();
+    document.getElementById('saveas-name').value = tab?.filename || 'documento.md';
+    openOv('ov-saveas'); closeAllMenus();
+    setTimeout(() => document.getElementById('saveas-name').select(), 80);
+  }
+}
+
+async function saveWithPicker(tab) {
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: tab.filename || 'documento.md',
+      types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md','.markdown'] } }]
+    });
+    const writable = await handle.createWritable();
+    await writable.write(tab.content);
+    await writable.close();
+    // Atualizar tab com o novo handle e nome
+    tab.fileHandle = handle;
+    tab.filename   = handle.name;
+    tab.name       = handle.name;
+    tab.modified   = false;
+    renderTabs();
+    document.getElementById('st-file').textContent = handle.name;
+    showSavedToast(handle.name);
+  } catch (e) {
+    if (e.name !== 'AbortError') console.error(e);
+  }
+}
+
+// Feedback visual de "Salvo" — aparece na statusbar por 2s
+function showSavedToast(name) {
+  const el = document.getElementById('st-file');
+  const orig = el.textContent;
+  el.textContent = '✓ Salvo — ' + name;
+  el.style.color = 'var(--ask-accent)';
+  setTimeout(() => { el.textContent = orig; el.style.color = ''; }, 2000);
 }
 
 function confirmSaveAs() {
+  // Usado apenas no fallback (sem FSA)
   const name = document.getElementById('saveas-name').value.trim() || 'documento.md';
   const tab = activeTab(); if (!tab) return;
   tab.content = TA().value; tab.filename = name; tab.name = name; tab.modified = false;
@@ -1566,9 +1655,12 @@ function confirmSaveAs() {
 function newWindow() { window.open(window.location.href, '_blank'); closeAllMenus(); }
 
 function dl(content, filename, mime) {
+  // Fallback: download clássico (usado quando FSA não disponível
+  // ou para exportações que não são .md)
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([content], { type: mime }));
   a.download = filename; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 3000);
 }
 
 // ── EXPORT ─────────────────────────────────────────────────
