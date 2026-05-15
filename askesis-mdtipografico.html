@@ -9,7 +9,7 @@
    ASKESIS-MD TYPOGRAPHICA
    Design elegante baseado em tipografia clássica
    Fontes: Cormorant Garamond · EB Garamond · Cardo
-   Temas: Scriptorium (claro) · Vellum (escuro)
+   Temas: Carta (alto contraste) · Scriptorium (sépia) · Vellum (Night Owl)
 
    COMO EDITAR:
    - Cores: altere as variáveis CSS em :root e .theme-vellum
@@ -19,49 +19,148 @@
    - Cor de destaque: --ask-accent e --ask-cap
    ============================================================ */
 
-/* Fontes elegantes via Google Fonts — sem base64, fáceis de trocar */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Cardo:ital,wght@0,400;0,700;1,400&display=swap');
+/* ── FONTES: Latin Modern (latex.now.sh) — mesma fonte do askemata.github.io
+   Latin Modern: serifada elegante, derivada da Computer Modern do LaTeX
+   Latin Modern Mono: variante monospace para o editor (garante alinhamento perfeito) */
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: normal; font-weight: normal; font-display: swap;
+  src: url('https://latex.now.sh/fonts/LM-regular.woff2') format('woff2'),
+       url('https://latex.now.sh/fonts/LM-regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: italic; font-weight: normal; font-display: swap;
+  src: url('https://latex.now.sh/fonts/LM-italic.woff2') format('woff2'),
+       url('https://latex.now.sh/fonts/LM-italic.woff') format('woff');
+}
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: normal; font-weight: bold; font-display: swap;
+  src: url('https://latex.now.sh/fonts/LM-bold.woff2') format('woff2'),
+       url('https://latex.now.sh/fonts/LM-bold.woff') format('woff');
+}
+@font-face {
+  font-family: 'Latin Modern';
+  font-style: italic; font-weight: bold; font-display: swap;
+  src: url('https://latex.now.sh/fonts/LM-bold-italic.woff2') format('woff2'),
+       url('https://latex.now.sh/fonts/LM-bold-italic.woff') format('woff');
+}
+/* Libertinus: fallback serifado elegante */
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal; font-weight: normal; font-display: swap;
+  src: url('https://latex.now.sh/fonts/Libertinus-regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Libertinus';
+  font-style: italic; font-weight: normal; font-display: swap;
+  src: url('https://latex.now.sh/fonts/Libertinus-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Libertinus';
+  font-style: normal; font-weight: bold; font-display: swap;
+  src: url('https://latex.now.sh/fonts/Libertinus-bold.woff2') format('woff2');
+}
 
-/* ── VARIÁVEIS — Carta (branco, tema principal) ── */
+/* ── VARIÁVEIS — Carta (fundo branco · texto preto · cores askemata/style-latex.css) ── */
 :root {
   /* Fontes */
-  --fm: 'Courier New', 'Lucida Console', 'DejaVu Sans Mono', monospace;
-  --fu: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  /* EDITOR: monospace obrigatório — garante alinhamento highlight↔cursor */
+  --fm: 'Latin Modern Mono', 'Courier New', 'Lucida Console', monospace;
+  /* UI / INTERFACE: Latin Modern serifada — mesma do askemata.github.io */
+  --fu: 'Latin Modern', 'Libertinus', Georgia, 'Times New Roman', serif;
   --fc: 'Courier New', 'Lucida Console', monospace;
   --tr: 0.16s ease;
 
   /* Editor */
-  --efs: 16px;
+  --efs: 17px;
   --elh: 1.75;
   --epv: 28px;
   --eph: 40px;
 
-  /* Carta: paleta Minima Classic (askemata.github.io / jekyll/minima) */
-  --bg0: #fdfdfd;   /* $background-color */
-  --bg1: #e8e8e8;   /* $header-background-color */
-  --bg2: #f5f5ff;   /* hover suave */
-  --bg3: #dcdcec;   /* pressed */
-  --bga: #2a7ae2;   /* $link-base-color */
-  --bd:  #e8e8e8;   /* $border-color */
+  /* Carta: fundo branco puro · texto preto · cores do askemata/style-latex.css
+     Links:      #0070b7  (estilo latex.css)
+     Link hover: #d86d4e  (estilo latex.css)
+     Headings no editor: azul sobrio (#1a5276) para estrutura
+     Bold:   preto — alto contraste
+     Italic: tom de link (#0070b7) — elegância tipográfica
+     Blockquote: #666666  (estilo latex.css)                       */
+  --bg0: #ffffff;   /* fundo editor: branco puro */
+  --bg1: #f8f8f8;   /* menubar / fmtbar */
+  --bg2: #f0f0f0;   /* hover */
+  --bg3: #e4e4e4;   /* pressed */
+  --bga: #0070b7;   /* accent — link color do style-latex.css */
+  --bd:  #e0e0e0;   /* bordas */
+  --bd2: #cccccc;
+  --t0:  #000000;   /* texto: preto puro — máximo contraste */
+  --t1:  #222222;
+  --t2:  #666666;   /* blockquote color do style-latex.css */
+  --ta:  #0070b7;   /* link color */
+  --cur: #0070b7;   /* cursor */
+  --scr: #cccccc;
+
+  /* Sintaxe do editor Markdown — derivada do style-latex.css:
+     Headings: azul (#0070b7) — mesma cor de link do latex.css
+     Bold:     preto (#000000) — alto contraste, tipografia clássica
+     Italic:   laranja-terra (#d86d4e) — hover color do latex.css
+     Code:     verde-escuro tipográfico
+     Links:    #0070b7 — link color exato do latex.css
+     Blockquote: #666666 — cor de blockquote do latex.css        */
+  --sh: #0070b7;    /* headings: link color latex.css */
+  --sb: #000000;    /* bold: preto — alto contraste */
+  --si: #d86d4e;    /* italic: hover color latex.css */
+  --sc: #1a6b3c;    /* code: verde escuro tipográfico */
+  --sl: #0070b7;    /* links: link color exato */
+  --sq: #666666;    /* blockquote: color latex.css */
+  --sm: #0070b7;    /* list markers: azul */
+  --sr: #cccccc;    /* HR */
+  --ss: #888888;    /* strikethrough */
+  --sg: #1a6b3c;    /* images: verde */
+  --st: #0070b7;    /* table */
+
+  --tbg:  #f0f0f0;
+  --tabg: #ffffff;
+  --tbd:  #e0e0e0;
+  --tt:   #888888;
+  --tat:  #000000;
+
+  --sbg: #f0f0f0;
+  --st2: #888888;
+
+  --ask-rule:   #e0e0e0;
+  --ask-cap:    #000000;
+  --ask-accent: #0070b7;
+  --ask-drop:   rgba(0,0,0,.08);
+}
+
+/* ── Tema Scriptorium — pergaminho sépia (era o tema Carta) ── */
+.theme-scriptorium {
+  --bg0: #fdfdfd;   /* fundo quase branco */
+  --bg1: #e8e8e8;
+  --bg2: #f5f5ff;
+  --bg3: #dcdcec;
+  --bga: #2a7ae2;
+  --bd:  #e8e8e8;
   --bd2: #b8b8b8;
-  --t0:  #111111;   /* $text-color */
+  --t0:  #111111;
   --t1:  #424242;
-  --t2:  #828282;   /* $brand-color grey */
+  --t2:  #828282;
   --ta:  #2a7ae2;
-  --cur: #2a7ae2;   /* cursor na cor do brand */
+  --cur: #2a7ae2;
   --scr: #b8b8b8;
 
-  --sh: #990000;    /* headings */
-  --sb: #111111;    /* bold */
-  --si: #005580;    /* italic: azul Minima */
-  --sc: #008000;    /* code: verde */
-  --sl: #2a7ae2;    /* links: brand-color exato */
-  --sq: #828282;    /* blockquote: grey */
-  --sm: #990000;    /* list markers */
-  --sr: #e8e8e8;    /* HR: border-color */
-  --ss: #828282;    /* strikethrough */
-  --sg: #005580;    /* images */
-  --st: #005580;    /* table */
+  --sh: #990000;
+  --sb: #111111;
+  --si: #005580;
+  --sc: #008000;
+  --sl: #2a7ae2;
+  --sq: #828282;
+  --sm: #990000;
+  --sr: #e8e8e8;
+  --ss: #828282;
+  --sg: #005580;
+  --st: #005580;
 
   --tbg:  #e8e8e8;
   --tabg: #fdfdfd;
@@ -74,51 +173,8 @@
 
   --ask-rule:   #e8e8e8;
   --ask-cap:    #111111;
-  --ask-accent: #2a7ae2;   /* brand-color exato */
+  --ask-accent: #2a7ae2;
   --ask-drop:   rgba(0,0,0,.08);
-}
-
-/* ── Tema Scriptorium — pergaminho sépia ── */
-.theme-scriptorium {
-  --bg0: #fdfaf4;
-  --bg1: #f5f0e6;
-  --bg2: #ece6d8;
-  --bg3: #e0d8c8;
-  --bga: #4a3520;
-  --bd:  #c8bfaa;
-  --bd2: #ddd6c4;
-  --t0:  #1e1408;
-  --t1:  #4a3c28;
-  --t2:  #8a7860;
-  --ta:  #6b4c2a;
-  --cur: #2a1a08;
-  --scr: #c0b89a;
-
-  --sh: #1a0a00;
-  --sb: #6b2500;
-  --si: #003a5a;
-  --sc: #1a4a1a;
-  --sl: #1a3a6a;
-  --sq: #6a5a40;
-  --sm: #6b2500;
-  --sr: #b0a890;
-  --ss: #8a8070;
-  --sg: #003a5a;
-  --st: #2a1a00;
-
-  --tbg:  #ede8df;
-  --tabg: #fdfaf4;
-  --tbd:  #c8bfaa;
-  --tt:   #7a6a50;
-  --tat:  #1e1408;
-
-  --sbg: #ece6d8;
-  --st2: #8a7860;
-
-  --ask-rule:   #b0a080;
-  --ask-cap:    #2a1a08;
-  --ask-accent: #6b4c2a;
-  --ask-drop:   rgba(0,0,0,.06);
 }
 
 /* ── Tema Vellum: Night Owl (sdras/night-owl-vscode-theme, Sarah Drasner) ── */
@@ -191,7 +247,7 @@ svg.ic {
   flex-shrink: 0; position: relative; z-index: 1000; gap: 2px;
 }
 #logo {
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 15px; font-weight: 500; font-style: italic;
   color: var(--ask-cap);
   padding: 0 18px 0 2px; white-space: nowrap;
@@ -202,7 +258,7 @@ svg.ic {
 .mt {
   display: flex; align-items: center;
   height: 28px; padding: 0 12px;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 14px; letter-spacing: .03em;
   color: var(--t1); cursor: pointer;
   transition: background var(--tr), color var(--tr); white-space: nowrap;
@@ -219,7 +275,7 @@ svg.ic {
 .mc {
   display: flex; align-items: center;
   padding: 6px 16px 6px 12px;
-  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 13.5px; letter-spacing: .015em;
   color: var(--t0); cursor: pointer; gap: 8px;
 }
@@ -249,7 +305,7 @@ svg.ic {
   transform: translateX(-50%);
   background: var(--bg1); border: 1px solid var(--ask-rule);
   color: var(--t0);
-  font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 12px;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-style: italic; font-size: 12px;
   padding: 3px 10px; white-space: nowrap; pointer-events: none; z-index: 9999;
   box-shadow: 0 2px 8px var(--ask-drop);
 }
@@ -266,7 +322,7 @@ svg.ic {
 }
 .tdot:hover { transform: scale(1.2); }
 .tdot.on { border-color: var(--ask-accent); }
-.d-w { background: radial-gradient(circle at 35% 35%, #ffffff, #e0e0e0); border-color: #c0c0c0 !important; }
+.d-w { background: radial-gradient(circle at 35% 35%, #ffffff, #d0d8f0); border-color: #1a56c4 !important; }
 .d-t { background: radial-gradient(circle at 35% 35%, #f5f0e0, #c8b888); }
 .d-c { background: radial-gradient(circle at 35% 35%, #3a3228, #1a1610); }
 
@@ -281,7 +337,7 @@ svg.ic {
   display: flex; align-items: center; justify-content: center;
   height: 26px; min-width: 28px; padding: 0 6px;
   border-radius: 2px; cursor: pointer; color: var(--t2);
-  font-family: 'Cormorant Garamond', serif; font-size: 13px;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 13px;
   transition: background var(--tr), color var(--tr); position: relative;
 }
 .fb:hover { background: var(--bg2); color: var(--t0); }
@@ -289,7 +345,7 @@ svg.ic {
   content: attr(title); position: absolute; top: calc(100% + 5px); left: 50%;
   transform: translateX(-50%);
   background: var(--bg1); border: 1px solid var(--ask-rule);
-  color: var(--t0); font-family: 'Cormorant Garamond', serif; font-style: italic;
+  color: var(--t0); font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-style: italic;
   font-size: 12px; padding: 2px 9px; white-space: nowrap;
   pointer-events: none; z-index: 9999; box-shadow: 0 2px 8px var(--ask-drop);
 }
@@ -306,7 +362,7 @@ svg.ic {
 .tab {
   display: flex; align-items: center; gap: 6px;
   padding: 0 13px; height: 30px;
-  font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 14px; font-style: italic;
   color: var(--tt); cursor: pointer;
   border-radius: 3px 3px 0 0;
   border: 1px solid transparent; border-bottom: none;
@@ -344,7 +400,7 @@ svg.ic {
 #searchbar.show { display: flex; }
 .sinp {
   background: var(--bg0); border: 1px solid var(--ask-rule);
-  color: var(--t0); font-family: 'EB Garamond', Georgia, serif; font-size: 15px;
+  color: var(--t0); font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 15px;
   padding: 4px 10px; outline: none;
   box-shadow: inset 0 1px 3px rgba(0,0,0,.06);
 }
@@ -353,14 +409,14 @@ svg.ic {
 #s-repl { width: 170px; }
 .sbtn {
   padding: 5px 14px; cursor: pointer;
-  font-family: 'Cormorant Garamond', serif; font-size: 13.5px;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 13.5px;
   background: var(--bg2); border: 1px solid var(--ask-rule); color: var(--t0);
   transition: background var(--tr); display: flex; align-items: center; gap: 5px;
 }
 .sbtn:hover { background: var(--bg3); }
 .sbtn.pri { background: var(--ask-accent); border-color: var(--ask-accent); color: #fff; }
 #s-res {
-  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-style: italic;
   font-size: 13.5px; color: var(--t2); min-width: 90px;
 }
 
@@ -433,7 +489,7 @@ svg.ic {
 #preview-pane {
   width: 50%; display: none; overflow-y: auto;
   background: var(--bg0); padding: 36px 56px;
-  font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 18px; line-height: 1.88;
   color: var(--t0); min-width: 0;
   border-left: 1px solid var(--ask-rule);
@@ -444,19 +500,19 @@ svg.ic {
 
 /* Tipografia da prévia — estilo editorial */
 #preview-pane h1 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 2em; font-weight: 400; font-style: normal;
   text-align: center; letter-spacing: .06em; text-transform: uppercase;
   margin: 1.4em 0 .6em;
   border-bottom: 1px solid var(--ask-rule); padding-bottom: .4em;
 }
 #preview-pane h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 1.45em; font-weight: 500; font-style: italic;
   margin: 1.4em 0 .5em;
 }
 #preview-pane h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 1.18em; font-weight: 600;
   margin: 1.2em 0 .4em;
 }
@@ -498,7 +554,7 @@ svg.ic {
   display: flex; align-items: center;
   background: var(--sbg); border-top: 1px solid var(--ask-rule);
   height: 24px; padding: 0 16px; flex-shrink: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 12.5px; font-style: italic; color: var(--st2); gap: 0;
 }
 .sm {
@@ -511,26 +567,27 @@ svg.ic {
 .ssep { color: var(--ask-rule); font-style: normal; }
 
 /* ── SINTAXE ── */
-/* REGRA CRÍTICA: nenhuma classe de sintaxe altera font-size,
-   font-family, font-weight ou font-style — qualquer mudança de
-   métrica de glifo causa desalinhamento entre highlight e cursor */
-.h1  { color: var(--sh); }
-.h2  { color: var(--sh); }
-.h3  { color: var(--sh); }
+/* SINTAXE: font-weight e font-style são SEGUROS em monospace
+   porque não alteram o avanço horizontal nem a altura da linha
+   (line-height fixo em ratio × font-size constante = altura invariável).
+   font-size e font-family continuam PROIBIDOS — esses sim causam drift. */
+.h1  { color: var(--sh); font-weight: bold; }
+.h2  { color: var(--sh); font-weight: bold; }
+.h3  { color: var(--sh); font-weight: bold; }
 .h4, .h5, .h6 { color: var(--sh); opacity: .8; }
 .mk  { color: var(--t2); }
-.bd2 { color: var(--sb); }
-.it  { color: var(--si); }
+.bd2 { color: var(--sb); font-weight: bold; }
+.it  { color: var(--si); font-style: italic; }
 .cd  { color: var(--sc); }
 .cb  { color: var(--sc); }
 .lk  { color: var(--sl); }
 .im  { color: var(--sg); }
-.bq  { color: var(--sq); }
+.bq  { color: var(--sq); font-style: italic; }
 .li  { color: var(--sm); }
 .hr  { color: var(--sr); }
 .st  { color: var(--ss); text-decoration: line-through; }
 .hl-tb { color: var(--st); }
-.fm  { color: var(--t2); }
+.fm  { color: var(--t2); font-style: italic; }
 
 /* ── MODAIS ── */
 .ov {
@@ -546,19 +603,19 @@ svg.ic {
   width: 92vw; max-height: 90vh; overflow-y: auto;
 }
 .modal h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif;
   font-size: 17px; font-weight: 400; font-style: italic;
   color: var(--t0); margin-bottom: 16px;
   display: flex; align-items: center; gap: 9px;
   border-bottom: 1px solid var(--ask-rule); padding-bottom: 10px;
 }
 .modal p {
-  font-family: 'EB Garamond', serif; font-size: 15px;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 15px;
   color: var(--t1); margin-bottom: 12px; line-height: 1.7;
 }
 .modal input {
   width: 100%; background: var(--bg0); border: 1px solid var(--ask-rule);
-  color: var(--t0); font-family: 'EB Garamond', serif; font-size: 15px;
+  color: var(--t0); font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 15px;
   padding: 7px 10px; margin-bottom: 12px; outline: none;
   box-shadow: inset 0 1px 3px rgba(0,0,0,.06);
 }
@@ -566,7 +623,7 @@ svg.ic {
 .mbtns { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
 .btn {
   padding: 7px 22px; cursor: pointer;
-  font-family: 'Cormorant Garamond', serif; font-size: 14px; font-style: italic;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 14px; font-style: italic;
   border: 1px solid var(--ask-rule); background: var(--bg2); color: var(--t0);
   transition: all var(--tr); display: flex; align-items: center; gap: 6px;
 }
@@ -585,15 +642,15 @@ svg.ic {
 }
 .eopt:hover { border-color: var(--ask-accent); background: var(--bg2); }
 .eopt .ext {
-  font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-style: italic;
   font-size: 14px; color: var(--ask-accent);
 }
-.eopt .dsc { font-family: 'Cormorant Garamond', serif; font-size: 11px; color: var(--t2); }
+.eopt .dsc { font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 11px; color: var(--t2); }
 .eopt.sp { grid-column: span 2; border-color: var(--ask-accent); }
 .eopt.sp .ext { font-weight: 500; }
 .scg {
   display: grid; grid-template-columns: auto 1fr; gap: 4px 20px;
-  font-family: 'Cormorant Garamond', serif; font-size: 13.5px; line-height: 2.2;
+  font-family: 'Latin Modern', 'Libertinus', Georgia, serif; font-size: 13.5px; line-height: 2.2;
 }
 .sck { color: var(--ask-accent); white-space: nowrap; font-style: italic; }
 .scd { color: var(--t1); }
@@ -700,7 +757,7 @@ svg.ic {
       <div class="mc" onclick="adjFont(-1)"><span class="lb">Diminuir fonte</span><span class="ks">Ctrl+–</span></div>
       <div class="mc" onclick="adjFont(1)"><span class="lb">Aumentar fonte</span><span class="ks">Ctrl+=</span></div>
       <hr>
-      <div class="mc" onclick="setTheme('carta')"><span class="lb">◉ Carta (branco)</span></div>
+      <div class="mc" onclick="setTheme('carta')"><span class="lb">◉ Carta (alto contraste)</span></div>
       <div class="mc" onclick="setTheme('scriptorium')"><span class="lb">◉ Scriptorium (sépia)</span></div>
       <div class="mc" onclick="setTheme('vellum')"><span class="lb">◉ Vellum (escuro)</span></div>
     </div>
@@ -761,7 +818,7 @@ svg.ic {
     <div class="tsep"></div>
     <!-- Theme dots -->
     <div class="tdots">
-      <div class="tdot d-w on" id="dot-carta" title="Carta (branco)"      onclick="setTheme('carta')"></div>
+      <div class="tdot d-w on" id="dot-carta" title="Carta (alto contraste)"      onclick="setTheme('carta')"></div>
       <div class="tdot d-t"   id="dot-scr"   title="Scriptorium (sépia)" onclick="setTheme('scriptorium')"></div>
       <div class="tdot d-c"   id="dot-vel"   title="Vellum (escuro)"     onclick="setTheme('vellum')"></div>
     </div>
@@ -1103,45 +1160,71 @@ const TA   = () => document.getElementById('editor-textarea');
 const HL   = () => document.getElementById('editor-highlight');
 const WRAP = () => document.getElementById('editor-wrap');
 
-// ── SYNC HEIGHT ────────────────────────────────────────────
-// Architecture: #editor-highlight is in-flow (not absolute).
-// Its natural height drives #editor-inner's height.
-// #editor-textarea is absolute top:0 left:0 width:100% height:100%
-// so it always matches the inner div exactly.
-// syncHeight just ensures the inner div is tall enough for both
-// the content AND the visible wrap area.
+// ── SYNC HEIGHT — solução definitiva ────────────────────────
+//
+// Arquitetura:
+//   #editor-wrap   → overflow:auto  (único container que rola)
+//   #editor-inner  → position:relative, in-flow dentro do wrap
+//   #editor-highlight (<pre>) → display:block, in-flow dentro do inner
+//                               SUA altura natural impulsiona o inner
+//   #editor-textarea → position:absolute top:0 left:0 w:100% h:100%
+//                      transparente, nunca rola (overflow:hidden)
+//
+// syncHeight garante que inner.minHeight ≥ max(conteúdo, viewport)
+// para que a textarea sempre cubra pelo menos a área visível.
+//
+// REGRAS CRÍTICAS para alinhamento perfeito:
+//   1. .ed-layer usa font-family MONOSPACE — único jeito de garantir
+//      que highlight e textarea ocupam exatamente o mesmo espaço
+//   2. letter-spacing e word-spacing: normal — nunca altere
+//   3. font-size, line-height e padding: IDÊNTICOS entre as duas camadas
+//   4. Não resetar minHeight para '' antes de medir — causa colapso
+//      que torna scrollHeight impreciso
+//   5. getBoundingClientRect().height é mais confiável que scrollHeight
+//      para elementos in-flow após font-load de fontes web
+//
 function syncHeight() {
   const hl = HL(), wrap = WRAP(), inner = document.getElementById('editor-inner');
   if (!hl || !wrap || !inner) return;
 
-  // Reset min-height so scrollHeight reflects true content
-  inner.style.minHeight = '';
-
-  // hl.scrollHeight: total height of the in-flow <pre> including content
-  // wrap.clientHeight: visible viewport of the scrollable container
-  // We take the max so the textarea always fills at least the viewport
-  const contentH = hl.scrollHeight;
+  // getBoundingClientRect().height força reflow síncrono e retorna
+  // a altura real renderizada — mais confiável que scrollHeight
+  // para fontes web (Latin Modern, etc.) que podem ainda estar carregando
+  const contentH = hl.getBoundingClientRect().height;
   const wrapH    = wrap.clientHeight;
-  const minH     = Math.max(contentH, wrapH);
 
-  inner.style.minHeight = minH + 'px';
+  // +4px: buffer para fractional-pixel DPI (ex: 1.25× scale)
+  // Nunca reduzir abaixo do valor atual para evitar tremulação
+  const needed = Math.max(contentH, wrapH) + 4;
+  const current = parseFloat(inner.style.minHeight) || 0;
+  if (needed > current || needed < current - 40) {
+    // Só atualiza se diferença significativa (>40px para baixo)
+    // evita re-layouts desnecessários durante scroll
+    inner.style.minHeight = needed + 'px';
+  }
 }
 
-// ResizeObserver watches editor-wrap for size changes (split drag, window resize).
-let _ro = null;
+// ResizeObserver com debounce — evita loop de layout durante resize
+let _ro = null, _roTimer = null;
 function initResizeObserver() {
   if (typeof ResizeObserver === 'undefined') return;
-  _ro = new ResizeObserver(() => syncHeight());
+  _ro = new ResizeObserver(() => {
+    // Debounce: espera 1 frame antes de medir
+    // (garante que o browser terminou o layout do resize)
+    if (_roTimer) cancelAnimationFrame(_roTimer);
+    _roTimer = requestAnimationFrame(syncHeight);
+  });
   const wrap = WRAP();
   if (wrap) _ro.observe(wrap);
 }
 
 // ── HIGHLIGHT ──────────────────────────────────────────────
-// Sets highlight HTML then calls syncHeight after one rAF
-// (browser finishes in-flow layout before we read offsetHeight).
+// Double-rAF: primeiro frame commita o innerHTML no DOM,
+// segundo frame executa após o browser ter calculado o layout
+// completo do novo conteúdo (inclui carregamento de fontes web).
 function doHighlight(raw) {
   HL().innerHTML = buildHighlight(raw);
-  requestAnimationFrame(syncHeight);
+  requestAnimationFrame(() => requestAnimationFrame(syncHeight));
 }
 
 // ── INPUT ──────────────────────────────────────────────────
