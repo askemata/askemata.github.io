@@ -167,7 +167,10 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
     <div class="tb-sep"></div>
     <button class="tb-btn on" id="btn-sidebar">☰</button>
     <button class="tb-btn" id="btn-new">+ Nova</button>
+    <button class="tb-btn" id="btn-open">↙ Abrir</button>
+    <button class="tb-btn" id="btn-save">↓ Salvar</button>
     <button class="tb-btn" id="btn-export">↗ Exportar</button>
+    <input type="file" id="file-open-input" accept=".md,.markdown,.txt" style="display:none" multiple/>
     <div class="tb-spacer"></div>
     <div class="vm-grp">
       <button class="vm-btn" data-vm="editor">Editor</button>
@@ -246,6 +249,8 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
     <div class="ex-opts">
       <div class="ex-opt" data-fmt="markdown"><span class="ex-ico">⬇</span><div><div class="ex-lbl">Markdown</div><div class="ex-dsc">.md — formato nativo</div></div></div>
       <div class="ex-opt" data-fmt="html"><span class="ex-ico">🌐</span><div><div class="ex-lbl">HTML</div><div class="ex-dsc">.html — página web com estilo</div></div></div>
+      <div class="ex-opt" data-fmt="fodt"><span class="ex-ico">📝</span><div><div class="ex-lbl">Flat OpenDocument</div><div class="ex-dsc">.fodt — compatível com LibreOffice / Word</div></div></div>
+      <div class="ex-opt" data-fmt="rtf"><span class="ex-ico">📋</span><div><div class="ex-lbl">Rich Text Format</div><div class="ex-dsc">.rtf — compatível com Word, Pages, Writer</div></div></div>
       <div class="ex-opt" data-fmt="text"><span class="ex-ico">📄</span><div><div class="ex-lbl">Texto Simples</div><div class="ex-dsc">.txt — sem formatação</div></div></div>
     </div>
     <div class="modal-row"><button class="btn btn-s" id="btn-export-close">Fechar</button></div>
@@ -354,6 +359,53 @@ function md(text){
 }
 
 // ── Export ──
+function mdToPlain(content){
+  return content.replace(/^---[\s\S]*?---\n/,"").replace(/#{1,6}\s+/g,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\*(.+?)\*/g,"$1").replace(/`(.+?)`/g,"$1").replace(/\[\[(.+?)\]\]/g,"$1").replace(/\[(.+?)\]\(.+?\)/g,"$1");
+}
+function mdToFodt(note){
+  const plain=mdToPlain(note.content);
+  const lines=plain.split("\n");
+  let body="";
+  for(const l of lines){
+    const t=l.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    if(!t.trim()){body+=`<text:p text:style-name="Text_20_Body"/>`;continue;}
+    body+=`<text:p text:style-name="Text_20_Body">${t}</text:p>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.text"
+  office:version="1.3">
+<office:styles>
+  <style:style style:name="Text_20_Body" style:family="paragraph">
+    <style:paragraph-properties fo:margin-bottom="0.2cm"/>
+    <style:text-properties fo:font-size="11pt" fo:font-family="Georgia,serif" fo:line-height="180%"/>
+  </style:style>
+  <style:style style:name="Heading_20_1" style:family="paragraph">
+    <style:text-properties fo:font-size="18pt" fo:font-weight="bold"/>
+  </style:style>
+</office:styles>
+<office:body><office:text>
+  <text:p text:style-name="Heading_20_1">${note.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</text:p>
+  ${body}
+</office:text></office:body>
+</office:document>`;
+}
+function mdToRtf(note){
+  const plain=mdToPlain(note.content);
+  // RTF-encode: escape backslash, braces, non-ASCII
+  const rtfEsc=s=>s.replace(/\\/g,"\\\\").replace(/\{/g,"\\{").replace(/\}/g,"\\}").replace(/[^\x00-\x7F]/g,c=>{const cp=c.codePointAt(0);return `\\u${cp}?`;});
+  const lines=plain.split("\n").map(l=>rtfEsc(l));
+  const body=lines.map(l=>l.trim()?`\\pard\\sa120\\sl360\\slmult1 ${l}\\par`:"\\pard\\sa120\\par").join("\n");
+  return `{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Georgia;}{\\f1 IBM Plex Mono;}}
+{\\colortbl ;\\red44\\green42\\blue38;}
+\\deflang1046\\widowctrl\\hyphauto
+\\pard\\sa200\\b\\fs36 ${rtfEsc(note.title)}\\b0\\par
+${body}
+}`;
+}
 function doExport(note,fmt){
   let c="",mime="text/plain",ext="txt";
   if(fmt==="markdown"){c=note.content;mime="text/markdown";ext="md";}
@@ -361,8 +413,12 @@ function doExport(note,fmt){
     const body=md(note.content);
     c=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${note.title}</title><style>body{font-family:Georgia,serif;max-width:760px;margin:60px auto;padding:0 20px;line-height:1.8;color:#2c2a26}code{background:#f0ece2;padding:2px 6px;border-radius:3px;font-size:.9em}pre{background:#f0ece2;padding:16px;border-radius:6px;overflow-x:auto}blockquote{border-left:3px solid #c9a96e;padding-left:16px;color:#7a6640;margin:0;font-style:italic}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px 12px}th{background:#f5f0e8}.wikilink{color:#2a6e87}</style></head><body>${body}</body></html>`;
     mime="text/html";ext="html";
+  } else if(fmt==="fodt"){
+    c=mdToFodt(note);mime="application/vnd.oasis.opendocument.text-flat-xml";ext="fodt";
+  } else if(fmt==="rtf"){
+    c=mdToRtf(note);mime="application/rtf";ext="rtf";
   } else {
-    c=note.content.replace(/^---[\s\S]*?---\n/,"").replace(/#{1,6}\s+/g,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\*(.+?)\*/g,"$1").replace(/`(.+?)`/g,"$1").replace(/\[\[(.+?)\]\]/g,"$1").replace(/\[(.+?)\]\(.+?\)/g,"$1");
+    c=mdToPlain(note.content);
   }
   const a=document.createElement("a");
   a.href=URL.createObjectURL(new Blob([c],{type:mime}));
@@ -515,6 +571,60 @@ function insertFmt(fmt){
 // ── Events ──
 document.getElementById("btn-sidebar").onclick=()=>{sidebarOpen=!sidebarOpen;document.getElementById("sidebar").classList.toggle("closed",!sidebarOpen);document.getElementById("btn-sidebar").classList.toggle("on",sidebarOpen);};
 document.getElementById("btn-new").onclick=()=>openModal("modal-new");
+
+// ── Open file(s) ──
+const fileHandles={}; // noteId -> FileSystemFileHandle (if available)
+document.getElementById("btn-open").onclick=async()=>{
+  if(window.showOpenFilePicker){
+    try{
+      const handles=await window.showOpenFilePicker({multiple:true,types:[{description:"Markdown",accept:{"text/markdown":[".md",".markdown",".txt"]}}]});
+      for(const handle of handles){
+        const file=await handle.getFile();
+        const content=await file.text();
+        const title=file.name.replace(/\.(md|markdown|txt)$/i,"");
+        const existing=notes.find(n=>n.title===title);
+        if(existing){existing.content=content;existing.updated=tod();fileHandles[existing.id]=handle;save();openNote(existing.id);}
+        else{const id=genId(),t=tod();const note={id,title,tags:[],created:t,updated:t,content};notes.push(note);fileHandles[id]=handle;save();openNote(id);}
+      }
+      renderSidebar();renderStatus();
+    }catch(e){if(e.name!=="AbortError")alert("Erro ao abrir: "+e.message);}
+  } else {
+    document.getElementById("file-open-input").click();
+  }
+};
+document.getElementById("file-open-input").onchange=async(e)=>{
+  for(const file of e.target.files){
+    const content=await file.text();
+    const title=file.name.replace(/\.(md|markdown|txt)$/i,"");
+    const existing=notes.find(n=>n.title===title);
+    if(existing){existing.content=content;existing.updated=tod();save();openNote(existing.id);}
+    else{const id=genId(),t=tod();const note={id,title,tags:[],created:t,updated:t,content};notes.push(note);save();openNote(note.id);}
+  }
+  e.target.value="";
+  renderSidebar();renderStatus();
+};
+
+// ── Save file ──
+document.getElementById("btn-save").onclick=async()=>{
+  const n=curNote();if(!n)return;
+  if(window.showSaveFilePicker){
+    try{
+      let handle=fileHandles[n.id];
+      if(!handle){
+        handle=await window.showSaveFilePicker({suggestedName:`${n.title.replace(/\s+/g,"-")}.md`,types:[{description:"Markdown",accept:{"text/markdown":[".md"]}}]});
+        fileHandles[n.id]=handle;
+      }
+      const writable=await handle.createWritable();
+      await writable.write(n.content);
+      await writable.close();
+    }catch(e){if(e.name!=="AbortError")alert("Erro ao salvar: "+e.message);}
+  } else {
+    // fallback: download
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([n.content],{type:"text/markdown"}));
+    a.download=`${n.title.replace(/\s+/g,"-")}.md`;a.click();
+  }
+};
 document.getElementById("btn-export").onclick=()=>openModal("modal-export");
 document.getElementById("btn-theme").onclick=()=>openModal("modal-theme");
 document.getElementById("btn-focus").onclick=()=>setFocusMode(!focusMode);
