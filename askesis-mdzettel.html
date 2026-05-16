@@ -3,11 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta name="theme-color" content="#0d0d0d" id="theme-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="theme-color" content="#0d0d0d" id="theme-color-meta"/>
 <meta name="description" content="Askesis-Zettel — Editor Markdown Zettelkasten local-first"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -109,48 +104,77 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
 .tbtn{padding:3px 7px;border-radius:3px;cursor:pointer;border:none;background:transparent;color:var(--text-secondary);font-size:12px;font-family:inherit;transition:all .12s;font-weight:500;line-height:1.4}
 .tbtn:hover{background:var(--bg-hover);color:var(--text-primary)}
 .tsep{width:1px;height:14px;background:var(--border);margin:0 2px;flex-shrink:0}
-/* ── Highlight editor ── */
+/* ── Highlight editor ──
+   Architecture: editor-wrap is the scroll container. The textarea is
+   invisible (transparent text, transparent bg) and sits on top for input.
+   The hl-layer is underneath, positioned to match the textarea exactly.
+   CRITICAL RULE: hl-layer must NEVER change font-size, line-height, or any
+   metric that affects layout — only color, font-weight, font-style are safe.
+   The layer does NOT scroll; it is shifted via transform:translateY by JS.
+*/
 #editor-wrap{
-  flex:1;position:relative;
-  overflow:hidden;
+  flex:1;
+  position:relative;
+  overflow:hidden;           /* clips the shifted layer */
   background:var(--editor-bg);
 }
+/* Shared metrics — single source of truth applied to both via CSS vars */
+:root{
+  --ed-pad-v:32px;
+  --ed-pad-h:40px;
+  --ed-font:'IBM Plex Mono',monospace;
+  --ed-size:13px;
+  --ed-lh:1.9;
+}
 #hl-layer{
+  /* Exact same box model as #editor */
   position:absolute;
-  top:0;left:0;right:0;
-  min-height:100%;
-  padding:32px 40px;
-  /* Right padding absorbs the scrollbar gutter so line-wrap matches the textarea.
-     The textarea uses scrollbar-gutter:stable (~15-17px). We widen padding-right
-     to push content left the same amount. Set via JS after measuring. */
-  font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.9;tab-size:2;
+  top:0; left:0; right:0;
+  /* Height grows with content; wrap clips overflow */
+  padding:var(--ed-pad-v) var(--ed-pad-h);
+  font-family:var(--ed-font);
+  font-size:var(--ed-size);    /* NEVER change this — must match textarea */
+  line-height:var(--ed-lh);   /* NEVER change this */
+  tab-size:2;
   white-space:pre-wrap;
-  overflow-wrap:break-word;
-  word-break:normal;
-  overflow:hidden;
+  word-wrap:break-word;
+  overflow:hidden;             /* layer does NOT scroll */
   pointer-events:none;
   z-index:1;
   color:var(--sh-plain);
+  /* GPU layer for smooth transform during scroll */
   will-change:transform;
+  transform:translateY(0);
 }
 #editor{
-  position:absolute;inset:0;
-  padding:32px 40px;
-  font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.9;tab-size:2;
-  background:transparent;color:transparent;
-  border:none;outline:none;resize:none;
-  overflow-y:scroll;
-  overflow-x:hidden;
+  position:absolute;
+  inset:0;
+  padding:var(--ed-pad-v) var(--ed-pad-h);
+  font-family:var(--ed-font);
+  font-size:var(--ed-size);
+  line-height:var(--ed-lh);
+  tab-size:2;
+  /* Text invisible — caret and selection still visible */
+  background:transparent;
+  color:transparent;
   caret-color:var(--accent);
   -webkit-text-fill-color:transparent;
-  z-index:2;
-  white-space:pre-wrap;
-  overflow-wrap:break-word;
-  word-break:normal;
+  border:none;outline:none;resize:none;
+  /* Single scroll axis; scrollbar-gutter keeps width stable so wrap
+     points never shift when the scrollbar appears/disappears */
+  overflow-y:scroll;
+  overflow-x:hidden;
   scrollbar-gutter:stable;
+  white-space:pre-wrap;
+  word-wrap:break-word;
+  z-index:2;
 }
-#editor::selection{background:var(--selection)}
-.focus-mode #editor,.focus-mode #hl-layer{padding:48px calc(50% - 36ch)}
+#editor::selection{
+  background:var(--selection);
+}
+.focus-mode #editor,.focus-mode #hl-layer{
+  padding:48px calc(50% - 36ch);
+}
 .focus-mode #editor-toolbar{display:none!important}
 /* ── Preview ── */
 #preview-toolbar{display:flex;align-items:center;justify-content:flex-end;padding:4px 10px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;font-size:10px;color:var(--text-muted)}
@@ -448,41 +472,85 @@ function md(text){
 
 // ══════════════════════════════════════════
 //  SYNTAX HIGHLIGHT (editor layer)
+//  RULE: NEVER change font-size or line-height — only color/weight/style.
+//  Any metric change would break textarea↔layer line alignment.
 // ══════════════════════════════════════════
-function hlInline(s){
-  const he=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  let out="",i=0,r=s;
-  while(i<r.length){
-    if(r[i]==="["&&r[i+1]==="["){const e=r.indexOf("]]",i+2);if(e!==-1){out+=`<span style="color:var(--sh-wiki)">${he(r.slice(i,e+2))}</span>`;i=e+2;continue;}}
-    if(r[i]==="`"){const e=r.indexOf("`",i+1);if(e!==-1){out+=`<span style="color:var(--sh-code)">${he(r.slice(i,e+1))}</span>`;i=e+1;continue;}}
-    if(r[i]==="*"&&r[i+1]==="*"){const e=r.indexOf("**",i+2);if(e!==-1){out+=`<span style="color:var(--sh-bold);font-weight:600">${he(r.slice(i,e+2))}</span>`;i=e+2;continue;}}
-    if(r[i]==="_"&&r[i+1]==="_"){const e=r.indexOf("__",i+2);if(e!==-1){out+=`<span style="color:var(--sh-bold);font-weight:600">${he(r.slice(i,e+2))}</span>`;i=e+2;continue;}}
-    if(r[i]==="~"&&r[i+1]==="~"){const e=r.indexOf("~~",i+2);if(e!==-1){out+=`<span style="opacity:.5;text-decoration:line-through">${he(r.slice(i,e+2))}</span>`;i=e+2;continue;}}
-    if(r[i]==="*"&&r[i+1]!=="*"){const e=r.indexOf("*",i+1);if(e!==-1){out+=`<span style="color:var(--sh-italic);font-style:italic">${he(r.slice(i,e+1))}</span>`;i=e+1;continue;}}
-    if(r[i]==="_"&&r[i+1]!=="_"){const e=r.indexOf("_",i+1);if(e!==-1){out+=`<span style="color:var(--sh-italic);font-style:italic">${he(r.slice(i,e+1))}</span>`;i=e+1;continue;}}
-    if(r[i]==="["&&r[i+1]!=="["){const cb=r.indexOf("](",i);if(cb!==-1){const pe=r.indexOf(")",cb+2);if(pe!==-1){out+=`<span style="color:var(--sh-link)">${he(r.slice(i,pe+1))}</span>`;i=pe+1;continue;}}}
-    out+=he(r[i]);i++;
+function hlInline(raw){
+  const he=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  let out="",i=0;
+  while(i<raw.length){
+    // [[wikilink]]
+    if(raw[i]==="["&&raw[i+1]==="["){
+      const e=raw.indexOf("]]",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-wiki)">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // `code`
+    if(raw[i]==="`"){
+      const e=raw.indexOf("`",i+1);
+      if(e!==-1){out+=`<span style="color:var(--sh-code)">${he(raw.slice(i,e+1))}</span>`;i=e+1;continue;}
+    }
+    // **bold**
+    if(raw[i]==="*"&&raw[i+1]==="*"){
+      const e=raw.indexOf("**",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-bold);font-weight:700">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // __bold__
+    if(raw[i]==="_"&&raw[i+1]==="_"){
+      const e=raw.indexOf("__",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-bold);font-weight:700">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // ~~strike~~
+    if(raw[i]==="~"&&raw[i+1]==="~"){
+      const e=raw.indexOf("~~",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-quote);text-decoration:line-through">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // *italic* (not **)
+    if(raw[i]==="*"&&raw[i+1]!=="*"){
+      const e=raw.indexOf("*",i+1);
+      if(e!==-1){out+=`<span style="color:var(--sh-italic);font-style:italic">${he(raw.slice(i,e+1))}</span>`;i=e+1;continue;}
+    }
+    // _italic_ (not __)
+    if(raw[i]==="_"&&raw[i+1]!=="_"){
+      const e=raw.indexOf("_",i+1);
+      if(e!==-1){out+=`<span style="color:var(--sh-italic);font-style:italic">${he(raw.slice(i,e+1))}</span>`;i=e+1;continue;}
+    }
+    // [link](url)
+    if(raw[i]==="["&&raw[i+1]!=="["){
+      const cb=raw.indexOf("](",i);
+      if(cb!==-1){const pe=raw.indexOf(")",cb+2);
+        if(pe!==-1){out+=`<span style="color:var(--sh-link)">${he(raw.slice(i,pe+1))}</span>`;i=pe+1;continue;}}
+    }
+    out+=he(raw[i]);i++;
   }
   return out;
 }
 function hlMd(text){
-  if(!text) return "";
-  const he=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  if(!text)return "";
+  const he=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   const lines=text.split("\n");
-  let out=[],inCode=false,inFM=false;
+  const out=[];
+  let inCode=false,inFM=false;
   for(let i=0;i<lines.length;i++){
     const l=lines[i];
+    // front matter
     if(i===0&&l==="---"){inFM=true;out.push(`<span style="color:var(--sh-fm)">${he(l)}</span>`);continue;}
     if(inFM){out.push(`<span style="color:var(--sh-fm)">${he(l)}</span>`);if(l==="---"&&i>0)inFM=false;continue;}
+    // fenced code
     if(l.startsWith("```")){inCode=!inCode;out.push(`<span style="color:var(--sh-cb)">${he(l)}</span>`);continue;}
     if(inCode){out.push(`<span style="color:var(--sh-cb)">${he(l)}</span>`);continue;}
-    // heading
+    // heading — bold+color, NO font-size (preserves line height)
     const hm=l.match(/^(#{1,6})(\s+.*)$/);
-    if(hm){const sz=["1.5em","1.25em","1.1em","1em","0.95em","0.9em"][hm[1].length-1];out.push(`<span style="color:var(--sh-head);font-size:${sz}">${he(hm[1])}${hlInline(hm[2])}</span>`);continue;}
+    if(hm){
+      out.push(`<span style="color:var(--sh-fm)">${he(hm[1])}</span><span style="color:var(--sh-head);font-weight:700">${hlInline(hm[2])}</span>`);
+      continue;
+    }
     // hr
-    if(/^(-{3,}|\*{3,})$/.test(l.trim())){out.push(`<span style="color:var(--sh-hr)">${he(l)}</span>`);continue;}
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(l.trim())){out.push(`<span style="color:var(--sh-hr)">${he(l)}</span>`);continue;}
     // blockquote
-    if(l.startsWith("> ")){out.push(`<span style="color:var(--sh-quote)">&gt; ${hlInline(l.slice(2))}</span>`);continue;}
+    if(l.startsWith("> ")){
+      out.push(`<span style="color:var(--sh-quote)">&gt; </span><span style="color:var(--sh-quote);font-style:italic">${hlInline(l.slice(2))}</span>`);
+      continue;
+    }
     // ul
     const ulm=l.match(/^(\s*)([-*+])(\s+)(.*)$/);
     if(ulm){out.push(`${he(ulm[1])}<span style="color:var(--sh-list)">${he(ulm[2])}</span>${he(ulm[3])}${hlInline(ulm[4])}`);continue;}
@@ -494,8 +562,8 @@ function hlMd(text){
       const cells=l.split("|");
       out.push(cells.map((cell,ci)=>{
         const isDivider=/^[\s:|-]+$/.test(cell.trim())&&cell.includes("-");
-        const sep=ci<cells.length-1?`<span style="color:var(--sh-list)">|</span>`:"";
-        return (isDivider?`<span style="color:var(--sh-hr)">${he(cell)}</span>`:hlInline(cell))+sep;
+        const pipe=ci<cells.length-1?`<span style="color:var(--sh-list)">|</span>`:"";
+        return (isDivider?`<span style="color:var(--sh-hr)">${he(cell)}</span>`:hlInline(cell))+pipe;
       }).join(""));
       continue;
     }
@@ -1083,683 +1151,6 @@ renderSidebar();
 renderStatus();
 setViewMode("split");
 setSaved(true);
-</script>
-</body>
-</html>
--meta"/>
-<meta name="description" content="Askesis-MD — Editor Markdown Zettelkasten local-first"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<meta name="apple-mobile-web-app-title" content="Askesis-MD"/>
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d0d0d'/><text x='256' y='360' font-family='serif' font-size='300' text-anchor='middle' fill='%23c9a96e'>✦</text></svg>"/>
-<title>Askesis-MD</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;1,7..72,300;1,7..72,400&display=swap');
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font-size:13px}
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:3px}
-::selection{background:var(--selection)}
-:root{
-  --bg-primary:#0d0d0d;--bg-secondary:#141414;--bg-tertiary:#1a1a1a;
-  --bg-hover:#222;--bg-active:#2a2a2a;--border:#2a2a2a;--border-light:#1f1f1f;
-  --text-primary:#e8e4dc;--text-secondary:#8a8680;--text-muted:#4a4845;
-  --accent:#c9a96e;--accent-dim:#7a6640;--link:#7eb8c9;
-  --tag:#2a2010;--tag-text:#c9a96e;--scrollbar:#2a2a2a;
-  --shadow:0 8px 32px rgba(0,0,0,.7);--editor-bg:#0f0f0f;--preview-bg:#0f0f0f;
-  --code-bg:#1a1a1a;--selection:rgba(201,169,110,.2);
-}
-#app{display:flex;flex-direction:column;height:100dvh;background:var(--bg-primary);color:var(--text-primary);overflow:hidden}
-#install-bar{display:none;align-items:center;justify-content:center;gap:8px;padding:8px 14px;background:var(--accent);color:var(--bg-primary);font-size:11px;cursor:pointer;border:none;width:100%;letter-spacing:.05em;font-weight:500;font-family:inherit;flex-shrink:0}
-#install-bar:hover{opacity:.9}
-#install-bar.visible{display:flex}
-#titlebar{display:flex;align-items:center;padding:0 10px;height:38px;background:var(--bg-secondary);border-bottom:1px solid var(--border);gap:6px;flex-shrink:0;user-select:none;overflow:hidden}
-.tb-logo{font-family:'Literata',Georgia,serif;font-size:14px;color:var(--accent);letter-spacing:.06em;flex-shrink:0}
-.tb-sep{width:1px;height:16px;background:var(--border);margin:0 2px;flex-shrink:0}
-.tb-btn{display:flex;align-items:center;gap:4px;padding:4px 8px;border-radius:4px;cursor:pointer;color:var(--text-secondary);font-size:11px;border:none;background:transparent;transition:all .15s;font-family:inherit;letter-spacing:.03em;white-space:nowrap;flex-shrink:0}
-.tb-btn:hover{background:var(--bg-hover);color:var(--text-primary)}
-.tb-btn.on{background:var(--bg-active);color:var(--accent)}
-.tb-spacer{flex:1}
-.vm-grp{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;flex-shrink:0}
-.vm-btn{padding:3px 10px;cursor:pointer;border:none;font-size:11px;background:transparent;color:var(--text-secondary);font-family:inherit;transition:all .15s;letter-spacing:.02em}
-.vm-btn+.vm-btn{border-left:1px solid var(--border)}
-.vm-btn.on{background:var(--bg-active);color:var(--accent)}
-.vm-btn:hover:not(.on){background:var(--bg-hover);color:var(--text-primary)}
-#tabs-bar{display:flex;align-items:center;background:var(--bg-secondary);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;min-height:32px}
-#tabs-bar::-webkit-scrollbar{height:0}
-.tab{display:flex;align-items:center;gap:5px;padding:0 12px;height:32px;flex-shrink:0;cursor:pointer;border-right:1px solid var(--border);color:var(--text-secondary);font-size:11px;transition:all .15s;max-width:180px;position:relative;white-space:nowrap;overflow:hidden}
-.tab.on{color:var(--text-primary);background:var(--bg-primary)}
-.tab.on::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:var(--accent)}
-.tab:hover:not(.on){background:var(--bg-hover);color:var(--text-primary)}
-.tab-name{overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-.tab-x{opacity:0;width:14px;height:14px;display:flex;align-items:center;justify-content:center;border-radius:2px;flex-shrink:0;font-size:14px;line-height:1}
-.tab:hover .tab-x{opacity:.5}
-.tab-x:hover{opacity:1!important;background:var(--bg-hover)}
-#tab-new{padding:0 12px;height:32px;display:flex;align-items:center;cursor:pointer;color:var(--text-muted);font-size:20px;transition:color .15s;flex-shrink:0;line-height:1;background:none;border:none;font-family:inherit}
-#tab-new:hover{color:var(--accent)}
-#main{display:flex;flex:1;overflow:hidden}
-#sidebar{width:218px;flex-shrink:0;background:var(--bg-secondary);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;transition:width .2s ease}
-#sidebar.closed{width:0;border:none}
-#sb-header{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.sb-tab{flex:1;padding:7px 0;text-align:center;cursor:pointer;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);border-right:1px solid var(--border);transition:all .15s;white-space:nowrap;overflow:hidden}
-.sb-tab:last-child{border:none}
-.sb-tab.on{color:var(--accent);background:var(--bg-tertiary)}
-.sb-tab:hover:not(.on){color:var(--text-secondary);background:var(--bg-hover)}
-#sb-body{flex:1;overflow-y:auto;padding:8px}
-#sb-search{display:flex;align-items:center;gap:6px;margin-bottom:8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:5px;padding:5px 8px}
-#sb-search input{flex:1;background:transparent;border:none;outline:none;color:var(--text-primary);font-size:11px;font-family:inherit}
-#sb-search input::placeholder{color:var(--text-muted)}
-.ni{padding:6px 8px;border-radius:4px;cursor:pointer;margin-bottom:1px;position:relative;transition:background .1s}
-.ni:hover{background:var(--bg-hover)}
-.ni.on{background:var(--bg-active)}
-.ni-title{font-size:11px;color:var(--text-primary);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:18px}
-.ni-meta{font-size:10px;color:var(--text-muted)}
-.ni-tags{display:flex;gap:3px;flex-wrap:wrap;margin-top:3px}
-.ni-del{position:absolute;right:6px;top:6px;opacity:0;font-size:11px;color:var(--text-muted);cursor:pointer;padding:2px 4px;border-radius:3px;transition:all .15s;border:none;background:transparent;font-family:inherit}
-.ni:hover .ni-del{opacity:.4}
-.ni-del:hover{opacity:1!important;color:#e05050;background:rgba(200,0,50,.1)}
-.chip{font-size:9px;padding:1px 5px;border-radius:3px;background:var(--tag);color:var(--tag-text);letter-spacing:.02em}
-.sb-sec{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);padding:6px 8px 5px;margin-top:4px}
-.ol-item{padding:3px 8px;cursor:pointer;font-size:11px;color:var(--text-secondary);border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .1s}
-.ol-item:hover{background:var(--bg-hover);color:var(--text-primary)}
-.bl-item{padding:5px 8px;border-radius:4px;cursor:pointer;margin-bottom:2px;border-left:2px solid var(--accent-dim);transition:all .1s;font-size:11px;color:var(--text-primary)}
-.bl-item:hover{background:var(--bg-hover);border-left-color:var(--accent)}
-.sb-empty{color:var(--text-muted);font-size:11px;padding:6px 8px}
-#editor-area{flex:1;display:flex;overflow:hidden}
-#editor-pane,#preview-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#editor-pane{border-right:1px solid var(--border)}
-#editor-pane.solo,#preview-pane.solo{border:none}
-#editor-pane.hidden,#preview-pane.hidden{display:none}
-#editor-toolbar{display:flex;align-items:center;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;flex-wrap:wrap}
-#editor-toolbar.hidden{display:none}
-.tbtn{padding:3px 7px;border-radius:3px;cursor:pointer;border:none;background:transparent;color:var(--text-secondary);font-size:12px;font-family:inherit;transition:all .12s;font-weight:500;line-height:1.4}
-.tbtn:hover{background:var(--bg-hover);color:var(--text-primary)}
-.tsep{width:1px;height:14px;background:var(--border);margin:0 2px;flex-shrink:0}
-#editor{flex:1;background:var(--editor-bg);color:var(--text-primary);border:none;outline:none;resize:none;padding:32px 40px;font-family:'IBM Plex Mono',monospace;font-size:13px;line-height:1.9;tab-size:2;caret-color:var(--accent);overflow-y:auto}
-#editor::selection{background:var(--selection)}
-.focus-mode #editor{padding:48px calc(50% - 36ch)}
-.focus-mode #editor-toolbar{display:none!important}
-#preview-toolbar{display:flex;align-items:center;justify-content:flex-end;padding:4px 10px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;font-size:10px;color:var(--text-muted)}
-#preview-toolbar.hidden{display:none}
-#preview{flex:1;overflow-y:auto;padding:36px 48px;background:var(--preview-bg);font-family:'Literata',Georgia,serif;font-size:15px;line-height:1.85;color:var(--text-primary)}
-#preview h1{font-size:1.85em;margin:0 0 .5em;font-weight:400;border-bottom:1px solid var(--border);padding-bottom:.3em}
-#preview h2{font-size:1.3em;margin:1.6em 0 .5em;font-weight:400}
-#preview h3{font-size:1.1em;margin:1.2em 0 .4em;font-weight:400;color:var(--text-secondary)}
-#preview h4{font-size:1em;margin:1em 0 .3em;font-weight:500;color:var(--text-secondary)}
-#preview p{margin:0 0 .85em}
-#preview .spacer{height:.5em}
-#preview strong{font-weight:600}
-#preview em{font-style:italic;color:var(--text-secondary)}
-#preview del{opacity:.5;text-decoration:line-through}
-#preview a{color:var(--link);text-underline-offset:3px}
-#preview blockquote{border-left:3px solid var(--accent-dim);padding:0 0 0 16px;color:var(--text-secondary);margin:1em 0;font-style:italic}
-#preview code{background:var(--code-bg);padding:2px 6px;border-radius:3px;font-family:'IBM Plex Mono',monospace;font-size:.83em;color:var(--accent)}
-#preview pre{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:16px;overflow-x:auto;margin:1em 0}
-#preview pre code{background:transparent;padding:0;font-size:.83em;color:var(--text-secondary)}
-#preview ul,#preview ol{padding-left:1.6em;margin:.5em 0 .8em}
-#preview li{margin-bottom:.2em}
-#preview hr{border:none;border-top:1px solid var(--border);margin:1.6em 0}
-#preview table{width:100%;border-collapse:collapse;margin:1em 0;font-size:.9em}
-#preview td,#preview th{border:1px solid var(--border);padding:7px 12px}
-#preview th{background:var(--bg-secondary);font-weight:500;font-family:'IBM Plex Mono',monospace;font-size:.8em;letter-spacing:.04em}
-.wikilink{cursor:pointer}
-.wikilink-exists{color:var(--link);text-decoration:underline;text-underline-offset:3px}
-.wikilink-missing{color:var(--text-muted);text-decoration:underline dashed;text-underline-offset:3px}
-.wikilink:hover{opacity:.8}
-#statusbar{display:flex;align-items:center;gap:10px;padding:0 12px;height:21px;background:var(--bg-secondary);border-top:1px solid var(--border);font-size:10px;color:var(--text-muted);letter-spacing:.04em;flex-shrink:0;user-select:none;overflow:hidden}
-.st-sep{width:1px;height:12px;background:var(--border);flex-shrink:0}
-.st-spacer{flex:1}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(3px)}
-.overlay.hidden{display:none}
-.modal{background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:22px;min-width:320px;max-width:92vw;box-shadow:var(--shadow)}
-.modal h3{font-size:11px;margin-bottom:14px;color:var(--text-primary);font-weight:500;letter-spacing:.08em;text-transform:uppercase}
-.modal-input{width:100%;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--text-primary);font-size:12px;font-family:inherit;outline:none;margin-bottom:12px;transition:border .15s}
-.modal-input:focus{border-color:var(--accent)}
-.modal-row{display:flex;gap:8px;justify-content:flex-end}
-.btn{padding:6px 14px;border-radius:5px;cursor:pointer;border:none;font-size:11px;font-family:inherit;letter-spacing:.04em;transition:all .15s}
-.btn-p{background:var(--accent);color:var(--bg-primary);font-weight:500}
-.btn-p:hover{opacity:.85}
-.btn-s{background:var(--bg-tertiary);color:var(--text-secondary);border:1px solid var(--border)}
-.btn-s:hover{background:var(--bg-hover);color:var(--text-primary)}
-.th-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.th-opt{padding:10px 12px;border-radius:6px;cursor:pointer;border:2px solid transparent;font-size:11px;letter-spacing:.03em;transition:all .15s}
-.th-opt.on{border-color:var(--accent)!important}
-.th-dots{display:flex;gap:4px;margin-top:5px}
-.th-dot{width:10px;height:10px;border-radius:50%}
-.ex-opts{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
-.ex-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:6px;cursor:pointer;border:1px solid var(--border);background:var(--bg-tertiary);transition:all .15s}
-.ex-opt:hover{border-color:var(--accent);background:var(--bg-hover)}
-.ex-ico{font-size:20px;flex-shrink:0}
-.ex-lbl{font-size:12px;color:var(--text-primary)}
-.ex-dsc{font-size:10px;color:var(--text-muted)}
-@media(max-width:700px){
-  #sidebar{position:absolute;z-index:50;top:60px;left:0;height:calc(100dvh - 60px);width:85%!important;box-shadow:var(--shadow)}
-  #sidebar.closed{width:0!important}
-  #preview-pane{display:flex!important}
-  #editor-pane{display:none!important}
-  .vm-grp{display:none}
-}
-</style>
-</head>
-<body>
-<div id="app">
-  <button id="install-bar">⬇ Instalar Askesis-MD como aplicativo — funciona offline</button>
-  <div id="titlebar">
-    <span class="tb-logo">✦ Askesis-MD</span>
-    <div class="tb-sep"></div>
-    <button class="tb-btn on" id="btn-sidebar">☰</button>
-    <button class="tb-btn" id="btn-new">+ Nova</button>
-    <button class="tb-btn" id="btn-open">↙ Abrir</button>
-    <button class="tb-btn" id="btn-save">↓ Salvar</button>
-    <button class="tb-btn" id="btn-export">↗ Exportar</button>
-    <input type="file" id="file-open-input" accept=".md,.markdown,.txt" style="display:none" multiple/>
-    <div class="tb-spacer"></div>
-    <div class="vm-grp">
-      <button class="vm-btn" data-vm="editor">Editor</button>
-      <button class="vm-btn on" data-vm="split">Split</button>
-      <button class="vm-btn" data-vm="preview">Preview</button>
-    </div>
-    <div class="tb-sep"></div>
-    <button class="tb-btn" id="btn-focus">◎ Foco</button>
-    <button class="tb-btn" id="btn-theme">◑ Tema</button>
-  </div>
-  <div id="tabs-bar"><button id="tab-new">+</button></div>
-  <div id="main">
-    <div id="sidebar">
-      <div id="sb-header">
-        <div class="sb-tab on" data-sb="explorer">Notas</div>
-        <div class="sb-tab" data-sb="backlinks">Links</div>
-        <div class="sb-tab" data-sb="outline">Índice</div>
-      </div>
-      <div id="sb-body">
-        <div id="sb-search"><span style="color:var(--text-muted);font-size:13px">⌕</span><input type="text" placeholder="Buscar..." id="search-input"/></div>
-        <div id="sb-content"></div>
-      </div>
-    </div>
-    <div id="editor-area">
-      <div id="editor-pane">
-        <div id="editor-toolbar">
-          <button class="tbtn" data-fmt="bold">B</button>
-          <button class="tbtn" data-fmt="italic">I</button>
-          <button class="tbtn" data-fmt="strike">~~</button>
-          <div class="tsep"></div>
-          <button class="tbtn" data-fmt="h1">H1</button>
-          <button class="tbtn" data-fmt="h2">H2</button>
-          <button class="tbtn" data-fmt="h3">H3</button>
-          <div class="tsep"></div>
-          <button class="tbtn" data-fmt="quote">&gt;</button>
-          <button class="tbtn" data-fmt="hr">—</button>
-          <button class="tbtn" data-fmt="wiki">[[⇥]]</button>
-        </div>
-        <textarea id="editor" spellcheck="false" placeholder="Comece a escrever..."></textarea>
-      </div>
-      <div id="preview-pane">
-        <div id="preview-toolbar">Preview</div>
-        <div id="preview"></div>
-      </div>
-    </div>
-  </div>
-  <div id="statusbar">
-    <span id="st-id"></span><div class="st-sep"></div>
-    <span id="st-words">0 palavras</span><div class="st-sep"></div>
-    <span id="st-chars">0 chars</span><div class="st-sep"></div>
-    <span id="st-links">0 links</span><div class="st-sep"></div>
-    <span id="st-backlinks">0 backlinks</span><div class="st-sep"></div>
-    <span id="st-total">0 notas</span>
-    <div class="st-spacer"></div>
-    <span style="color:var(--tag-text)">● salvo</span><div class="st-sep"></div>
-    <span id="st-date"></span>
-  </div>
-</div>
-
-<!-- Modal: Nova nota -->
-<div class="overlay hidden" id="modal-new">
-  <div class="modal">
-    <h3>Nova Nota</h3>
-    <input class="modal-input" id="new-note-input" type="text" placeholder="Título da nota..."/>
-    <div class="modal-row">
-      <button class="btn btn-s" id="btn-new-cancel">Cancelar</button>
-      <button class="btn btn-p" id="btn-new-confirm">Criar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Exportar -->
-<div class="overlay hidden" id="modal-export">
-  <div class="modal">
-    <h3 id="export-title">Exportar</h3>
-    <div class="ex-opts">
-      <div class="ex-opt" data-fmt="markdown"><span class="ex-ico">⬇</span><div><div class="ex-lbl">Markdown</div><div class="ex-dsc">.md — formato nativo</div></div></div>
-      <div class="ex-opt" data-fmt="html"><span class="ex-ico">🌐</span><div><div class="ex-lbl">HTML</div><div class="ex-dsc">.html — página web com estilo</div></div></div>
-      <div class="ex-opt" data-fmt="fodt"><span class="ex-ico">📝</span><div><div class="ex-lbl">Flat OpenDocument</div><div class="ex-dsc">.fodt — compatível com LibreOffice / Word</div></div></div>
-      <div class="ex-opt" data-fmt="rtf"><span class="ex-ico">📋</span><div><div class="ex-lbl">Rich Text Format</div><div class="ex-dsc">.rtf — compatível com Word, Pages, Writer</div></div></div>
-      <div class="ex-opt" data-fmt="text"><span class="ex-ico">📄</span><div><div class="ex-lbl">Texto Simples</div><div class="ex-dsc">.txt — sem formatação</div></div></div>
-    </div>
-    <div class="modal-row"><button class="btn btn-s" id="btn-export-close">Fechar</button></div>
-  </div>
-</div>
-
-<!-- Modal: Tema -->
-<div class="overlay hidden" id="modal-theme">
-  <div class="modal">
-    <h3>Tema Visual</h3>
-    <div class="th-grid" id="theme-grid"></div>
-    <div class="modal-row"><button class="btn btn-s" id="btn-theme-close">Fechar</button></div>
-  </div>
-</div>
-
-<script>
-const THEMES={
-  "askesis-dark":{label:"Askesis Dark",vars:{"--bg-primary":"#0d0d0d","--bg-secondary":"#141414","--bg-tertiary":"#1a1a1a","--bg-hover":"#222","--bg-active":"#2a2a2a","--border":"#2a2a2a","--border-light":"#1f1f1f","--text-primary":"#e8e4dc","--text-secondary":"#8a8680","--text-muted":"#4a4845","--accent":"#c9a96e","--accent-dim":"#7a6640","--link":"#7eb8c9","--tag":"#2a2010","--tag-text":"#c9a96e","--scrollbar":"#2a2a2a","--shadow":"0 8px 32px rgba(0,0,0,.7)","--editor-bg":"#0f0f0f","--preview-bg":"#0f0f0f","--code-bg":"#1a1a1a","--selection":"rgba(201,169,110,.2)"}},
-  "askesis-light":{label:"Askesis Light",vars:{"--bg-primary":"#f5f1ea","--bg-secondary":"#ede9e1","--bg-tertiary":"#e5e0d8","--bg-hover":"#ddd9d0","--bg-active":"#d5d0c6","--border":"#ccc8be","--border-light":"#ddd9d0","--text-primary":"#2c2a26","--text-secondary":"#6b6760","--text-muted":"#b0ada6","--accent":"#8b6914","--accent-dim":"#c9a850","--link":"#2a6e87","--tag":"#f0e8d0","--tag-text":"#7a5a10","--scrollbar":"#ccc8be","--shadow":"0 8px 32px rgba(0,0,0,.12)","--editor-bg":"#faf6ef","--preview-bg":"#faf6ef","--code-bg":"#ede9e1","--selection":"rgba(139,105,20,.15)"}},
-  "hc-dark":{label:"Alto Contraste Escuro",vars:{"--bg-primary":"#000","--bg-secondary":"#080808","--bg-tertiary":"#111","--bg-hover":"#1c1c1c","--bg-active":"#242424","--border":"#383838","--border-light":"#242424","--text-primary":"#fff","--text-secondary":"#ccc","--text-muted":"#666","--accent":"#ffcc00","--accent-dim":"#7a6200","--link":"#66ccff","--tag":"#002800","--tag-text":"#66ff66","--scrollbar":"#333","--shadow":"0 8px 32px rgba(0,0,0,.95)","--editor-bg":"#000","--preview-bg":"#000","--code-bg":"#0c0c0c","--selection":"rgba(255,204,0,.25)"}},
-  "hc-light":{label:"Alto Contraste Claro",vars:{"--bg-primary":"#fff","--bg-secondary":"#f0f0f0","--bg-tertiary":"#e0e0e0","--bg-hover":"#d0d0d0","--bg-active":"#c0c0c0","--border":"#000","--border-light":"#888","--text-primary":"#000","--text-secondary":"#111","--text-muted":"#444","--accent":"#0033cc","--accent-dim":"#6688dd","--link":"#0000cc","--tag":"#e8ffe8","--tag-text":"#004400","--scrollbar":"#888","--shadow":"0 8px 32px rgba(0,0,0,.3)","--editor-bg":"#fff","--preview-bg":"#fff","--code-bg":"#eee","--selection":"rgba(0,51,204,.15)"}},
-  "nord":{label:"Nord Calm",vars:{"--bg-primary":"#2e3440","--bg-secondary":"#282e3c","--bg-tertiary":"#232934","--bg-hover":"#3b4252","--bg-active":"#434c5e","--border":"#3b4252","--border-light":"#2e3440","--text-primary":"#d8dee9","--text-secondary":"#9aa4b8","--text-muted":"#555e72","--accent":"#88c0d0","--accent-dim":"#4c7a8a","--link":"#81a1c1","--tag":"#2a3828","--tag-text":"#a3be8c","--scrollbar":"#3b4252","--shadow":"0 8px 32px rgba(0,0,0,.5)","--editor-bg":"#2a3040","--preview-bg":"#2a3040","--code-bg":"#232934","--selection":"rgba(136,192,208,.2)"}},
-  "solarized":{label:"Solarized Warm",vars:{"--bg-primary":"#fdf6e3","--bg-secondary":"#f5eed4","--bg-tertiary":"#ede6cb","--bg-hover":"#e5ddbf","--bg-active":"#ddd6b5","--border":"#d0c9a8","--border-light":"#e5ddbf","--text-primary":"#586e75","--text-secondary":"#839496","--text-muted":"#b8c0bb","--accent":"#cb4b16","--accent-dim":"#d3956a","--link":"#268bd2","--tag":"#f0f8e0","--tag-text":"#859900","--scrollbar":"#d0c9a8","--shadow":"0 8px 32px rgba(0,0,0,.1)","--editor-bg":"#fdf6e3","--preview-bg":"#fdf6e3","--code-bg":"#eee8d5","--selection":"rgba(203,75,22,.12)"}},
-};
-
-const DN=[
-  {id:"202605151000",title:"Bem-vindo ao Askesis-MD",tags:["início","guia"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Bem-vindo ao Askesis-MD\nid: 202605151000\ntags: [início, guia]\ncreated: 2026-05-15\n---\n\n# Bem-vindo ao Askesis-MD\n\n> *\"Um ambiente cognitivo de permanência.\"*\n\nO **Askesis-MD** é um editor Markdown local-first com sistema [[Zettelkasten]] integrado. Projetado para longas sessões de estudo e escrita profunda.\n\n## Funcionalidades Principais\n\n- **Múltiplas abas** — navegue entre notas sem perder contexto\n- **Links bidirecionais** — use `[[título da nota]]` para conectar ideias\n- **Backlinks** — veja quais notas apontam para a atual\n- **6 temas** — do alto contraste ao Solarized suave\n- **Exportação** — Markdown, HTML e texto simples\n- **Modo foco** — elimine distrações, Esc para sair\n- **PWA** — instale como app offline\n\n## Sintaxe Markdown\n\n### Texto\n\nVocê pode usar **negrito**, *itálico*, ~~tachado~~ e `código inline`.\n\n### Listas\n\n- Item um\n- Item dois\n  - Subitem aninhado\n- Item três\n\n### Código\n\n```javascript\nfunction zettelkasten(nota) {\n  return nota.links.map(link => buscar(link));\n}\n```\n\n### Tabela\n\n| Ferramenta | Tipo | Local-first |\n|---|---|---|\n| Askesis-MD | Zettelkasten | ✓ |\n| Obsidian | PKM | ✓ |\n| Notion | Wiki | ✗ |\n\n### Citação\n\n> A escrita é o pensamento tornado visível.\n\n## Como usar links\n\nCrie um link para [[Zettelkasten]] assim: coloque o título entre colchetes duplos.\n\n---\n\n*Suas notas são salvas automaticamente no navegador (localStorage).*\n"},
-  {id:"202605151001",title:"Zettelkasten",tags:["método","conhecimento"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Zettelkasten\nid: 202605151001\ntags: [método, conhecimento]\ncreated: 2026-05-15\n---\n\n# Zettelkasten\n\nO **Zettelkasten** é um método de gestão do conhecimento do sociólogo Niklas Luhmann.\n\n## Princípios\n\n1. **Atomicidade** — uma ideia por nota\n2. **Autonomia** — cada nota compreensível por si\n3. **Conexão** — notas ligadas entre si\n4. **Indexação** — ponto de entrada organizado\n\n## IDs Atômicos\n\n```\n202605151001\n202605151001-zettelkasten\n```\n\n## No Askesis-MD\n\nUse `[[título]]` para links. Veja [[Bem-vindo ao Askesis-MD]] para começar.\n\n## Referências\n\n- Luhmann, N. *Kommunikation mit Zettelkästen* (1981)\n- Ahrens, S. *How to Take Smart Notes* (2017)\n"},
-  {id:"202605151002",title:"Filosofia do Estudo",tags:["filosofia","estudo"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Filosofia do Estudo\nid: 202605151002\ntags: [filosofia, estudo]\ncreated: 2026-05-15\n---\n\n# Filosofia do Estudo\n\n> *\"Não basta acumular informação — é preciso cultivar compreensão.\"*\n\n## Estudo como Askesis\n\n*Askesis* (ἄσκησις) — prática disciplinada, exercício espiritual.\n\n- requer **quietude**\n- exige **presença**\n- produz **transformação**\n\n## Conexão com [[Zettelkasten]]\n\nAo externalizar conexões, liberamos memória de trabalho para pensar com mais profundidade.\n\n## Práticas\n\n- Escreva **durante** a leitura\n- Prefira **elaboração** à cópia\n- Conecte cada nota a pelo menos uma existente\n\n---\n\n*\"A mente não é um recipiente a ser preenchido, mas um fogo a ser aceso.\"* — Plutarco\n"},
-];
-
-// ── State ──
-let notes=(() => { try{const s=localStorage.getItem("askesis-notes");return s?JSON.parse(s):DN;}catch{return DN;} })();
-let currentTheme=localStorage.getItem("askesis-theme")||"askesis-dark";
-let tabs=[{noteId:"202605151000"}];
-let activeTab=0;
-let viewMode="split";
-let sidebarMode="explorer";
-let sidebarOpen=true;
-let focusMode=false;
-let searchQuery="";
-let installPromptEvent=null;
-
-// ── Utils ──
-function genId(){const n=new Date();return n.getFullYear()+String(n.getMonth()+1).padStart(2,"0")+String(n.getDate()).padStart(2,"0")+String(n.getHours()).padStart(2,"0")+String(n.getMinutes()).padStart(2,"0");}
-function tod(){return new Date().toISOString().slice(0,10);}
-function save(){try{localStorage.setItem("askesis-notes",JSON.stringify(notes));}catch{}}
-function curNote(){return notes.find(n=>n.id===tabs[activeTab]?.noteId);}
-function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-
-// ── Markdown ──
-function inline(text){
-  let t=esc(text);
-  t=t.replace(/\[\[([^\]]+)\]\]/g,(_,title)=>{
-    const f=notes.find(n=>n.title.toLowerCase()===title.toLowerCase());
-    return `<span class="wikilink ${f?"wikilink-exists":"wikilink-missing"}" data-noteid="${f?f.id:""}" data-title="${title}">${title}</span>`;
-  });
-  t=t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
-  t=t.replace(/__(.+?)__/g,"<strong>$1</strong>");
-  t=t.replace(/\*(.+?)\*/g,"<em>$1</em>");
-  t=t.replace(/_(.+?)_/g,"<em>$1</em>");
-  t=t.replace(/~~(.+?)~~/g,"<del>$1</del>");
-  t=t.replace(/`([^`]+)`/g,"<code>$1</code>");
-  t=t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-  return t;
-}
-
-function md(text){
-  if(!text) return "";
-  const lines=text.split("\n");
-  let html="",inCode=false,codeLang="",codeBuf=[],inTable=false,tableBuf=[],stack=[],inFM=false,i=0;
-  const flushList=()=>{while(stack.length) html+=`</${stack.pop()}>`};
-  const flushTable=()=>{
-    if(!tableBuf.length) return;
-    let o="<table><thead><tr>";
-    tableBuf[0].split("|").filter(c=>c.trim()).forEach(h=>o+=`<th>${inline(h.trim())}</th>`);
-    o+="</tr></thead><tbody>";
-    for(let r=2;r<tableBuf.length;r++){o+="<tr>";tableBuf[r].split("|").filter(c=>c.trim()).forEach(c=>o+=`<td>${inline(c.trim())}</td>`);o+="</tr>";}
-    o+="</tbody></table>";html+=o;tableBuf=[];inTable=false;
-  };
-  while(i<lines.length){
-    const l=lines[i];
-    if(i===0&&l==="---"){inFM=true;i++;continue;}
-    if(inFM&&l==="---"){inFM=false;i++;continue;}
-    if(inFM){i++;continue;}
-    if(l.startsWith("```")){
-      if(!inCode){flushList();flushTable();inCode=true;codeLang=l.slice(3).trim();codeBuf=[];}
-      else{html+=`<pre><code class="lang-${codeLang}">${codeBuf.map(esc).join("\n")}</code></pre>`;inCode=false;codeBuf=[];}
-      i++;continue;
-    }
-    if(inCode){codeBuf.push(l);i++;continue;}
-    if(l.includes("|")&&!l.match(/^#{1,6}\s/)){inTable=true;tableBuf.push(l);i++;continue;}
-    if(inTable&&!l.includes("|")) flushTable();
-    const hm=l.match(/^(#{1,6})\s+(.+)/);
-    if(hm){flushList();html+=`<h${hm[1].length}>${inline(hm[2])}</h${hm[1].length}>`;i++;continue;}
-    if(/^-{3,}$/.test(l.trim())){flushList();html+="<hr>";i++;continue;}
-    if(l.startsWith("> ")){flushList();html+=`<blockquote>${inline(l.slice(2))}</blockquote>`;i++;continue;}
-    const ulm=l.match(/^(\s*)[-*+]\s+(.+)/);
-    if(ulm){const d=Math.floor(ulm[1].length/2);while(stack.length>d+1)html+=`</${stack.pop()}>`;if(stack.length<=d){html+="<ul>";stack.push("ul");}html+=`<li>${inline(ulm[2])}</li>`;i++;continue;}
-    const olm=l.match(/^(\s*)\d+\.\s+(.+)/);
-    if(olm){const d=Math.floor(olm[1].length/2);while(stack.length>d+1)html+=`</${stack.pop()}>`;if(stack.length<=d){html+="<ol>";stack.push("ol");}html+=`<li>${inline(olm[2])}</li>`;i++;continue;}
-    if(l.trim()===""){flushList();if(!inTable)html+=`<div class="spacer"></div>`;i++;continue;}
-    flushList();html+=`<p>${inline(l)}</p>`;i++;
-  }
-  flushList();flushTable();return html;
-}
-
-// ── Export ──
-function mdToPlain(content){
-  return content.replace(/^---[\s\S]*?---\n/,"").replace(/#{1,6}\s+/g,"").replace(/\*\*(.+?)\*\*/g,"$1").replace(/\*(.+?)\*/g,"$1").replace(/`(.+?)`/g,"$1").replace(/\[\[(.+?)\]\]/g,"$1").replace(/\[(.+?)\]\(.+?\)/g,"$1");
-}
-function mdToFodt(note){
-  const plain=mdToPlain(note.content);
-  const lines=plain.split("\n");
-  let body="";
-  for(const l of lines){
-    const t=l.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    if(!t.trim()){body+=`<text:p text:style-name="Text_20_Body"/>`;continue;}
-    body+=`<text:p text:style-name="Text_20_Body">${t}</text:p>`;
-  }
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
-  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
-  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
-  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
-  office:mimetype="application/vnd.oasis.opendocument.text"
-  office:version="1.3">
-<office:styles>
-  <style:style style:name="Text_20_Body" style:family="paragraph">
-    <style:paragraph-properties fo:margin-bottom="0.2cm"/>
-    <style:text-properties fo:font-size="11pt" fo:font-family="Georgia,serif" fo:line-height="180%"/>
-  </style:style>
-  <style:style style:name="Heading_20_1" style:family="paragraph">
-    <style:text-properties fo:font-size="18pt" fo:font-weight="bold"/>
-  </style:style>
-</office:styles>
-<office:body><office:text>
-  <text:p text:style-name="Heading_20_1">${note.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</text:p>
-  ${body}
-</office:text></office:body>
-</office:document>`;
-}
-function mdToRtf(note){
-  const plain=mdToPlain(note.content);
-  // RTF-encode: escape backslash, braces, non-ASCII
-  const rtfEsc=s=>s.replace(/\\/g,"\\\\").replace(/\{/g,"\\{").replace(/\}/g,"\\}").replace(/[^\x00-\x7F]/g,c=>{const cp=c.codePointAt(0);return `\\u${cp}?`;});
-  const lines=plain.split("\n").map(l=>rtfEsc(l));
-  const body=lines.map(l=>l.trim()?`\\pard\\sa120\\sl360\\slmult1 ${l}\\par`:"\\pard\\sa120\\par").join("\n");
-  return `{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Georgia;}{\\f1 IBM Plex Mono;}}
-{\\colortbl ;\\red44\\green42\\blue38;}
-\\deflang1046\\widowctrl\\hyphauto
-\\pard\\sa200\\b\\fs36 ${rtfEsc(note.title)}\\b0\\par
-${body}
-}`;
-}
-function doExport(note,fmt){
-  let c="",mime="text/plain",ext="txt";
-  if(fmt==="markdown"){c=note.content;mime="text/markdown";ext="md";}
-  else if(fmt==="html"){
-    const body=md(note.content);
-    c=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${note.title}</title><style>body{font-family:Georgia,serif;max-width:760px;margin:60px auto;padding:0 20px;line-height:1.8;color:#2c2a26}code{background:#f0ece2;padding:2px 6px;border-radius:3px;font-size:.9em}pre{background:#f0ece2;padding:16px;border-radius:6px;overflow-x:auto}blockquote{border-left:3px solid #c9a96e;padding-left:16px;color:#7a6640;margin:0;font-style:italic}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px 12px}th{background:#f5f0e8}.wikilink{color:#2a6e87}</style></head><body>${body}</body></html>`;
-    mime="text/html";ext="html";
-  } else if(fmt==="fodt"){
-    c=mdToFodt(note);mime="application/vnd.oasis.opendocument.text-flat-xml";ext="fodt";
-  } else if(fmt==="rtf"){
-    c=mdToRtf(note);mime="application/rtf";ext="rtf";
-  } else {
-    c=mdToPlain(note.content);
-  }
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([c],{type:mime}));
-  a.download=`${note.title.replace(/\s+/g,"-")}.${ext}`;a.click();
-}
-
-// ── Theme ──
-function applyTheme(key){
-  currentTheme=key;
-  const v=THEMES[key].vars,r=document.documentElement;
-  Object.entries(v).forEach(([k,val])=>r.style.setProperty(k,val));
-  document.getElementById("theme-color-meta").setAttribute("content",v["--bg-primary"]);
-  localStorage.setItem("askesis-theme",key);
-  renderThemeGrid();
-}
-function renderThemeGrid(){
-  const g=document.getElementById("theme-grid"); g.innerHTML="";
-  Object.entries(THEMES).forEach(([key,t])=>{
-    const v=t.vars,d=document.createElement("div");
-    d.className="th-opt"+(currentTheme===key?" on":"");
-    d.style.cssText=`background:${v["--bg-secondary"]};color:${v["--text-primary"]};border-color:${currentTheme===key?v["--accent"]:v["--border"]}`;
-    d.innerHTML=`<div style="font-size:11px;margin-bottom:5px">${t.label}</div><div class="th-dots">${[v["--accent"],v["--link"],v["--tag-text"],v["--text-secondary"]].map(c=>`<div class="th-dot" style="background:${c}"></div>`).join("")}</div>`;
-    d.onclick=()=>{applyTheme(key);closeModal("modal-theme");};
-    g.appendChild(d);
-  });
-}
-
-// ── Tabs ──
-function renderTabs(){
-  const bar=document.getElementById("tabs-bar"); bar.innerHTML="";
-  tabs.forEach((tab,idx)=>{
-    const note=notes.find(n=>n.id===tab.noteId);
-    const d=document.createElement("div");
-    d.className="tab"+(activeTab===idx?" on":"");
-    d.innerHTML=`<span class="tab-name">${note?note.title:"Sem título"}</span><span class="tab-x">×</span>`;
-    d.onclick=(e)=>{if(e.target.classList.contains("tab-x")){closeTab(idx);return;}setActiveTab(idx);};
-    bar.appendChild(d);
-  });
-  const nb=document.createElement("button");
-  nb.id="tab-new";nb.textContent="+";nb.onclick=()=>openModal("modal-new");
-  bar.appendChild(nb);
-}
-function setActiveTab(idx){activeTab=idx;renderTabs();renderEditor();renderSidebar();renderStatus();}
-function closeTab(idx){if(tabs.length===1)return;tabs.splice(idx,1);activeTab=Math.min(activeTab,tabs.length-1);renderTabs();renderEditor();renderSidebar();renderStatus();}
-function openNote(noteId){
-  const idx=tabs.findIndex(t=>t.noteId===noteId);
-  if(idx>=0){activeTab=idx;}else{tabs.push({noteId});activeTab=tabs.length-1;}
-  renderTabs();renderEditor();renderSidebar();renderStatus();
-}
-
-// ── Editor ──
-function renderEditor(){const n=curNote();document.getElementById("editor").value=n?n.content:"";renderPreview();}
-function renderPreview(){const n=curNote();document.getElementById("preview").innerHTML=n?md(n.content):"";}
-
-// ── Sidebar ──
-function renderSidebar(){
-  const note=curNote();
-  const cont=document.getElementById("sb-content");
-  const q=searchQuery.toLowerCase();
-  const filtered=q?notes.filter(n=>n.title.toLowerCase().includes(q)||n.content.toLowerCase().includes(q)||n.tags?.some(t=>t.toLowerCase().includes(q))):notes;
-  const backlinks=note?notes.filter(n=>n.id!==note.id&&n.content.toLowerCase().includes(`[[${note.title.toLowerCase()}]]`)):[];
-  const outline=note?note.content.split("\n").filter(l=>l.match(/^#{1,4}\s+/)).map(l=>{const m=l.match(/^(#{1,4})\s+(.+)/);return{level:m[1].length,text:m[2]};}) : [];
-
-  if(sidebarMode==="explorer"){
-    if(!filtered.length){cont.innerHTML=`<div class="sb-empty">Nenhuma nota encontrada.</div>`;return;}
-    cont.innerHTML=filtered.map(n=>`<div class="ni${n.id===tabs[activeTab]?.noteId?" on":""}" data-id="${n.id}"><button class="ni-del" data-del="${n.id}">✕</button><div class="ni-title">${n.title}</div><div class="ni-meta">${n.updated}</div>${n.tags?.length?`<div class="ni-tags">${n.tags.map(t=>`<span class="chip">${t}</span>`).join("")}</div>`:""}</div>`).join("");
-    cont.querySelectorAll(".ni").forEach(el=>el.onclick=e=>{if(e.target.dataset.del){deleteNote(e.target.dataset.del);return;}openNote(el.dataset.id);});
-  } else if(sidebarMode==="backlinks"){
-    let h=`<div class="sb-sec">Backlinks → ${note?note.title:""}</div>`;
-    if(!backlinks.length) h+=`<div class="sb-empty">Nenhuma nota aponta para esta.</div>`;
-    else backlinks.forEach(n=>{h+=`<div class="bl-item" data-id="${n.id}">${n.title}</div>`;});
-    h+=`<div class="sb-sec" style="margin-top:14px">Links nesta nota</div>`;
-    const wl=note?(note.content.match(/\[\[([^\]]+)\]\]/g)||[]):[];
-    if(!wl.length) h+=`<div class="sb-empty">Nenhum link.</div>`;
-    else wl.forEach(m=>{const t=m.slice(2,-2),f=notes.find(n=>n.title.toLowerCase()===t.toLowerCase());h+=`<div class="bl-item" style="opacity:${f?1:.5};cursor:${f?"pointer":"default"}" data-id="${f?f.id:""}">${f?"→":"⊘"} ${t}</div>`;});
-    cont.innerHTML=h;
-    cont.querySelectorAll(".bl-item[data-id]").forEach(el=>{if(el.dataset.id) el.onclick=()=>openNote(el.dataset.id);});
-  } else {
-    let h=`<div class="sb-sec">Estrutura</div>`;
-    if(!outline.length) h+=`<div class="sb-empty">Sem cabeçalhos.</div>`;
-    else outline.forEach(it=>{h+=`<div class="ol-item" style="padding-left:${(it.level-1)*12+8}px"><span style="color:var(--accent-dim);margin-right:4px;font-size:9px">${"#".repeat(it.level)}</span>${it.text}</div>`;});
-    cont.innerHTML=h;
-  }
-}
-
-// ── Status ──
-function renderStatus(){
-  const n=curNote(),c=n?n.content:"";
-  const bl=n?notes.filter(x=>x.id!==n.id&&x.content.toLowerCase().includes(`[[${n.title.toLowerCase()}]]`)).length:0;
-  document.getElementById("st-id").textContent=n?n.id:"";
-  document.getElementById("st-words").textContent=c.split(/\s+/).filter(Boolean).length+" palavras";
-  document.getElementById("st-chars").textContent=c.length+" chars";
-  document.getElementById("st-links").textContent=(c.match(/\[\[([^\]]+)\]\]/g)||[]).length+" links";
-  document.getElementById("st-backlinks").textContent=bl+" backlinks";
-  document.getElementById("st-total").textContent=notes.length+" notas";
-  document.getElementById("st-date").textContent=n?n.updated:"";
-}
-
-// ── Notes CRUD ──
-function createNote(title){
-  const id=genId(),t=tod();
-  const note={id,title,tags:[],created:t,updated:t,content:`---\ntitle: ${title}\nid: ${id}\ntags: []\ncreated: ${t}\n---\n\n# ${title}\n\n`};
-  notes.push(note);save();openNote(id);
-}
-function deleteNote(id){
-  if(!confirm("Excluir esta nota?")) return;
-  notes=notes.filter(n=>n.id!==id);
-  tabs=tabs.filter(t=>t.noteId!==id);
-  if(!tabs.length) tabs=[{noteId:notes[0]?.id||""}];
-  activeTab=Math.min(activeTab,tabs.length-1);
-  save();renderTabs();renderEditor();renderSidebar();renderStatus();
-}
-function updateNote(content){const n=curNote();if(!n)return;n.content=content;n.updated=tod();save();renderPreview();renderSidebar();renderStatus();}
-
-// ── Modals ──
-function openModal(id){
-  document.getElementById(id).classList.remove("hidden");
-  if(id==="modal-new"){const inp=document.getElementById("new-note-input");inp.value="";inp.focus();}
-  if(id==="modal-export"){const n=curNote();document.getElementById("export-title").textContent="Exportar"+(n?" — "+n.title:"");}
-  if(id==="modal-theme") renderThemeGrid();
-}
-function closeModal(id){document.getElementById(id).classList.add("hidden");}
-
-// ── View ──
-function setViewMode(vm){
-  viewMode=vm;
-  document.querySelectorAll(".vm-btn").forEach(b=>b.classList.toggle("on",b.dataset.vm===vm));
-  const ep=document.getElementById("editor-pane"),pp=document.getElementById("preview-pane"),ptb=document.getElementById("preview-toolbar");
-  if(vm==="editor"){ep.className="";pp.className="hidden";ptb.className="hidden";}
-  else if(vm==="preview"){pp.className="solo";ep.className="hidden";ptb.className="hidden";}
-  else{ep.className="";pp.className="";ptb.className="";}
-}
-function setFocusMode(on){
-  focusMode=on;
-  document.getElementById("editor-area").classList.toggle("focus-mode",on);
-  document.getElementById("btn-focus").classList.toggle("on",on);
-  if(on){setViewMode("editor");}else{setViewMode("split");}
-}
-
-// ── Toolbar insert ──
-function insertFmt(fmt){
-  const ta=document.getElementById("editor"),s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.slice(s,e);
-  const map={bold:`**${sel||"texto"}**`,italic:`*${sel||"texto"}*`,strike:`~~${sel||"texto"}~~`,h1:`# ${sel||"Título"}`,h2:`## ${sel||"Título"}`,h3:`### ${sel||"Título"}`,quote:`> ${sel||""}`,hr:"\n---\n",wiki:`[[${sel||""}]]`};
-  const ins=map[fmt]||"";
-  ta.value=ta.value.slice(0,s)+ins+ta.value.slice(e);
-  ta.selectionStart=ta.selectionEnd=s+ins.length;
-  ta.focus();updateNote(ta.value);
-}
-
-// ── Events ──
-document.getElementById("btn-sidebar").onclick=()=>{sidebarOpen=!sidebarOpen;document.getElementById("sidebar").classList.toggle("closed",!sidebarOpen);document.getElementById("btn-sidebar").classList.toggle("on",sidebarOpen);};
-document.getElementById("btn-new").onclick=()=>openModal("modal-new");
-
-// ── Open file(s) ──
-const fileHandles={}; // noteId -> FileSystemFileHandle (if available)
-document.getElementById("btn-open").onclick=async()=>{
-  if(window.showOpenFilePicker){
-    try{
-      const handles=await window.showOpenFilePicker({multiple:true,types:[{description:"Markdown",accept:{"text/markdown":[".md",".markdown",".txt"]}}]});
-      for(const handle of handles){
-        const file=await handle.getFile();
-        const content=await file.text();
-        const title=file.name.replace(/\.(md|markdown|txt)$/i,"");
-        const existing=notes.find(n=>n.title===title);
-        if(existing){existing.content=content;existing.updated=tod();fileHandles[existing.id]=handle;save();openNote(existing.id);}
-        else{const id=genId(),t=tod();const note={id,title,tags:[],created:t,updated:t,content};notes.push(note);fileHandles[id]=handle;save();openNote(id);}
-      }
-      renderSidebar();renderStatus();
-    }catch(e){if(e.name!=="AbortError")alert("Erro ao abrir: "+e.message);}
-  } else {
-    document.getElementById("file-open-input").click();
-  }
-};
-document.getElementById("file-open-input").onchange=async(e)=>{
-  for(const file of e.target.files){
-    const content=await file.text();
-    const title=file.name.replace(/\.(md|markdown|txt)$/i,"");
-    const existing=notes.find(n=>n.title===title);
-    if(existing){existing.content=content;existing.updated=tod();save();openNote(existing.id);}
-    else{const id=genId(),t=tod();const note={id,title,tags:[],created:t,updated:t,content};notes.push(note);save();openNote(note.id);}
-  }
-  e.target.value="";
-  renderSidebar();renderStatus();
-};
-
-// ── Save file ──
-document.getElementById("btn-save").onclick=async()=>{
-  const n=curNote();if(!n)return;
-  if(window.showSaveFilePicker){
-    try{
-      let handle=fileHandles[n.id];
-      if(!handle){
-        handle=await window.showSaveFilePicker({suggestedName:`${n.title.replace(/\s+/g,"-")}.md`,types:[{description:"Markdown",accept:{"text/markdown":[".md"]}}]});
-        fileHandles[n.id]=handle;
-      }
-      const writable=await handle.createWritable();
-      await writable.write(n.content);
-      await writable.close();
-    }catch(e){if(e.name!=="AbortError")alert("Erro ao salvar: "+e.message);}
-  } else {
-    // fallback: download
-    const a=document.createElement("a");
-    a.href=URL.createObjectURL(new Blob([n.content],{type:"text/markdown"}));
-    a.download=`${n.title.replace(/\s+/g,"-")}.md`;a.click();
-  }
-};
-document.getElementById("btn-export").onclick=()=>openModal("modal-export");
-document.getElementById("btn-theme").onclick=()=>openModal("modal-theme");
-document.getElementById("btn-focus").onclick=()=>setFocusMode(!focusMode);
-document.getElementById("btn-new-cancel").onclick=()=>closeModal("modal-new");
-document.getElementById("btn-new-confirm").onclick=()=>{const t=document.getElementById("new-note-input").value.trim();if(t){createNote(t);closeModal("modal-new");}};
-document.getElementById("new-note-input").onkeydown=e=>{if(e.key==="Enter"){const t=e.target.value.trim();if(t){createNote(t);closeModal("modal-new");}}if(e.key==="Escape")closeModal("modal-new");};
-document.getElementById("btn-export-close").onclick=()=>closeModal("modal-export");
-document.querySelectorAll(".ex-opt").forEach(el=>el.onclick=()=>{const n=curNote();if(n)doExport(n,el.dataset.fmt);closeModal("modal-export");});
-document.getElementById("btn-theme-close").onclick=()=>closeModal("modal-theme");
-document.querySelectorAll(".vm-btn").forEach(b=>b.onclick=()=>setViewMode(b.dataset.vm));
-document.querySelectorAll(".sb-tab").forEach(tab=>tab.onclick=()=>{
-  sidebarMode=tab.dataset.sb;
-  document.querySelectorAll(".sb-tab").forEach(t=>t.classList.toggle("on",t.dataset.sb===sidebarMode));
-  document.getElementById("sb-search").style.display=sidebarMode==="explorer"?"flex":"none";
-  renderSidebar();
-});
-document.getElementById("search-input").oninput=e=>{searchQuery=e.target.value;renderSidebar();};
-document.getElementById("editor").oninput=e=>updateNote(e.target.value);
-document.getElementById("editor").onkeydown=e=>{
-  if(e.key==="Tab"){e.preventDefault();const ta=e.target,s=ta.selectionStart;ta.value=ta.value.slice(0,s)+"  "+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+2;updateNote(ta.value);}
-  if(e.key==="Escape"&&focusMode) setFocusMode(false);
-};
-document.querySelectorAll(".tbtn").forEach(b=>b.onclick=()=>insertFmt(b.dataset.fmt));
-document.getElementById("preview").onclick=e=>{
-  const el=e.target.closest(".wikilink");if(!el)return;
-  const id=el.dataset.noteid,title=el.dataset.title;
-  if(id){openNote(id);return;}
-  if(confirm(`Criar nova nota: "${title}"?`)) createNote(title);
-};
-document.querySelectorAll(".overlay").forEach(ov=>ov.onclick=e=>{if(e.target===ov)ov.classList.add("hidden");});
-
-// ── PWA ──
-window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPromptEvent=e;document.getElementById("install-bar").classList.add("visible");});
-window.addEventListener("appinstalled",()=>document.getElementById("install-bar").classList.remove("visible"));
-document.getElementById("install-bar").onclick=()=>{if(installPromptEvent){installPromptEvent.prompt();installPromptEvent=null;document.getElementById("install-bar").classList.remove("visible");}};
-
-if("serviceWorker" in navigator){
-  const sw=`const C="askesis-v2";self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C).map(n=>caches.delete(n))))));self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.open(C).then(cache=>fetch(e.request).then(r=>{cache.put(e.request,r.clone());return r;}).catch(()=>caches.match(e.request))));});`;
-  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(()=>{});
-}
-
-// Manifest
-const mf={name:"Askesis-MD",short_name:"Askesis",description:"Editor Markdown Zettelkasten",theme_color:"#0d0d0d",background_color:"#0d0d0d",display:"standalone",start_url:".",icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d0d0d'/><text x='256' y='360' font-family='serif' font-size='300' text-anchor='middle' fill='%23c9a96e'>✦</text></svg>",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
-const ml=document.createElement("link");ml.rel="manifest";ml.href="data:application/manifest+json,"+encodeURIComponent(JSON.stringify(mf));document.head.appendChild(ml);
-
-// ── Init ──
-applyTheme(currentTheme);
-renderTabs();
-renderEditor();
-renderSidebar();
-renderStatus();
-setViewMode("split");
 </script>
 </body>
 </html>
