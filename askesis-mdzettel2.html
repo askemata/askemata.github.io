@@ -103,13 +103,13 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
 .ft-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ft-children{display:none}
 .ft-children.open{display:block}
-.ft-note{display:flex;align-items:center;gap:0;padding:2px 6px 2px 0;border-radius:3px;cursor:pointer;transition:all .1s;position:relative}
+.ft-note{display:flex;align-items:center;padding:3px 4px 3px 0;border-radius:3px;cursor:pointer;transition:background .1s;min-width:0}
 .ft-note:hover{background:var(--bg-hover)}
 .ft-note.on{background:var(--bg-active)}
-.ft-note-title{font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;padding-left:4px}
+.ft-note-title{font-size:11px;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .ft-note.on .ft-note-title{color:var(--accent)}
-.ft-note-del{opacity:0;font-size:10px;color:var(--text-muted);cursor:pointer;padding:1px 5px;border-radius:2px;border:none;background:transparent;font-family:inherit;flex-shrink:0;transition:all .12s}
-.ft-note:hover .ft-note-del{opacity:.4}
+.ft-note-del{opacity:0;font-size:10px;color:var(--text-muted);cursor:pointer;padding:2px 5px;border-radius:2px;border:none;background:transparent;font-family:inherit;flex-shrink:0;line-height:1;transition:opacity .12s}
+.ft-note:hover .ft-note-del{opacity:.45}
 .ft-note-del:hover{opacity:1!important;color:#e05050;background:rgba(200,0,50,.08)}
 #editor-area{flex:1;display:flex;overflow:hidden}
 #editor-pane,#preview-pane{flex:1;display:flex;flex-direction:column;overflow:hidden}
@@ -895,32 +895,30 @@ function renderSidebar(){
   }
 }
 
-// ── Build folder tree HTML recursively ──
+// ── Build folder tree HTML — iterates node.items (pre-sorted, unified) ──
 function renderFolderTree(node, depth){
   const activeId=tabs[activeTab]?.noteId;
-  const indent=depth*14; // px indentation per level
+  const pad=depth*14;
   let html="";
-
-  // Notes directly inside this node
-  for(const nf of node.notes){
-    const isActive=nf.id===activeId;
-    html+=`<div class="ft-note${isActive?" on":""}" data-id="${nf.id}" style="padding-left:${indent+6}px">
-      <span class="ft-note-title">${escHtml(nf.title)}</span>
-      <button class="ft-note-del" data-del="${nf.id}" title="Excluir">✕</button>
-    </div>`;
-  }
-
-  // Sub-folders
-  for(const child of node.children){
-    const isOpen=!collapsedFolders.has(child.relPath);
-    html+=`<div class="ft-folder" data-folder="${escHtml(child.relPath)}" style="padding-left:${indent+4}px">
-      <span class="ft-arrow${isOpen?" open":""}">▶</span>
-      <span class="ft-icon">${isOpen?"📂":"📁"}</span>
-      <span class="ft-label">${escHtml(child.name)}</span>
-    </div>
-    <div class="ft-children${isOpen?" open":""}" data-children="${escHtml(child.relPath)}">
-      ${renderFolderTree(child, depth+1)}
-    </div>`;
+  for(const it of node.items){
+    if(it.kind==="note"){
+      const isActive=it.id===activeId;
+      html+=`<div class="ft-note${isActive?" on":""}" data-id="${it.id}" style="padding-left:${pad+20}px">
+        <span class="ft-note-title">${escHtml(it.title)}</span>
+        <button class="ft-note-del" data-del="${it.id}" title="Excluir">✕</button>
+      </div>`;
+    } else {
+      const child=it.node;
+      const isOpen=!collapsedFolders.has(child.relPath);
+      html+=`<div class="ft-folder" data-folder="${escHtml(child.relPath)}" style="padding-left:${pad+4}px">
+        <span class="ft-arrow${isOpen?" open":""}">▶</span>
+        <span class="ft-icon">${isOpen?"📂":"📁"}</span>
+        <span class="ft-label">${escHtml(child.name)}</span>
+      </div>
+      <div class="ft-children${isOpen?" open":""}" data-children="${escHtml(child.relPath)}">
+        ${renderFolderTree(child, depth+1)}
+      </div>`;
+    }
   }
   return html;
 }
@@ -1075,95 +1073,83 @@ document.getElementById("file-open-input").onchange=async(e)=>{
 //  FILE SYSTEM — Open FOLDER (Zettelkasten, recursive)
 // ══════════════════════════════════════════
 
-// Recursively read a DirectoryHandle, returning a tree node and
-// populating folderFileHandles + folderTitleIndex + notes.
+// Recursively read a DirectoryHandle.
+// node.items is a unified, pre-sorted list of {kind:"note"|"folder",...}
+// so renderFolderTree can emit them in correct order without re-sorting.
 async function readDirRecursive(dirHandle, relPath){
-  const node={
-    name: dirHandle.name,
-    relPath: relPath,
-    notes: [],   // [{title, id, relPath}]
-    children: [] // sub-nodes
-  };
+  const node={name:dirHandle.name, relPath, items:[]};
 
   const entries=[];
-  for await(const [name, handle] of dirHandle.entries()){
-    entries.push([name, handle]);
-  }
-  // Sort: folders first, then files, both alphabetically
-  entries.sort(([na, ha],[nb, hb])=>{
+  for await(const [name,handle] of dirHandle.entries()) entries.push([name,handle]);
+
+  // Sort: folders first, then files; both alphabetical, case-insensitive
+  entries.sort(([na,ha],[nb,hb])=>{
     if(ha.kind!==hb.kind) return ha.kind==="directory"?-1:1;
-    return na.localeCompare(nb, undefined, {sensitivity:"base"});
+    return na.localeCompare(nb,undefined,{sensitivity:"base"});
   });
 
-  for(const [name, handle] of entries){
-    if(name.startsWith(".")) continue; // skip hidden
+  for(const [name,handle] of entries){
+    if(name.startsWith(".")) continue;
 
     if(handle.kind==="directory"){
-      const childPath=relPath?(relPath+"/"+name):name;
-      const child=await readDirRecursive(handle, childPath);
-      // Only add sub-folder if it has any notes (recursively)
-      if(child.notes.length>0||child.children.length>0){
-        node.children.push(child);
-      }
+      const childPath=relPath?relPath+"/"+name:name;
+      const child=await readDirRecursive(handle,childPath);
+      if(countTreeItems(child)>0) node.items.push({kind:"folder",node:child});
+
     } else if(/\.(md|markdown|txt)$/i.test(name)){
-      const fileRelPath=relPath?(relPath+"/"+name):name;
+      const fileRelPath=relPath?relPath+"/"+name:name;
       try{
         const file=await handle.getFile();
         const content=await file.text();
         const title=name.replace(/\.(md|markdown|txt)$/i,"");
-        // Upsert note
-        let note=notes.find(n=>n.title===title);
-        if(note){note.content=content;note.updated=tod();}
-        else{
-          const id=genId(),t=tod();
-          note={id,title,tags:[],created:t,updated:t,content};
-          notes.push(note);
-        }
-        // Index by relPath
+        // Stable ID derived from path — survives reloads and avoids title collision
+        // between files with the same name in different subfolders
+        const stableId="fp_"+fileRelPath.replace(/[^a-z0-9]/gi,"_");
+        let note=notes.find(n=>n.id===stableId);
+        if(note){note.content=content;note.title=title;note.updated=tod();}
+        else{const t=tod();note={id:stableId,title,tags:[],created:t,updated:t,content};notes.push(note);}
         folderFileHandles[fileRelPath]=handle;
-        // Title index for wikilink resolution (last-wins on collision)
-        folderTitleIndex[title.toLowerCase()]=fileRelPath;
-        node.notes.push({title, id:note.id, relPath:fileRelPath});
+        folderTitleIndex[title.toLowerCase()]=fileRelPath; // last-write wins on collision
+        node.items.push({kind:"note",title,id:note.id,relPath:fileRelPath});
       }catch(err){console.warn("Error reading",fileRelPath,err);}
     }
   }
   return node;
 }
 
+function countTreeItems(node){
+  return node.items.reduce((s,it)=>s+(it.kind==="note"?1:countTreeItems(it.node)),0);
+}
+function firstNoteInTree(node){
+  for(const it of node.items){
+    if(it.kind==="note") return notes.find(n=>n.id===it.id)||null;
+    const f=firstNoteInTree(it.node);
+    if(f) return f;
+  }
+  return null;
+}
+
 async function loadFolder(handle){
   folderHandle=handle;
-  const name=handle.name;
-  document.getElementById("folder-name").textContent=name;
+  document.getElementById("folder-name").textContent=handle.name;
   document.getElementById("folder-bar").classList.add("visible");
   document.getElementById("btn-folder").classList.add("folder-active");
 
-  // Clear old indexes
   for(const k in folderFileHandles)delete folderFileHandles[k];
   for(const k in folderTitleIndex)delete folderTitleIndex[k];
   collapsedFolders.clear();
 
-  // Recursive read
   folderTree=await readDirRecursive(handle,"");
-  const totalLoaded=countTreeNotes(folderTree);
+  const total=countTreeItems(folderTree);
   save();
 
-  // Open first note if none active
-  if(totalLoaded>0 && (!curNote()||!notes.find(n=>n.id===tabs[activeTab]?.noteId))){
+  if(total>0&&(!curNote()||!notes.find(n=>n.id===tabs[activeTab]?.noteId))){
     const first=firstNoteInTree(folderTree);
-    if(first)openNote(first.id);
+    if(first) openNote(first.id);
   }
   renderSidebar();renderStatus();
   setSaved(true);
-  return totalLoaded;
-}
-
-function countTreeNotes(node){
-  return node.notes.length+node.children.reduce((s,c)=>s+countTreeNotes(c),0);
-}
-function firstNoteInTree(node){
-  if(node.notes.length>0) return notes.find(n=>n.id===node.notes[0].id);
-  for(const c of node.children){const f=firstNoteInTree(c);if(f)return f;}
-  return null;
+  return total;
 }
 
 document.getElementById("btn-folder").onclick=async()=>{
