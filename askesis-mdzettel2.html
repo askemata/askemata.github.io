@@ -247,13 +247,143 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
 .ex-ico{font-size:20px;flex-shrink:0}
 .ex-lbl{font-size:12px;color:var(--text-primary)}
 .ex-dsc{font-size:10px;color:var(--text-muted)}
-@media(max-width:700px){
-  #sidebar{position:absolute;z-index:50;top:70px;left:0;height:calc(100dvh - 70px);width:85%!important;box-shadow:var(--shadow)}
-  #sidebar.closed{width:0!important}
-  #preview-pane{display:flex!important}
-  #editor-pane{display:none!important}
-  .vm-grp{display:none}
+/* ══════════════════════════════════════════════════════════
+   RESPONSIVE — três breakpoints
+   desktop  : >1024px  — comportamento padrão intacto
+   tablet   : 640–1024px — sidebar colapsável, split ok
+   mobile   : <640px   — drawer overlay, view único, navbar compacta
+   ══════════════════════════════════════════════════════════ */
+
+/* ── Drawer overlay (aparece só no mobile) ── */
+#sidebar-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);z-index:98;
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
 }
+
+/* ── Tablet: 640–1024px ── */
+@media(max-width:1024px){
+  /* Esconde labels dos botões de ação, mantém ícones */
+  .tb-btn .btn-label{display:none}
+  /* Reduz padding da titlebar */
+  #titlebar{padding:0 6px;gap:2px}
+  .tb-btn{padding:4px 6px}
+  /* Preview padding menor */
+  #preview{padding:24px 28px}
+}
+
+/* ── Mobile: <640px ── */
+@media(max-width:639px){
+  /* Viewport fix para iOS que não respeita dvh */
+  #app{height:100svh;height:100dvh}
+
+  /* ── Titlebar: compacta em duas colunas ── */
+  #titlebar{
+    flex-wrap:wrap;
+    height:auto;
+    padding:4px 6px;
+    gap:2px;
+    row-gap:3px;
+  }
+  /* Logo menor */
+  .tb-logo{font-size:11px;letter-spacing:.03em}
+
+  /* Separadores somem */
+  .tb-sep{display:none}
+
+  /* Grupo de view mode some — mobile usa tab na bottom bar */
+  .vm-grp{display:none}
+
+  /* ◎ Foco some no mobile */
+  #btn-focus{display:none}
+
+  /* ↓ᴬ Salvar Como some (ação rara no mobile) */
+  #btn-save-as{display:none}
+
+  /* Botões ficam menores */
+  .tb-btn{padding:4px 6px;font-size:10px;gap:2px}
+
+  /* Spacer empurra tema para fim da primeira linha */
+  .tb-spacer{flex:1;order:10}
+  #btn-theme{order:11}
+
+  /* ── Tabs bar: rola horizontalmente ── */
+  #tabs-bar{min-height:28px}
+  .tab{height:28px;padding:0 8px;max-width:120px;font-size:10px}
+
+  /* ── Sidebar vira drawer overlay ── */
+  #sidebar{
+    position:fixed;
+    top:0; left:0; bottom:0;
+    z-index:99;
+    width:82vw!important;
+    max-width:300px;
+    transform:translateX(-100%);
+    transition:transform .22s ease, box-shadow .22s ease;
+    box-shadow:none;
+    border-right:1px solid var(--border);
+  }
+  #sidebar.open-mobile{
+    transform:translateX(0);
+    box-shadow:var(--shadow);
+  }
+  /* Quando fechado pelo botão ☰ no desktop (classe .closed), mantém hidden */
+  #sidebar.closed{
+    transform:translateX(-100%)!important;
+    width:82vw!important;
+  }
+
+  /* Overlay aparece quando sidebar está aberta */
+  #sidebar-overlay{display:block;opacity:0;pointer-events:none;transition:opacity .22s}
+  #sidebar.open-mobile~#sidebar-overlay,
+  body.sb-open #sidebar-overlay{opacity:1;pointer-events:auto}
+
+  /* ── Editor area: ocupa tudo ── */
+  #main{position:relative}
+  #editor-area{width:100%}
+
+  /* No mobile split não faz sentido — força só um painel visível */
+  /* JS controla qual painel mostrar via view mode */
+  #editor-pane{flex:1}
+  #preview-pane{flex:1}
+
+  /* Editor: padding menor ── */
+  :root{--ed-pad-v:16px;--ed-pad-h:16px}
+
+  /* Preview: padding menor ── */
+  #preview{padding:18px 18px 80px}
+
+  /* ── Barra de status simplificada ── */
+  #statusbar{font-size:9px;padding:0 8px;gap:6px}
+  /* Esconde itens menos importantes */
+  #st-chars,#st-links,#st-backlinks{display:none}
+  .st-sep:nth-of-type(n+3){display:none}
+
+  /* ── Bottom nav bar no mobile ── */
+  #mobile-nav{
+    display:flex;
+    background:var(--bg-secondary);
+    border-top:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .mn-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:2px;
+    padding:6px 0 5px;
+    border:none;background:transparent;
+    color:var(--text-muted);font-family:inherit;cursor:pointer;
+    font-size:8px;letter-spacing:.05em;text-transform:uppercase;
+    transition:color .15s;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .mn-btn .mn-ico{font-size:16px;line-height:1}
+  .mn-btn.on{color:var(--accent)}
+  .mn-btn:active{opacity:.7}
+}
+
+/* Desktop: bottom nav escondida */
+#mobile-nav{display:none}
 </style>
 </head>
 <body>
@@ -281,6 +411,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
     <button class="tb-btn" id="btn-theme">◑ Tema</button>
   </div>
   <div id="tabs-bar"><button id="tab-new">+</button></div>
+  <div id="sidebar-overlay"></div>
   <div id="main">
     <div id="sidebar">
       <div id="sb-header">
@@ -320,6 +451,13 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
       </div>
     </div>
   </div>
+  <nav id="mobile-nav">
+    <button class="mn-btn on" id="mn-notes"><span class="mn-ico">☰</span>Notas</button>
+    <button class="mn-btn" id="mn-editor"><span class="mn-ico">✏</span>Editor</button>
+    <button class="mn-btn" id="mn-preview"><span class="mn-ico">👁</span>Preview</button>
+    <button class="mn-btn" id="mn-save"><span class="mn-ico">↓</span>Salvar</button>
+    <button class="mn-btn" id="mn-more"><span class="mn-ico">⋯</span>Mais</button>
+  </nav>
   <div id="statusbar">
     <span id="st-id"></span><div class="st-sep"></div>
     <span id="st-words">0 palavras</span><div class="st-sep"></div>
@@ -1224,7 +1362,94 @@ document.getElementById("btn-save-as").onclick=async()=>{
 // ══════════════════════════════════════════
 //  EVENTS
 // ══════════════════════════════════════════
-document.getElementById("btn-sidebar").onclick=()=>{sidebarOpen=!sidebarOpen;document.getElementById("sidebar").classList.toggle("closed",!sidebarOpen);document.getElementById("btn-sidebar").classList.toggle("on",sidebarOpen);};
+// ── Responsive helpers ──────────────────────────────────────
+const isMobile=()=>window.innerWidth<640;
+
+function openSidebarMobile(){
+  document.getElementById("sidebar").classList.add("open-mobile");
+  document.getElementById("sidebar-overlay").style.cssText="opacity:1;pointer-events:auto";
+  document.getElementById("mn-notes").classList.add("on");
+}
+function closeSidebarMobile(){
+  document.getElementById("sidebar").classList.remove("open-mobile");
+  document.getElementById("sidebar-overlay").style.cssText="opacity:0;pointer-events:none";
+  document.getElementById("mn-notes").classList.remove("on");
+}
+
+// Overlay tap closes sidebar
+document.getElementById("sidebar-overlay").onclick=closeSidebarMobile;
+
+// ── Sidebar toggle (desktop vs mobile behaviour) ──
+document.getElementById("btn-sidebar").onclick=()=>{
+  if(isMobile()){
+    const isOpen=document.getElementById("sidebar").classList.contains("open-mobile");
+    isOpen?closeSidebarMobile():openSidebarMobile();
+  } else {
+    sidebarOpen=!sidebarOpen;
+    document.getElementById("sidebar").classList.toggle("closed",!sidebarOpen);
+    document.getElementById("btn-sidebar").classList.toggle("on",sidebarOpen);
+  }
+};
+
+// ── Mobile bottom nav ──────────────────────────────────────
+function setMobileTab(active){
+  ["mn-notes","mn-editor","mn-preview","mn-save","mn-more"].forEach(id=>{
+    document.getElementById(id)?.classList.toggle("on",id===active);
+  });
+}
+
+document.getElementById("mn-notes").onclick=()=>{
+  const isOpen=document.getElementById("sidebar").classList.contains("open-mobile");
+  if(isOpen){closeSidebarMobile();setMobileTab("mn-editor");}
+  else{openSidebarMobile();setMobileTab("mn-notes");}
+};
+
+document.getElementById("mn-editor").onclick=()=>{
+  closeSidebarMobile();
+  setViewMode("editor");
+  setMobileTab("mn-editor");
+};
+
+document.getElementById("mn-preview").onclick=()=>{
+  closeSidebarMobile();
+  setViewMode("preview");
+  setMobileTab("mn-preview");
+};
+
+document.getElementById("mn-save").onclick=()=>{
+  const n=curNote();if(n)saveNoteToFile(n,false);
+  setMobileTab("mn-save");
+  setTimeout(()=>setMobileTab("mn-editor"),600);
+};
+
+document.getElementById("mn-more").onclick=()=>{
+  closeSidebarMobile();
+  openModal("modal-export");
+};
+
+// ── Adapt view mode when resizing across breakpoints ──
+let _lastWasMobile=isMobile();
+window.addEventListener("resize",()=>{
+  const nowMobile=isMobile();
+  if(nowMobile!==_lastWasMobile){
+    _lastWasMobile=nowMobile;
+    // Switching to mobile: close sidebar overlay artifacts
+    if(nowMobile){
+      document.getElementById("sidebar").classList.remove("closed");
+      closeSidebarMobile();
+      // Force single-pane if was in split
+      if(viewMode==="split") setViewMode("editor");
+    } else {
+      // Back to desktop: restore sidebar state
+      document.getElementById("sidebar").classList.toggle("closed",!sidebarOpen);
+    }
+  }
+});
+
+// ── Initial mobile setup ──
+if(isMobile()){
+  setViewMode("editor");
+}
 document.getElementById("btn-new").onclick=()=>openModal("modal-new");
 document.getElementById("btn-export").onclick=()=>openModal("modal-export");
 document.getElementById("btn-theme").onclick=()=>openModal("modal-theme");
