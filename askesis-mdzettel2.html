@@ -1160,8 +1160,8 @@ document.getElementById("btn-folder").onclick=async()=>{
   try{
     const handle=await window.showDirectoryPicker({mode:"readwrite"});
     const loaded=await loadFolder(handle);
-    if(loaded===0)alert("Nenhum arquivo .md encontrado na pasta.");
-    else alert(`${loaded} nota(s) carregada(s) da pasta "${handle.name}". Links [[título]] agora funcionam entre todos os arquivos.`);
+    if(loaded===0) setSaved(false,"⚠ nenhum .md encontrado");
+    else setSaved(true,`✓ ${loaded} nota(s) carregada(s)`);
   }catch(e){if(e.name!=="AbortError")alert("Erro ao abrir pasta: "+e.message);}
 };
 
@@ -1280,7 +1280,7 @@ window.addEventListener("appinstalled",()=>document.getElementById("install-bar"
 document.getElementById("install-bar").onclick=()=>{if(installPromptEvent){installPromptEvent.prompt();installPromptEvent=null;document.getElementById("install-bar").classList.remove("visible");}};
 
 if("serviceWorker" in navigator){
-  const sw=`const C="askesis-zettel-v1";self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C).map(n=>caches.delete(n))))));self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.open(C).then(cache=>fetch(e.request).then(r=>{cache.put(e.request,r.clone());return r;}).catch(()=>caches.match(e.request))));});`;
+  const sw=`const C="askesis-zettel-v2";self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C).map(n=>caches.delete(n))))));self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.open(C).then(cache=>fetch(e.request).then(r=>{cache.put(e.request,r.clone());return r;}).catch(()=>caches.match(e.request))));});`;
   navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(()=>{});
 }
 
@@ -1300,4 +1300,3 @@ setSaved(true);
 </script>
 </body>
 </html>
- 
