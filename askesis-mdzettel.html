@@ -88,16 +88,6 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
 .ni:hover .ni-del{opacity:.4}
 .ni-del:hover{opacity:1!important;color:#e05050;background:rgba(200,0,50,.1)}
 .chip{font-size:9px;padding:1px 5px;border-radius:3px;background:var(--tag);color:var(--tag-text);letter-spacing:.02em}
-
-/* Classes para Árvore de Diretórios */
-.folder-group{margin-left:6px;border-left:1px dashed var(--border);padding-left:6px;margin-bottom:2px}
-.folder-details{margin-bottom:2px}
-.folder-summary{font-size:10px;color:var(--text-secondary);padding:4px 6px;cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;gap:4px;border-radius:4px;transition:background .15s}
-.folder-summary:hover{background:var(--bg-hover);color:var(--text-primary)}
-.folder-summary::-webkit-details-marker{display:none}
-.folder-summary::before{content:"⊞";color:var(--accent);font-size:11px}
-.folder-details[open] > .folder-summary::before{content:"⊟"}
-
 .sb-sec{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);padding:6px 8px 5px;margin-top:4px}
 .ol-item{padding:3px 8px;cursor:pointer;font-size:11px;color:var(--text-secondary);border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .1s}
 .ol-item:hover{background:var(--bg-hover);color:var(--text-primary)}
@@ -114,12 +104,21 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
 .tbtn{padding:3px 7px;border-radius:3px;cursor:pointer;border:none;background:transparent;color:var(--text-secondary);font-size:12px;font-family:inherit;transition:all .12s;font-weight:500;line-height:1.4}
 .tbtn:hover{background:var(--bg-hover);color:var(--text-primary)}
 .tsep{width:1px;height:14px;background:var(--border);margin:0 2px;flex-shrink:0}
+/* ── Highlight editor ──
+   Architecture: editor-wrap is the scroll container. The textarea is
+   invisible (transparent text, transparent bg) and sits on top for input.
+   The hl-layer is underneath, positioned to match the textarea exactly.
+   CRITICAL RULE: hl-layer must NEVER change font-size, line-height, or any
+   metric that affects layout — only color, font-weight, font-style are safe.
+   The layer does NOT scroll; it is shifted via transform:translateY by JS.
+*/
 #editor-wrap{
   flex:1;
   position:relative;
-  overflow:hidden;
+  overflow:hidden;           /* clips the shifted layer */
   background:var(--editor-bg);
 }
+/* Shared metrics — single source of truth applied to both via CSS vars */
 :root{
   --ed-pad-v:32px;
   --ed-pad-h:40px;
@@ -128,19 +127,22 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
   --ed-lh:1.9;
 }
 #hl-layer{
+  /* Exact same box model as #editor */
   position:absolute;
   top:0; left:0; right:0;
+  /* Height grows with content; wrap clips overflow */
   padding:var(--ed-pad-v) var(--ed-pad-h);
   font-family:var(--ed-font);
-  font-size:var(--ed-size);
-  line-height:var(--ed-lh);
+  font-size:var(--ed-size);    /* NEVER change this — must match textarea */
+  line-height:var(--ed-lh);   /* NEVER change this */
   tab-size:2;
   white-space:pre-wrap;
   word-wrap:break-word;
-  overflow:hidden;
+  overflow:hidden;             /* layer does NOT scroll */
   pointer-events:none;
   z-index:1;
   color:var(--sh-plain);
+  /* GPU layer for smooth transform during scroll */
   will-change:transform;
   transform:translateY(0);
 }
@@ -152,11 +154,14 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
   font-size:var(--ed-size);
   line-height:var(--ed-lh);
   tab-size:2;
+  /* Text invisible — caret and selection still visible */
   background:transparent;
   color:transparent;
   caret-color:var(--accent);
   -webkit-text-fill-color:transparent;
   border:none;outline:none;resize:none;
+  /* Single scroll axis; scrollbar-gutter keeps width stable so wrap
+     points never shift when the scrollbar appears/disappears */
   overflow-y:scroll;
   overflow-x:hidden;
   scrollbar-gutter:stable;
@@ -171,6 +176,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
   padding:48px calc(50% - 36ch);
 }
 .focus-mode #editor-toolbar{display:none!important}
+/* ── Preview ── */
 #preview-toolbar{display:flex;align-items:center;justify-content:flex-end;padding:4px 10px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;font-size:10px;color:var(--text-muted)}
 #preview-toolbar.hidden{display:none}
 #preview{flex:1;overflow-y:auto;padding:36px 48px;background:var(--preview-bg);font-family:'Literata',Georgia,serif;font-size:15px;line-height:1.85;color:var(--text-primary)}
@@ -256,7 +262,6 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
     <div class="tb-sep"></div>
     <button class="tb-btn" id="btn-focus">◎ Foco</button>
     <button class="tb-btn" id="btn-theme">◑ Tema</button>
-    <button class="tb-btn" id="btn-install-permanent" style="display:none;" title="Instalar aplicativo local">⬇ Instalar</button>
   </div>
   <div id="tabs-bar"><button id="tab-new">+</button></div>
   <div id="main">
@@ -311,6 +316,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
   </div>
 </div>
 
+<!-- Modal: Nova nota -->
 <div class="overlay hidden" id="modal-new">
   <div class="modal">
     <h3>Nova Nota</h3>
@@ -322,6 +328,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
   </div>
 </div>
 
+<!-- Modal: Exportar -->
 <div class="overlay hidden" id="modal-export">
   <div class="modal">
     <h3 id="export-title">Exportar</h3>
@@ -338,6 +345,7 @@ html,body{height:100%;overflow:hidden;font-family:'IBM Plex Mono',monospace;font
   </div>
 </div>
 
+<!-- Modal: Tema -->
 <div class="overlay hidden" id="modal-theme">
   <div class="modal">
     <h3>Tema Visual</h3>
@@ -364,598 +372,785 @@ const THEMES={
 // ══════════════════════════════════════════
 const DN=[
   {id:"202605151000",title:"Bem-vindo ao Askesis-Zettel",tags:["início","guia"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Bem-vindo ao Askesis-Zettel\nid: 202605151000\ntags: [início, guia]\ncreated: 2026-05-15\n---\n\n# Bem-vindo ao Askesis-Zettel\n\n> *\"Um ambiente cognitivo de permanência.\"*\n\nO **Askesis-Zettel** é um editor Markdown local-first com sistema [[Zettelkasten]] integrado.\n\n## Novidades\n\n- **Pasta de projeto** — abra uma pasta e todas as notas ficam interligadas\n- **Links entre arquivos** — `[[título]]` funciona entre todos os `.md` da pasta\n- **Salvar nativo** — o botão Salvar grava diretamente no arquivo em disco\n- **Realce de sintaxe** — o editor colore Markdown em tempo real\n- **Export Latin Modern** — HTML e PDF tipografados como LaTeX\n\n## Como usar links\n\nCrie um link para [[Zettelkasten]] colocando o título entre colchetes duplos.\n\n---\n\n*Suas notas são salvas no localStorage e/ou em arquivos via File System Access API.*\n"},
-  {id:"202605151001",title:"Zettelkasten",tags:["método","conhecimento"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Zettelkasten\nid: 202605151001\ntags: [método, conhecimento]\ncreated: 2026-05-15\n---\n\n# Zettelkasten\n\nO **Zettelkasten** é um método de organização de notas que maximiza a geração de conexões criativas.\n\nCada nota (um *Zettel*) deve ser atômica e conter links explícitos para outras notas, criando uma teia orgânica, similar a um segundo cérebro.\n\nRetorne para o [[Bem-vindo ao Askesis-Zettel]] para rever o guia rápido."}
+  {id:"202605151001",title:"Zettelkasten",tags:["método","conhecimento"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Zettelkasten\nid: 202605151001\ntags: [método, conhecimento]\ncreated: 2026-05-15\n---\n\n# Zettelkasten\n\nO **Zettelkasten** é um método de gestão do conhecimento do sociólogo Niklas Luhmann.\n\n## Princípios\n\n1. **Atomicidade** — uma ideia por nota\n2. **Autonomia** — cada nota compreensível por si\n3. **Conexão** — notas ligadas entre si\n4. **Indexação** — ponto de entrada organizado\n\n## No Askesis-Zettel\n\nUse `[[título]]` para links. Veja [[Bem-vindo ao Askesis-Zettel]] para começar.\n\n## Referências\n\n- Luhmann, N. *Kommunikation mit Zettelkästen* (1981)\n- Ahrens, S. *How to Take Smart Notes* (2017)\n"},
+  {id:"202605151002",title:"Filosofia do Estudo",tags:["filosofia","estudo"],created:"2026-05-15",updated:"2026-05-15",content:"---\ntitle: Filosofia do Estudo\nid: 202605151002\ntags: [filosofia, estudo]\ncreated: 2026-05-15\n---\n\n# Filosofia do Estudo\n\n> *\"Não basta acumular informação — é preciso cultivar compreensão.\"*\n\n## Estudo como Askesis\n\n*Askesis* (ἄσκησις) — prática disciplinada, exercício espiritual.\n\n- requer **quietude**\n- exige **presença**\n- produz **transformação**\n\n## Conexão com [[Zettelkasten]]\n\nAo externalizar conexões, liberamos memória de trabalho para pensar com mais profundidade.\n\n---\n\n*\"A mente não é um recipiente a ser preenchido, mas um fogo a ser aceso.\"* — Plutarco\n"},
 ];
 
 // ══════════════════════════════════════════
-//  STATE MANAGEMENT
+//  STATE
 // ══════════════════════════════════════════
-let state={
-  notes:[],         // {id, title, tags, content, created, updated, handle, relativePath}
-  tabs:[],          // Array of note IDs
-  activeTab:null,   // active note ID
-  folderHandle:null,// DirectoryHandle
-  activeSidebar:"explorer",
-  searchQuery:"",
-  currentTheme:"askesis-dark",
-  focusMode:false,
-  viewMode:"split"  // "editor", "split", "preview"
+let notes=(() => { try{const s=localStorage.getItem("askesis-notes");return s?JSON.parse(s):DN;}catch{return DN;} })();
+let currentTheme=localStorage.getItem("askesis-theme")||"askesis-dark";
+let tabs=[{noteId:notes[0]?.id||""}];
+let activeTab=0;
+let viewMode="split";
+let sidebarMode="explorer";
+let sidebarOpen=true;
+let focusMode=false;
+let searchQuery="";
+let installPromptEvent=null;
+
+// File System handles: noteId → FileSystemFileHandle
+const fileHandles={};
+// Folder handle & file map: filename (without ext) → FileSystemFileHandle
+let folderHandle=null;
+const folderFileHandles={}; // title → FileSystemFileHandle
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function genId(){const n=new Date();return n.getFullYear()+String(n.getMonth()+1).padStart(2,"0")+String(n.getDate()).padStart(2,"0")+String(n.getHours()).padStart(2,"0")+String(n.getMinutes()).padStart(2,"0");}
+function tod(){return new Date().toISOString().slice(0,10);}
+function save(){try{localStorage.setItem("askesis-notes",JSON.stringify(notes));}catch{}}
+function curNote(){return notes.find(n=>n.id===tabs[activeTab]?.noteId);}
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function slugify(t){return t.replace(/\s+/g,"-").replace(/[^\w\-]/g,"");}
+
+function setSaved(ok,msg){
+  const el=document.getElementById("st-saved");
+  el.textContent=ok?"● salvo":(msg||"● não salvo");
+  el.style.color=ok?"var(--tag-text)":"#e05050";
+}
+
+// ══════════════════════════════════════════
+//  MARKDOWN RENDERER (for preview & export)
+// ══════════════════════════════════════════
+function inline(text){
+  let t=esc(text);
+  t=t.replace(/\[\[([^\]]+)\]\]/g,(_,title)=>{
+    const f=notes.find(n=>n.title.toLowerCase()===title.toLowerCase());
+    return `<span class="wikilink ${f?"wikilink-exists":"wikilink-missing"}" data-noteid="${f?f.id:""}" data-title="${title}">${title}</span>`;
+  });
+  t=t.replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>");
+  t=t.replace(/__(.+?)__/g,"<strong>$1</strong>");
+  t=t.replace(/\*(.+?)\*/g,"<em>$1</em>");
+  t=t.replace(/_(.+?)_/g,"<em>$1</em>");
+  t=t.replace(/~~(.+?)~~/g,"<del>$1</del>");
+  t=t.replace(/`([^`]+)`/g,"<code>$1</code>");
+  t=t.replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  return t;
+}
+function md(text){
+  if(!text) return "";
+  const lines=text.split("\n");
+  let html="",inCode=false,codeLang="",codeBuf=[],inTable=false,tableBuf=[],stack=[],inFM=false,i=0;
+  const flushList=()=>{while(stack.length)html+=`</${stack.pop()}>`};
+  const flushTable=()=>{
+    if(!tableBuf.length)return;
+    let o="<table><thead><tr>";
+    tableBuf[0].split("|").filter(c=>c.trim()).forEach(h=>o+=`<th>${inline(h.trim())}</th>`);
+    o+="</tr></thead><tbody>";
+    for(let r=2;r<tableBuf.length;r++){o+="<tr>";tableBuf[r].split("|").filter(c=>c.trim()).forEach(c=>o+=`<td>${inline(c.trim())}</td>`);o+="</tr>";}
+    o+="</tbody></table>";html+=o;tableBuf=[];inTable=false;
+  };
+  while(i<lines.length){
+    const l=lines[i];
+    if(i===0&&l==="---"){inFM=true;i++;continue;}
+    if(inFM&&l==="---"){inFM=false;i++;continue;}
+    if(inFM){i++;continue;}
+    if(l.startsWith("```")){
+      if(!inCode){flushList();flushTable();inCode=true;codeLang=l.slice(3).trim();codeBuf=[];}
+      else{html+=`<pre><code class="lang-${codeLang}">${codeBuf.map(esc).join("\n")}</code></pre>`;inCode=false;codeBuf=[];}
+      i++;continue;
+    }
+    if(inCode){codeBuf.push(l);i++;continue;}
+    if(l.includes("|")&&!l.match(/^#{1,6}\s/)){inTable=true;tableBuf.push(l);i++;continue;}
+    if(inTable&&!l.includes("|"))flushTable();
+    const hm=l.match(/^(#{1,6})\s+(.+)/);
+    if(hm){flushList();html+=`<h${hm[1].length}>${inline(hm[2])}</h${hm[1].length}>`;i++;continue;}
+    if(/^-{3,}$/.test(l.trim())){flushList();html+="<hr>";i++;continue;}
+    if(l.startsWith("> ")){flushList();html+=`<blockquote>${inline(l.slice(2))}</blockquote>`;i++;continue;}
+    const ulm=l.match(/^(\s*)[-*+]\s+(.+)/);
+    if(ulm){const d=Math.floor(ulm[1].length/2);while(stack.length>d+1)html+=`</${stack.pop()}>`;if(stack.length<=d){html+="<ul>";stack.push("ul");}html+=`<li>${inline(ulm[2])}</li>`;i++;continue;}
+    const olm=l.match(/^(\s*)\d+\.\s+(.+)/);
+    if(olm){const d=Math.floor(olm[1].length/2);while(stack.length>d+1)html+=`</${stack.pop()}>`;if(stack.length<=d){html+="<ol>";stack.push("ol");}html+=`<li>${inline(olm[2])}</li>`;i++;continue;}
+    if(l.trim()===""){flushList();if(!inTable)html+=`<div class="spacer"></div>`;i++;continue;}
+    flushList();html+=`<p>${inline(l)}</p>`;i++;
+  }
+  flushList();flushTable();return html;
+}
+
+// ══════════════════════════════════════════
+//  SYNTAX HIGHLIGHT (editor layer)
+//  RULE: NEVER change font-size or line-height — only color/weight/style.
+//  Any metric change would break textarea↔layer line alignment.
+// ══════════════════════════════════════════
+function hlInline(raw){
+  const he=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  let out="",i=0;
+  while(i<raw.length){
+    // [[wikilink]]
+    if(raw[i]==="["&&raw[i+1]==="["){
+      const e=raw.indexOf("]]",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-wiki)">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // `code`
+    if(raw[i]==="`"){
+      const e=raw.indexOf("`",i+1);
+      if(e!==-1){out+=`<span style="color:var(--sh-code)">${he(raw.slice(i,e+1))}</span>`;i=e+1;continue;}
+    }
+    // **bold**
+    if(raw[i]==="*"&&raw[i+1]==="*"){
+      const e=raw.indexOf("**",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-bold);font-weight:700">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // __bold__
+    if(raw[i]==="_"&&raw[i+1]==="_"){
+      const e=raw.indexOf("__",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-bold);font-weight:700">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // ~~strike~~
+    if(raw[i]==="~"&&raw[i+1]==="~"){
+      const e=raw.indexOf("~~",i+2);
+      if(e!==-1){out+=`<span style="color:var(--sh-quote);text-decoration:line-through">${he(raw.slice(i,e+2))}</span>`;i=e+2;continue;}
+    }
+    // *italic* (not **)
+    if(raw[i]==="*"&&raw[i+1]!=="*"){
+      const e=raw.indexOf("*",i+1);
+      if(e!==-1){out+=`<span style="color:var(--sh-italic);font-style:italic">${he(raw.slice(i,e+1))}</span>`;i=e+1;continue;}
+    }
+    // _italic_ (not __)
+    if(raw[i]==="_"&&raw[i+1]!=="_"){
+      const e=raw.indexOf("_",i+1);
+      if(e!==-1){out+=`<span style="color:var(--sh-italic);font-style:italic">${he(raw.slice(i,e+1))}</span>`;i=e+1;continue;}
+    }
+    // [link](url)
+    if(raw[i]==="["&&raw[i+1]!=="["){
+      const cb=raw.indexOf("](",i);
+      if(cb!==-1){const pe=raw.indexOf(")",cb+2);
+        if(pe!==-1){out+=`<span style="color:var(--sh-link)">${he(raw.slice(i,pe+1))}</span>`;i=pe+1;continue;}}
+    }
+    out+=he(raw[i]);i++;
+  }
+  return out;
+}
+function hlMd(text){
+  if(!text)return "";
+  const he=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const lines=text.split("\n");
+  const out=[];
+  let inCode=false,inFM=false;
+  for(let i=0;i<lines.length;i++){
+    const l=lines[i];
+    // front matter
+    if(i===0&&l==="---"){inFM=true;out.push(`<span style="color:var(--sh-fm)">${he(l)}</span>`);continue;}
+    if(inFM){out.push(`<span style="color:var(--sh-fm)">${he(l)}</span>`);if(l==="---"&&i>0)inFM=false;continue;}
+    // fenced code
+    if(l.startsWith("```")){inCode=!inCode;out.push(`<span style="color:var(--sh-cb)">${he(l)}</span>`);continue;}
+    if(inCode){out.push(`<span style="color:var(--sh-cb)">${he(l)}</span>`);continue;}
+    // heading — bold+color, NO font-size (preserves line height)
+    const hm=l.match(/^(#{1,6})(\s+.*)$/);
+    if(hm){
+      out.push(`<span style="color:var(--sh-fm)">${he(hm[1])}</span><span style="color:var(--sh-head);font-weight:700">${hlInline(hm[2])}</span>`);
+      continue;
+    }
+    // hr
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(l.trim())){out.push(`<span style="color:var(--sh-hr)">${he(l)}</span>`);continue;}
+    // blockquote
+    if(l.startsWith("> ")){
+      out.push(`<span style="color:var(--sh-quote)">&gt; </span><span style="color:var(--sh-quote);font-style:italic">${hlInline(l.slice(2))}</span>`);
+      continue;
+    }
+    // ul
+    const ulm=l.match(/^(\s*)([-*+])(\s+)(.*)$/);
+    if(ulm){out.push(`${he(ulm[1])}<span style="color:var(--sh-list)">${he(ulm[2])}</span>${he(ulm[3])}${hlInline(ulm[4])}`);continue;}
+    // ol
+    const olm=l.match(/^(\s*)(\d+\.)(\s+)(.*)$/);
+    if(olm){out.push(`${he(olm[1])}<span style="color:var(--sh-list)">${he(olm[2])}</span>${he(olm[3])}${hlInline(olm[4])}`);continue;}
+    // table
+    if(l.includes("|")){
+      const cells=l.split("|");
+      out.push(cells.map((cell,ci)=>{
+        const isDivider=/^[\s:|-]+$/.test(cell.trim())&&cell.includes("-");
+        const pipe=ci<cells.length-1?`<span style="color:var(--sh-list)">|</span>`:"";
+        return (isDivider?`<span style="color:var(--sh-hr)">${he(cell)}</span>`:hlInline(cell))+pipe;
+      }).join(""));
+      continue;
+    }
+    out.push(hlInline(l));
+  }
+  return out.join("\n")+"\n";
+}
+
+// ══════════════════════════════════════════
+//  EXPORT — Latin Modern CSS
+// ══════════════════════════════════════════
+const LATEX_CSS=`
+@font-face{font-family:'Latin Modern';font-style:normal;font-weight:normal;src:url('https://latex.now.sh/fonts/LM-regular.woff2') format('woff2'),url('https://latex.now.sh/fonts/LM-regular.woff') format('woff')}
+@font-face{font-family:'Latin Modern';font-style:italic;font-weight:normal;src:url('https://latex.now.sh/fonts/LM-italic.woff2') format('woff2'),url('https://latex.now.sh/fonts/LM-italic.woff') format('woff')}
+@font-face{font-family:'Latin Modern';font-style:normal;font-weight:bold;src:url('https://latex.now.sh/fonts/LM-bold.woff2') format('woff2'),url('https://latex.now.sh/fonts/LM-bold.woff') format('woff')}
+@font-face{font-family:'Latin Modern';font-style:italic;font-weight:bold;src:url('https://latex.now.sh/fonts/LM-bold-italic.woff2') format('woff2'),url('https://latex.now.sh/fonts/LM-bold-italic.woff') format('woff')}
+html{font-size:1rem;scroll-behavior:smooth}
+body{font-family:'Latin Modern',Georgia,'Times New Roman',serif;max-width:48em;margin:4em auto;padding:0 2em;line-height:1.8;color:#111}
+h1,h2,h3,h4{font-family:'Latin Modern',Georgia,serif;font-weight:normal;margin-top:2em;margin-bottom:.5em}
+h1{font-size:2em;text-align:center;border-bottom:1px solid #ccc;padding-bottom:.4em;margin-top:1em}
+h2{font-size:1.4em}h3{font-size:1.15em}h4{font-size:1em;font-weight:bold}
+p{text-align:justify;hyphens:auto;margin:.8em 0;font-size:1.05em}
+a,a:visited{color:#0070b7;text-decoration:none}
+a:hover{color:#d86d4e;text-decoration:underline}
+blockquote{margin:1.2em 2em;padding:.8em 1.2em;font-size:95%;line-height:1.6;color:#555;border-left:4px solid #c9a96e;background:#fdfaf5}
+code{font-family:'Courier New',monospace;font-size:.88em;background:#f3f0e8;padding:2px 5px;border-radius:3px}
+pre{background:#f3f0e8;border:1px solid #ddd;border-radius:4px;padding:1.2em;overflow-x:auto;margin:1.2em 0}
+pre code{background:transparent;padding:0}
+ul,ol{padding-left:2em;margin:.6em 0;font-size:1.05em;line-height:1.6}
+li{margin-bottom:.3em}
+hr{border:none;border-top:1px solid #ccc;margin:2em 0}
+table{width:100%;border-collapse:collapse;margin:1.2em 0;font-size:.95em}
+td,th{border:1px solid #ccc;padding:.5em .9em}
+th{background:#f5f0e8;font-weight:bold}
+.wikilink-exists{color:#0070b7;text-decoration:underline}
+.wikilink-missing{color:#aaa;text-decoration:underline dashed}
+del{opacity:.5;text-decoration:line-through}
+.spacer{height:.6em}
+@media print{
+  body{margin:0;padding:1cm;max-width:100%}
+  a{color:#000;text-decoration:none}
+  pre{white-space:pre-wrap}
+}
+@page{size:A4;margin:2.5cm 2cm 2.5cm 2.5cm}
+`;
+
+function buildLatexHtml(note){
+  const bodyHtml=md(note.content);
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>${note.title}</title>
+<style>${LATEX_CSS}</style>
+</head>
+<body>
+${bodyHtml}
+</body>
+</html>`;
+}
+
+function mdToPlain(content){
+  return content
+    .replace(/^---[\s\S]*?---\n/,"")
+    .replace(/#{1,6}\s+/g,"")
+    .replace(/\*\*(.+?)\*\*/g,"$1")
+    .replace(/\*(.+?)\*/g,"$1")
+    .replace(/`(.+?)`/g,"$1")
+    .replace(/\[\[(.+?)\]\]/g,"$1")
+    .replace(/\[(.+?)\]\(.+?\)/g,"$1");
+}
+function mdToFodt(note){
+  const plain=mdToPlain(note.content);
+  const lines=plain.split("\n");
+  let body="";
+  for(const l of lines){
+    const t=l.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    if(!t.trim()){body+=`<text:p text:style-name="Text_20_Body"/>`;continue;}
+    body+=`<text:p text:style-name="Text_20_Body">${t}</text:p>`;
+  }
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0"
+  xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0"
+  xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0"
+  xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0"
+  office:mimetype="application/vnd.oasis.opendocument.text"
+  office:version="1.3">
+<office:styles>
+  <style:style style:name="Text_20_Body" style:family="paragraph">
+    <style:paragraph-properties fo:margin-bottom="0.2cm"/>
+    <style:text-properties fo:font-size="11pt" fo:font-family="Georgia,serif" fo:line-height="180%"/>
+  </style:style>
+  <style:style style:name="Heading_20_1" style:family="paragraph">
+    <style:text-properties fo:font-size="18pt" fo:font-weight="bold"/>
+  </style:style>
+</office:styles>
+<office:body><office:text>
+  <text:p text:style-name="Heading_20_1">${note.title.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}</text:p>
+  ${body}
+</office:text></office:body>
+</office:document>`;
+}
+function mdToRtf(note){
+  const plain=mdToPlain(note.content);
+  const rtfEsc=s=>s.replace(/\\/g,"\\\\").replace(/\{/g,"\\{").replace(/\}/g,"\\}").replace(/[^\x00-\x7F]/g,c=>`\\u${c.codePointAt(0)}?`);
+  const body=plain.split("\n").map(l=>l.trim()?`\\pard\\sa120\\sl360\\slmult1 ${rtfEsc(l)}\\par`:"\\pard\\sa120\\par").join("\n");
+  return `{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Georgia;}}{\\colortbl;\\red44\\green42\\blue38;}\\deflang1046\\widowctrl\\hyphauto\n\\pard\\sa200\\b\\fs36 ${rtfEsc(note.title)}\\b0\\par\n${body}\n}`;
+}
+
+function doExport(note,fmt){
+  if(fmt==="pdf"){
+    // Open print window with Latin Modern styling
+    const html=buildLatexHtml(note);
+    const w=window.open("","_blank");
+    w.document.write(html);
+    w.document.close();
+    w.onload=()=>{ w.focus(); w.print(); };
+    return;
+  }
+  let c="",mime="text/plain",ext="txt";
+  if(fmt==="markdown"){c=note.content;mime="text/markdown";ext="md";}
+  else if(fmt==="html-latex"){c=buildLatexHtml(note);mime="text/html";ext="html";}
+  else if(fmt==="html"){
+    const body=md(note.content);
+    c=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>${note.title}</title><style>body{font-family:Georgia,serif;max-width:760px;margin:60px auto;padding:0 20px;line-height:1.8;color:#2c2a26}code{background:#f0ece2;padding:2px 6px;border-radius:3px;font-size:.9em}pre{background:#f0ece2;padding:16px;border-radius:6px;overflow-x:auto}blockquote{border-left:3px solid #c9a96e;padding-left:16px;color:#7a6640;margin:0;font-style:italic}table{border-collapse:collapse;width:100%}td,th{border:1px solid #ccc;padding:8px 12px}th{background:#f5f0e8}.wikilink{color:#2a6e87}</style></head><body>${body}</body></html>`;
+    mime="text/html";ext="html";
+  } else if(fmt==="fodt"){c=mdToFodt(note);mime="application/vnd.oasis.opendocument.text-flat-xml";ext="fodt";}
+  else if(fmt==="rtf"){c=mdToRtf(note);mime="application/rtf";ext="rtf";}
+  else{c=mdToPlain(note.content);}
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([c],{type:mime}));
+  a.download=`${slugify(note.title)||"nota"}.${ext}`;
+  a.click();
+}
+
+// ══════════════════════════════════════════
+//  THEME
+// ══════════════════════════════════════════
+function applyTheme(key){
+  currentTheme=key;
+  const v=THEMES[key].vars,r=document.documentElement;
+  Object.entries(v).forEach(([k,val])=>r.style.setProperty(k,val));
+  document.getElementById("theme-color-meta").setAttribute("content",v["--bg-primary"]);
+  localStorage.setItem("askesis-theme",key);
+  renderThemeGrid();
+}
+function renderThemeGrid(){
+  const g=document.getElementById("theme-grid");g.innerHTML="";
+  Object.entries(THEMES).forEach(([key,t])=>{
+    const v=t.vars,d=document.createElement("div");
+    d.className="th-opt"+(currentTheme===key?" on":"");
+    d.style.cssText=`background:${v["--bg-secondary"]};color:${v["--text-primary"]};border-color:${currentTheme===key?v["--accent"]:v["--border"]}`;
+    d.innerHTML=`<div style="font-size:11px;margin-bottom:5px">${t.label}</div><div class="th-dots">${[v["--accent"],v["--link"],v["--tag-text"],v["--text-secondary"]].map(c=>`<div class="th-dot" style="background:${c}"></div>`).join("")}</div>`;
+    d.onclick=()=>{applyTheme(key);closeModal("modal-theme");};
+    g.appendChild(d);
+  });
+}
+
+// ══════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════
+function renderTabs(){
+  const bar=document.getElementById("tabs-bar");bar.innerHTML="";
+  tabs.forEach((tab,idx)=>{
+    const note=notes.find(n=>n.id===tab.noteId);
+    const d=document.createElement("div");
+    d.className="tab"+(activeTab===idx?" on":"");
+    // show folder icon if note has a folder handle
+    const hasFh=note&&(fileHandles[note.id]||folderFileHandles[note.title]);
+    d.innerHTML=`<span class="tab-name">${hasFh?"📄 ":""}${note?note.title:"Sem título"}</span><span class="tab-x">×</span>`;
+    d.onclick=(e)=>{if(e.target.classList.contains("tab-x")){closeTab(idx);return;}setActiveTab(idx);};
+    bar.appendChild(d);
+  });
+  const nb=document.createElement("button");
+  nb.id="tab-new";nb.textContent="+";nb.onclick=()=>openModal("modal-new");
+  bar.appendChild(nb);
+}
+function setActiveTab(idx){activeTab=idx;renderTabs();renderEditor();renderSidebar();renderStatus();}
+function closeTab(idx){if(tabs.length===1)return;tabs.splice(idx,1);activeTab=Math.min(activeTab,tabs.length-1);renderTabs();renderEditor();renderSidebar();renderStatus();}
+function openNote(noteId){
+  const idx=tabs.findIndex(t=>t.noteId===noteId);
+  if(idx>=0){activeTab=idx;}else{tabs.push({noteId});activeTab=tabs.length-1;}
+  renderTabs();renderEditor();renderSidebar();renderStatus();
+}
+
+// ══════════════════════════════════════════
+//  EDITOR + HIGHLIGHT
+// ══════════════════════════════════════════
+// Measure the textarea's scrollbar width and apply it as extra right-padding
+// on the hl-layer, so both elements wrap text at exactly the same column.
+function syncLayerWidth(){
+  const ta=document.getElementById("editor");
+  const hl=document.getElementById("hl-layer");
+  if(!ta||!hl)return;
+  // offsetWidth - clientWidth = scrollbar width (0 if no scrollbar shown)
+  const sbW=ta.offsetWidth-ta.clientWidth;
+  // Base right padding is 40px; add scrollbar width so content area matches
+  hl.style.paddingRight=(40+sbW)+"px";
+}
+
+// syncScroll: shift the layer up by the textarea's scrollTop via transform.
+// The layer never scrolls itself — this is the only reliable approach.
+function syncScroll(){
+  const ta=document.getElementById("editor");
+  const hl=document.getElementById("hl-layer");
+  if(!hl||!ta)return;
+  hl.style.transform=`translateY(${-ta.scrollTop}px)`;
+}
+
+// Debounce via rAF — avoids hammering innerHTML on rapid keystrokes in large docs
+let _hlRaf=null;
+function renderHighlight(){
+  const ta=document.getElementById("editor");
+  const hl=document.getElementById("hl-layer");
+  if(!hl||!ta)return;
+  if(_hlRaf)cancelAnimationFrame(_hlRaf);
+  _hlRaf=requestAnimationFrame(()=>{
+    hl.innerHTML=hlMd(ta.value);
+    syncLayerWidth();
+    syncScroll();
+    _hlRaf=null;
+  });
+}
+
+function renderEditor(){
+  const n=curNote();
+  const ta=document.getElementById("editor");
+  ta.value=n?n.content:"";
+  ta.scrollTop=0; // reset scroll so layer and textarea start in sync
+  renderHighlight();
+  renderPreview();
+}
+
+// ResizeObserver: fires on window resize, sidebar toggle, split view change.
+// Re-render highlight so word-wrap recalculates, then re-sync scroll.
+(function(){
+  const wrap=document.getElementById("editor-wrap");
+  if(!wrap||!window.ResizeObserver)return;
+  let _resizeRaf=null;
+  new ResizeObserver(()=>{
+    if(_resizeRaf)cancelAnimationFrame(_resizeRaf);
+    _resizeRaf=requestAnimationFrame(()=>{
+      syncLayerWidth();
+      renderHighlight();
+      syncScroll();
+      _resizeRaf=null;
+    });
+  }).observe(wrap);
+})();
+function renderPreview(){
+  const n=curNote();
+  document.getElementById("preview").innerHTML=n?md(n.content):"";
+}
+
+// ══════════════════════════════════════════
+//  SIDEBAR
+// ══════════════════════════════════════════
+function renderSidebar(){
+  const note=curNote();
+  const cont=document.getElementById("sb-content");
+  const q=searchQuery.toLowerCase();
+  const filtered=q?notes.filter(n=>n.title.toLowerCase().includes(q)||n.content.toLowerCase().includes(q)||n.tags?.some(t=>t.toLowerCase().includes(q))):notes;
+  const backlinks=note?notes.filter(n=>n.id!==note.id&&n.content.toLowerCase().includes(`[[${note.title.toLowerCase()}]]`)):[];
+  const outline=note?note.content.split("\n").filter(l=>l.match(/^#{1,4}\s+/)).map(l=>{const m=l.match(/^(#{1,4})\s+(.+)/);return{level:m[1].length,text:m[2]};}) : [];
+  if(sidebarMode==="explorer"){
+    if(!filtered.length){cont.innerHTML=`<div class="sb-empty">Nenhuma nota encontrada.</div>`;return;}
+    cont.innerHTML=filtered.map(n=>`<div class="ni${n.id===tabs[activeTab]?.noteId?" on":""}" data-id="${n.id}"><button class="ni-del" data-del="${n.id}">✕</button><div class="ni-title">${n.title}</div><div class="ni-meta">${n.updated}</div>${n.tags?.length?`<div class="ni-tags">${n.tags.map(t=>`<span class="chip">${t}</span>`).join("")}</div>`:""}</div>`).join("");
+    cont.querySelectorAll(".ni").forEach(el=>el.onclick=e=>{if(e.target.dataset.del){deleteNote(e.target.dataset.del);return;}openNote(el.dataset.id);});
+  } else if(sidebarMode==="backlinks"){
+    let h=`<div class="sb-sec">Backlinks → ${note?note.title:""}</div>`;
+    if(!backlinks.length)h+=`<div class="sb-empty">Nenhuma nota aponta para esta.</div>`;
+    else backlinks.forEach(n=>{h+=`<div class="bl-item" data-id="${n.id}">${n.title}</div>`;});
+    h+=`<div class="sb-sec" style="margin-top:14px">Links nesta nota</div>`;
+    const wl=note?(note.content.match(/\[\[([^\]]+)\]\]/g)||[]):[];
+    if(!wl.length)h+=`<div class="sb-empty">Nenhum link.</div>`;
+    else wl.forEach(m=>{const t=m.slice(2,-2),f=notes.find(n=>n.title.toLowerCase()===t.toLowerCase());h+=`<div class="bl-item" style="opacity:${f?1:.5};cursor:${f?"pointer":"default"}" data-id="${f?f.id:""}">${f?"→":"⊘"} ${t}</div>`;});
+    cont.innerHTML=h;
+    cont.querySelectorAll(".bl-item[data-id]").forEach(el=>{if(el.dataset.id)el.onclick=()=>openNote(el.dataset.id);});
+  } else {
+    let h=`<div class="sb-sec">Estrutura</div>`;
+    if(!outline.length)h+=`<div class="sb-empty">Sem cabeçalhos.</div>`;
+    else outline.forEach(it=>{h+=`<div class="ol-item" style="padding-left:${(it.level-1)*12+8}px"><span style="color:var(--accent-dim);margin-right:4px;font-size:9px">${"#".repeat(it.level)}</span>${it.text}</div>`;});
+    cont.innerHTML=h;
+  }
+}
+
+// ══════════════════════════════════════════
+//  STATUS
+// ══════════════════════════════════════════
+function renderStatus(){
+  const n=curNote(),c=n?n.content:"";
+  const bl=n?notes.filter(x=>x.id!==n.id&&x.content.toLowerCase().includes(`[[${n.title.toLowerCase()}]]`)).length:0;
+  document.getElementById("st-id").textContent=n?n.id:"";
+  document.getElementById("st-words").textContent=c.split(/\s+/).filter(Boolean).length+" palavras";
+  document.getElementById("st-chars").textContent=c.length+" chars";
+  document.getElementById("st-links").textContent=(c.match(/\[\[([^\]]+)\]\]/g)||[]).length+" links";
+  document.getElementById("st-backlinks").textContent=bl+" backlinks";
+  document.getElementById("st-total").textContent=notes.length+" notas";
+  document.getElementById("st-date").textContent=n?n.updated:"";
+}
+
+// ══════════════════════════════════════════
+//  NOTES CRUD
+// ══════════════════════════════════════════
+function createNote(title){
+  const id=genId(),t=tod();
+  const note={id,title,tags:[],created:t,updated:t,content:`---\ntitle: ${title}\nid: ${id}\ntags: []\ncreated: ${t}\n---\n\n# ${title}\n\n`};
+  notes.push(note);save();openNote(id);
+}
+function deleteNote(id){
+  if(!confirm("Excluir esta nota?"))return;
+  notes=notes.filter(n=>n.id!==id);
+  tabs=tabs.filter(t=>t.noteId!==id);
+  if(!tabs.length)tabs=[{noteId:notes[0]?.id||""}];
+  activeTab=Math.min(activeTab,tabs.length-1);
+  delete fileHandles[id];
+  save();renderTabs();renderEditor();renderSidebar();renderStatus();
+}
+function updateNote(content){
+  const n=curNote();if(!n)return;
+  n.content=content;n.updated=tod();
+  save();
+  setSaved(false,"● modificado");
+  renderHighlight();renderPreview();renderSidebar();renderStatus();
+}
+
+// ══════════════════════════════════════════
+//  MODALS
+// ══════════════════════════════════════════
+function openModal(id){
+  document.getElementById(id).classList.remove("hidden");
+  if(id==="modal-new"){const inp=document.getElementById("new-note-input");inp.value="";inp.focus();}
+  if(id==="modal-export"){const n=curNote();document.getElementById("export-title").textContent="Exportar"+(n?" — "+n.title:"");}
+  if(id==="modal-theme")renderThemeGrid();
+}
+function closeModal(id){document.getElementById(id).classList.add("hidden");}
+
+// ══════════════════════════════════════════
+//  VIEW / FOCUS
+// ══════════════════════════════════════════
+function setViewMode(vm){
+  viewMode=vm;
+  document.querySelectorAll(".vm-btn").forEach(b=>b.classList.toggle("on",b.dataset.vm===vm));
+  const ep=document.getElementById("editor-pane"),pp=document.getElementById("preview-pane"),ptb=document.getElementById("preview-toolbar");
+  if(vm==="editor"){ep.className="";pp.className="hidden";ptb.className="hidden";}
+  else if(vm==="preview"){pp.className="solo";ep.className="hidden";ptb.className="hidden";}
+  else{ep.className="";pp.className="";ptb.className="";}
+}
+function setFocusMode(on){
+  focusMode=on;
+  document.getElementById("editor-area").classList.toggle("focus-mode",on);
+  document.getElementById("btn-focus").classList.toggle("on",on);
+  if(on)setViewMode("editor");else setViewMode("split");
+}
+
+// ══════════════════════════════════════════
+//  TOOLBAR INSERT
+// ══════════════════════════════════════════
+function insertFmt(fmt){
+  const ta=document.getElementById("editor"),s=ta.selectionStart,e=ta.selectionEnd,sel=ta.value.slice(s,e);
+  const map={bold:`**${sel||"texto"}**`,italic:`*${sel||"texto"}*`,strike:`~~${sel||"texto"}~~`,h1:`# ${sel||"Título"}`,h2:`## ${sel||"Título"}`,h3:`### ${sel||"Título"}`,quote:`> ${sel||""}`,hr:"\n---\n",wiki:`[[${sel||""}]]`};
+  const ins=map[fmt]||"";
+  ta.value=ta.value.slice(0,s)+ins+ta.value.slice(e);
+  ta.selectionStart=ta.selectionEnd=s+ins.length;
+  ta.focus();updateNote(ta.value);
+}
+
+// ══════════════════════════════════════════
+//  FILE SYSTEM — Open single/multiple files
+// ══════════════════════════════════════════
+async function loadFileHandle(handle,store){
+  const file=await handle.getFile();
+  const content=await file.text();
+  const title=file.name.replace(/\.(md|markdown|txt)$/i,"");
+  let note=notes.find(n=>n.title===title);
+  if(note){note.content=content;note.updated=tod();}
+  else{const id=genId(),t=tod();note={id,title,tags:[],created:t,updated:t,content};notes.push(note);}
+  if(store)fileHandles[note.id]=handle;
+  return note;
+}
+
+document.getElementById("btn-open").onclick=async()=>{
+  if(window.showOpenFilePicker){
+    try{
+      const handles=await window.showOpenFilePicker({multiple:true,types:[{description:"Markdown",accept:{"text/markdown":[".md",".markdown",".txt"]}}]});
+      for(const h of handles){const note=await loadFileHandle(h,true);openNote(note.id);}
+      save();renderSidebar();renderStatus();
+      setSaved(true);
+    }catch(e){if(e.name!=="AbortError")alert("Erro ao abrir: "+e.message);}
+  } else {
+    document.getElementById("file-open-input").click();
+  }
+};
+document.getElementById("file-open-input").onchange=async(e)=>{
+  for(const file of e.target.files){
+    const content=await file.text();
+    const title=file.name.replace(/\.(md|markdown|txt)$/i,"");
+    let note=notes.find(n=>n.title===title);
+    if(note){note.content=content;note.updated=tod();}
+    else{const id=genId(),t=tod();note={id,title,tags:[],created:t,updated:t,content};notes.push(note);}
+    openNote(note.id);
+  }
+  e.target.value="";
+  save();renderSidebar();renderStatus();
+  setSaved(true);
 };
 
 // ══════════════════════════════════════════
-//  INITIALIZATION
+//  FILE SYSTEM — Open FOLDER (Zettelkasten)
 // ══════════════════════════════════════════
-document.addEventListener("DOMContentLoaded",()=>{
-  initTheme();
-  loadStateFromStorage();
-  if(state.notes.length===0 && !state.folderHandle){
-    state.notes=JSON.parse(JSON.stringify(DN));
-    saveNotesToStorage();
+async function loadFolder(handle){
+  folderHandle=handle;
+  const name=handle.name;
+  document.getElementById("folder-name").textContent=name;
+  document.getElementById("folder-bar").classList.add("visible");
+  document.getElementById("btn-folder").classList.add("folder-active");
+
+  let loaded=0;
+  for await(const [filename,fh] of handle.entries()){
+    if(fh.kind!=="file")continue;
+    if(!/\.(md|markdown|txt)$/i.test(filename))continue;
+    try{
+      const file=await fh.getFile();
+      const content=await file.text();
+      const title=filename.replace(/\.(md|markdown|txt)$/i,"");
+      folderFileHandles[title]=fh;
+      let note=notes.find(n=>n.title===title);
+      if(note){note.content=content;note.updated=tod();}
+      else{const id=genId(),t=tod();note={id,title,tags:[],created:t,updated:t,content};notes.push(note);}
+      loaded++;
+    }catch(err){console.warn("Erro ao ler",filename,err);}
   }
-  if(state.tabs.length===0 && state.notes.length>0){
-    state.tabs=[state.notes[0].id];
-    state.activeTab=state.notes[0].id;
+  save();
+  // Open first note from folder if no active note
+  if(loaded>0){
+    const firstTitle=Object.keys(folderFileHandles)[0];
+    const firstNote=notes.find(n=>n.title===firstTitle);
+    if(firstNote)openNote(firstNote.id);
   }
-  buildTabs();
-  buildSidebar();
-  loadActiveNoteIntoEditor();
-  setupEventListeners();
-  updateStatusbar();
-  triggerHighlight();
-  initPWAInstallation();
-});
-
-function loadStateFromStorage(){
-  try{
-    const th=localStorage.getItem("az-theme");
-    if(th && THEMES[th]) state.currentTheme=th;
-    applyTheme(state.currentTheme);
-    const nt=localStorage.getItem("az-notes");
-    if(nt) state.notes=JSON.parse(nt);
-    const tb=localStorage.getItem("az-tabs");
-    if(tb) state.tabs=JSON.parse(tb);
-    const at=localStorage.getItem("az-active-tab");
-    if(at) state.activeTab=at;
-  }catch(e){console.error(e)}
-}
-function saveNotesToStorage(){
-  try{
-    const toSave=state.notes.filter(n=>!n.handle);
-    localStorage.setItem("az-notes",JSON.stringify(toSave));
-  }catch(e){console.error(e)}
-}
-function saveTabsToStorage(){
-  localStorage.setItem("az-tabs",JSON.stringify(state.tabs));
-  localStorage.setItem("az-active-tab",state.activeTab||"");
+  renderSidebar();renderStatus();
+  setSaved(true);
+  return loaded;
 }
 
-// ══════════════════════════════════════════
-//  PWA INSTALLATION LOGIC
-// ══════════════════════════════════════════
-let deferredPrompt=null;
-function initPWAInstallation(){
-  const installBar=document.getElementById("install-bar");
-  const btnInstallPermanent=document.getElementById("btn-install-permanent");
-  
-  const showButton=()=>{
-    if(installBar) installBar.classList.add("visible");
-    if(btnInstallPermanent) btnInstallPermanent.style.display="flex";
-  };
-  
-  const hideButton=()=>{
-    if(installBar) installBar.classList.remove("visible");
-    if(btnInstallPermanent) btnInstallPermanent.style.display="none";
-  };
-
-  window.addEventListener("beforeinstallprompt",(e)=>{
-    e.preventDefault();
-    deferredPrompt=e;
-    showButton();
-  });
-
-  const triggerInstall=async()=>{
-    if(!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const {outcome}=await deferredPrompt.userChoice;
-    if(outcome==="accepted") hideButton();
-    deferredPrompt=null;
-  };
-
-  if(installBar) installBar.addEventListener("click",triggerInstall);
-  if(btnInstallPermanent) btnInstallPermanent.addEventListener("click",triggerInstall);
-
-  window.addEventListener("appinstalled",()=>{
-    hideButton();
-    deferredPrompt=null;
-  });
-}
-
-// ══════════════════════════════════════════
-//  RECURSIVE FOLDER STORAGE & LOADING
-// ══════════════════════════════════════════
-async function syncFolder(){
-  if(!state.folderHandle) return;
-  try{
-    // Verificar ou solicitar permissão de leitura
-    const opts={mode:"readwrite"};
-    if(await state.folderHandle.queryPermission(opts)!=="granted"){
-      if(await state.folderHandle.requestPermission(opts)!=="granted") return;
-    }
-    
-    let folderNotes=[];
-    // Função recursiva interna para varrer os diretórios
-    async function readDirectoryRecursive(dirHandle, relativePath="") {
-      for await(const entry of dirHandle.values()){
-        if(entry.kind==="file"){
-          if(entry.name.endsWith(".md") || entry.name.endsWith(".markdown") || entry.name.endsWith(".txt")){
-            const file=await entry.getFile();
-            const text=await file.text();
-            const parsed=parseMarkdownFile(text, entry.name);
-            parsed.handle=entry;
-            // Define o caminho relativo (ex: "Subpasta/Nota.md") ou "" para a raiz
-            parsed.relativePath=relativePath; 
-            folderNotes.push(parsed);
-          }
-        } else if(entry.kind==="directory"){
-          const nextPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
-          await readDirectoryRecursive(entry, nextPath);
-        }
-      }
-    }
-    
-    await readDirectoryRecursive(state.folderHandle);
-    
-    // Reter as notas criadas em memória que não pertencem ao disco, se houver
-    const memoryNotes=state.notes.filter(n=>!n.handle);
-    state.notes=[...memoryNotes,...folderNotes];
-    
-    // Validar abas abertas
-    state.tabs=state.tabs.filter(id=>state.notes.some(n=>n.id===id));
-    if(state.tabs.length>0 && !state.tabs.includes(state.activeTab)){
-      state.activeTab=state.tabs[0];
-    } else if(state.tabs.length===0){
-      state.activeTab=state.notes[0]?.id || null;
-      if(state.activeTab) state.tabs=[state.activeTab];
-    }
-    
-    buildTabs();
-    buildSidebar();
-    loadActiveNoteIntoEditor();
-    updateStatusbar();
-  }catch(e){
-    console.error("Erro ao sincronizar pasta recursivamente:",e);
-    alert("Falha ao ler a hierarquia da pasta.");
-  }
-}
-
-function parseMarkdownFile(text,filename){
-  let id="",title="",tags=[],created="",updated="";
-  const fmRegex=/^---\r?\n([\s\S]*?)\r?\n---/;
-  const match=text.match(fmRegex);
-  let contentBody=text;
-  if(match){
-    contentBody=text.replace(fmRegex,"").trim();
-    const yaml=match[1];
-    yaml.split("\n").forEach(line=>{
-      const parts=line.split(":");
-      if(parts.length>=2){
-        const key=parts[0].trim().toLowerCase();
-        const val=parts.slice(1).join(":").trim();
-        if(key==="id") id=val;
-        else if(key==="title") title=val.replace(/^['"]|['"]$/g,"");
-        else if(key==="tags") {
-          tags=val.replace(/[\[\]]/g,"").split(",").map(t=>t.trim()).filter(t=>t);
-        }
-        else if(key==="created") created=val;
-        else if(key==="updated") updated=val;
-      }
-    });
-  }
-  if(!title){
-    title=filename.replace(/\.(md|markdown|txt)$/i,"");
-  }
-  if(!id){
-    id="note-"+Math.random().toString(36).substring(2,11);
-  }
-  const dStr=new Date().toISOString().split("T")[0];
-  return {
-    id,
-    title,
-    tags,
-    content:text,
-    created:created||dStr,
-    updated:updated||dStr
-  };
-}
-
-// ══════════════════════════════════════════
-//  UI RENDERING (TABS & TREE SIDEBAR)
-// ══════════════════════════════════════════
-function buildTabs(){
-  const bar=document.getElementById("tabs-bar");
-  const plus=document.getElementById("tab-new");
-  bar.querySelectorAll(".tab").forEach(t=>t.remove());
-  state.tabs.forEach(id=>{
-    const note=state.notes.find(n=>n.id===id);
-    if(!note) return;
-    const tDiv=document.createElement("div");
-    tDiv.className=`tab ${state.activeTab===id?'on':''}`;
-    tDiv.dataset.id=id;
-    
-    const name=document.createElement("span");
-    name.className="tab-name";
-    // Exibe o caminho relativo na aba se estiver em subpasta
-    name.textContent=note.relativePath ? `${note.relativePath}/${note.title}` : note.title;
-    
-    const x=document.createElement("span");
-    x.className="tab-x";
-    x.textContent="×";
-    x.addEventListener("click",(e)=>{
-      e.stopPropagation();
-      closeTab(id);
-    });
-    tDiv.appendChild(name);
-    tDiv.appendChild(x);
-    tDiv.addEventListener("click",()=>switchTab(id));
-    bar.insertBefore(tDiv,plus);
-  });
-  saveTabsToStorage();
-}
-
-function switchTab(id){
-  state.activeTab=id;
-  buildTabs();
-  loadActiveNoteIntoEditor();
-  buildSidebar();
-  updateStatusbar();
-}
-
-function closeTab(id){
-  const idx=state.tabs.indexOf(id);
-  if(idx===-1) return;
-  state.tabs.splice(idx,1);
-  if(state.activeTab===id){
-    if(state.tabs.length>0){
-      state.activeTab=state.tabs[Math.max(0,idx-1)];
-    }else{
-      state.activeTab=null;
-    }
-  }
-  buildTabs();
-  loadActiveNoteIntoEditor();
-  buildSidebar();
-  updateStatusbar();
-}
-
-function buildSidebar(){
-  const container=document.getElementById("sb-content");
-  container.innerHTML="";
-  
-  if(state.activeSidebar==="explorer"){
-    let filtered=state.notes;
-    if(state.searchQuery){
-      const q=state.searchQuery.toLowerCase();
-      filtered=state.notes.filter(n=>n.title.toLowerCase().includes(q)||n.content.toLowerCase().includes(q)||n.tags.some(t=>t.toLowerCase().includes(q)));
-    }
-    
-    if(filtered.length===0){
-      container.innerHTML='<div class="sb-empty">Nenhuma nota encontrada.</div>';
-      return;
-    }
-
-    // Se estiver filtrando via busca ou se não houver pasta no disco, renderiza em lista plana tradicional
-    if (state.searchQuery || !state.folderHandle) {
-      filtered.forEach(note => {
-        container.appendChild(createNoteItemElement(note));
-      });
-      return;
-    }
-
-    // RENDERIZAR ARVORE DINÂMICA DE SUBPASTAS
-    // Estrutura do objeto árvore
-    const tree = { _notes: [], _subfolders: {} };
-    
-    filtered.forEach(note => {
-      if (!note.relativePath) {
-        tree._notes.push(note);
-      } else {
-        const parts = note.relativePath.split("/");
-        let currentLevel = tree;
-        parts.forEach(part => {
-          if (!currentLevel._subfolders[part]) {
-            currentLevel._subfolders[part] = { _notes: [], _subfolders: {} };
-          }
-          currentLevel = currentLevel._subfolders[part];
-        });
-        currentLevel._notes.push(note);
-      }
-    });
-
-    // Função recursiva para gerar os nós HTML da árvore
-    function renderTreeNodes(node, targetElement) {
-      // 1. Renderiza os arquivos contidos neste nível
-      node._notes.forEach(note => {
-        targetElement.appendChild(createNoteItemElement(note));
-      });
-      
-      // 2. Renderiza as subpastas recursivamente encapsuladas em <details>
-      Object.keys(node._subfolders).sort().forEach(folderName => {
-        const details = document.createElement("details");
-        details.className = "folder-details";
-        // Mantém aberto se configurado ou por padrão
-        details.open = false; 
-        
-        const summary = document.createElement("summary");
-        summary.className = "folder-summary";
-        summary.textContent = folderName;
-        
-        const groupDiv = document.createElement("div");
-        groupDiv.className = "folder-group";
-        
-        renderTreeNodes(node._subfolders[folderName], groupDiv);
-        
-        details.appendChild(summary);
-        details.appendChild(groupDiv);
-        targetElement.appendChild(details);
-      });
-    }
-
-    renderTreeNodes(tree, container);
-
-  } else if(state.activeSidebar==="backlinks"){
-    const current=state.notes.find(n=>n.id===state.activeTab);
-    if(!current){
-      container.innerHTML='<div class="sb-empty">Nenhuma nota ativa.</div>';
-      return;
-    }
-    const bl=state.notes.filter(n=>n.id!==current.id && n.content.includes(`[[${current.title}]]`));
-    if(bl.length===0){
-      container.innerHTML='<div class="sb-empty">Nenhum link apontando para cá.</div>';
-      return;
-    }
-    container.innerHTML='<div class="sb-sec">Notas que citam esta:</div>';
-    bl.forEach(n=>{
-      const d=document.createElement("div");
-      d.className="bl-item";
-      // Exibe caminho no backlink para localização contextualizada
-      d.textContent=n.relativePath ? `${n.relativePath}/${n.title}` : n.title;
-      d.addEventListener("click",()=>openNoteInTab(n.id));
-      container.appendChild(d);
-    });
-  } else if(state.activeSidebar==="outline"){
-    const current=state.notes.find(n=>n.id===state.activeTab);
-    if(!current){
-      container.innerHTML='<div class="sb-empty">Nenhuma nota ativa.</div>';
-      return;
-    }
-    const lines=current.content.split("\n");
-    const headers=[];
-    lines.forEach(l=>{
-      const m=l.match(/^(#{1,6})\s+(.*)$/);
-      if(m) headers.push({level:m[1].length,text:m[2]});
-    });
-    if(headers.length===0){
-      container.innerHTML='<div class="sb-empty">Nenhum cabeçalho H1-H6.</div>';
-      return;
-    }
-    headers.forEach(h=>{
-      const d=document.createElement("div");
-      d.className="ol-item";
-      d.style.paddingLeft=`${(h.level-1)*12 + 8}px`;
-      d.textContent=h.text;
-      d.addEventListener("click",()=>{
-        const tx=document.getElementById("editor");
-        const idx=tx.value.indexOf(h.text);
-        if(idx!==-1){
-          tx.focus();
-          tx.setSelectionRange(idx,idx+h.text.length);
-          const lineNum=tx.value.substr(0,idx).split("\n").length-1;
-          const lh=parseFloat(getComputedStyle(tx).lineHeight);
-          tx.scrollTop=lineNum*lh - 40;
-        }
-      });
-      container.appendChild(d);
-    });
-  }
-}
-
-// Cria a linha HTML correspondente a uma única nota na barra lateral
-function createNoteItemElement(note) {
-  const nDiv=document.createElement("div");
-  nDiv.className=`ni ${state.activeTab===note.id?'on':''}`;
-  nDiv.dataset.id=note.id;
-  
-  const title=document.createElement("div");
-  title.className="ni-title";
-  title.textContent=note.title;
-  
-  const meta=document.createElement("div");
-  meta.className="ni-meta";
-  // Exibe o ID e opcionalmente um indicador de pasta local
-  meta.textContent=`ID: ${note.id} ${note.handle ? ' 💾' : ''}`;
-  
-  nDiv.appendChild(title);
-  nDiv.appendChild(meta);
-  
-  if(note.tags && note.tags.length>0){
-    const tg=document.createElement("div");
-    tg.className="ni-tags";
-    note.tags.forEach(t=>{
-      const c=document.createElement("span");
-      c.className="chip";
-      c.textContent=t;
-      tg.appendChild(c);
-    });
-    nDiv.appendChild(tg);
-  }
-  
-  const del=document.createElement("button");
-  del.className="ni-del";
-  del.textContent="✕";
-  del.addEventListener("click",(e)=>{
-    e.stopPropagation();
-    if(confirm(`Excluir a nota "${note.title}"?`)) deleteNote(note.id);
-  });
-  nDiv.appendChild(del);
-  
-  nDiv.addEventListener("click",()=>openNoteInTab(note.id));
-  return nDiv;
-}
-
-function openNoteInTab(id){
-  if(!state.tabs.includes(id)) state.tabs.push(id);
-  switchTab(id);
-}
-
-function deleteNote(id){
-  const idx=state.notes.findIndex(n=>n.id===id);
-  if(idx===-1) return;
-  const n=state.notes[idx];
-  if(n.handle){
-    alert("Para deletar arquivos físicos, remova-os diretamente da pasta do seu computador e recarregue a pasta no aplicativo.");
+document.getElementById("btn-folder").onclick=async()=>{
+  if(!window.showDirectoryPicker){
+    alert("Seu navegador não suporta acesso a pastas (Chrome/Edge necessário).");
     return;
   }
-  state.notes.splice(idx,1);
-  state.tabs=state.tabs.filter(t=>t!==id);
-  if(state.activeTab===id){
-    state.activeTab=state.tabs[0] || null;
-  }
-  saveNotesToStorage();
-  buildTabs();
-  buildSidebar();
-  loadActiveNoteIntoEditor();
-  updateStatusbar();
-}
+  try{
+    const handle=await window.showDirectoryPicker({mode:"readwrite"});
+    const loaded=await loadFolder(handle);
+    if(loaded===0)alert("Nenhum arquivo .md encontrado na pasta.");
+    else alert(`${loaded} nota(s) carregada(s) da pasta "${handle.name}". Links [[título]] agora funcionam entre todos os arquivos.`);
+  }catch(e){if(e.name!=="AbortError")alert("Erro ao abrir pasta: "+e.message);}
+};
+
+document.getElementById("btn-folder-sync").onclick=async()=>{
+  if(!folderHandle){return;}
+  await loadFolder(folderHandle);
+  renderEditor();
+};
+
+document.getElementById("btn-folder-close").onclick=()=>{
+  folderHandle=null;
+  for(const k in folderFileHandles)delete folderFileHandles[k];
+  document.getElementById("folder-bar").classList.remove("visible");
+  document.getElementById("btn-folder").classList.remove("folder-active");
+};
 
 // ══════════════════════════════════════════
-//  EDITOR & MARKDOWN PARSING ENGINE
+//  FILE SYSTEM — Save
 // ══════════════════════════════════════════
-function loadActiveNoteIntoEditor(){
-  const tx=document.getElementById("editor");
-  const note=state.notes.find(n=>n.id===state.activeTab);
-  if(note){
-    tx.value=note.content;
-    tx.disabled=false;
-    renderMarkdownPreview(note.content);
-  }else{
-    tx.value="";
-    tx.disabled=true;
-    document.getElementById("preview").innerHTML='<div style="color:var(--text-muted);text-align:center;margin-top:40px;">Nenhuma nota selecionada.</div>';
+async function saveNoteToFile(note, forceDialog){
+  if(!window.showSaveFilePicker){
+    // fallback: download
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob([note.content],{type:"text/markdown"}));
+    a.download=`${slugify(note.title)||"nota"}.md`;a.click();
+    setSaved(true);return;
   }
-  triggerHighlight();
-}
-
-function handleEditorInput(val){
-  const note=state.notes.find(n=>n.id===state.activeTab);
-  if(!note) return;
-  note.content=val;
-  
-  // Atualizar metadados dinamicamente se houver Front Matter modificado
-  const fmRegex=/^---\r?\n([\s\S]*?)\r?\n---/;
-  const match=val.match(fmRegex);
-  if(match){
-    match[1].split("\n").forEach(line=>{
-      const parts=line.split(":");
-      if(parts.length>=2 && parts[0].trim().toLowerCase()==="title"){
-        note.title=parts.slice(1).join(":").trim().replace(/^['"]|['"]$/g,"");
-      }
-    });
-  }
-  
-  saveNotesToStorage();
-  renderMarkdownPreview(val);
-  updateStatusbar();
-  
-  // Atualizar nomes visualizados sem redesenhar toda a estrutura pesada instantaneamente
-  const activeTabEl=document.querySelector(".tab.on .tab-name");
-  if(activeTabEl) activeTabEl.textContent=note.relativePath ? `${note.relativePath}/${note.title}` : note.title;
-  const activeNiEl=document.querySelector(".ni.on .ni-title");
-  if(activeNiEl) activeNiEl.textContent=note.title;
-}
-
-function renderMarkdownPreview(md){
-  const dest=document.getElementById("preview");
-  // Escapar HTML básico para prevenção de XSS básico
-  let html=md.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  
-  // Ocultar Bloco Front Matter
-  html=html.replace(/^---\r?\n[\s\S]*?\r?\n---/,"<div class='spacer'></div>");
-  
-  // Headers
-  html=html.replace(/^######\s+(.*)$/gm,"<h6>$1</h6>");
-  html=html.replace(/^#####\s+(.*)$/gm,"<h5>$1</h5>");
-  html=html.replace(/^####\s+(.*)$/gm,"<h4>$1</h4>");
-  html=html.replace(/^###\s+(.*)$/gm,"<h3>$1</h3>");
-  html=html.replace(/^##\s+(.*)$/gm,"<h2>$1</h2>");
-  html=html.replace(/^#\s+(.*)$/gm,"<h1>$1</h1>");
-  
-  // Blockquotes
-  html=html.replace(/^>\s+(.*)$/gm,"<blockquote>$1</blockquote>");
-  
-  // Listas
-  html=html.replace(/^\s*[-*+]\s+(.*)$/gm,"<ul><li>$1</li></ul>").replace(/<\/ul>\r?\n<ul>/g,"");
-  html=html.replace(/^\s*\d+\.\s+(.*)$/gm,"<ol><li>$1</li></ol>").replace(/<\/ol>\r?\n<ol>/g,"");
-  
-  // Código em bloco
-  html=html.replace(/```([\s\S]*?)```/g,"<pre><code>$1</code></pre>");
-  html=html.replace(/`([^`\n]+)`/g,"<code>$1</code>");
-  
-  // Estilos inline
-  html=html.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
-  html=html.replace(/\*([^*]+)\*/g,"<em>$1</em>");
-  html=html.replace(/__([^_]+)__/g,"<strong>$1</strong>");
-  html=html.replace(/_([^_]+)_/g,"<em>$1</em>");
-  html=html.replace(/~~([^~]+)~~/g,"<del>$1</del>");
-  html=html.replace(/==([^=]+)==/g,"<mark>$1</mark>");
-  
-  // Linha Horizontal
-  html=html.replace(/^---$/gm,"<hr/>");
-  
-  // Parágrafos básicos
-  html=html.split(/\n{2,}/).map(p=>{
-    if(p.trim().startsWith("<h")||p.trim().startsWith("<blockquote")||p.trim().startsWith("<pre")||p.trim().startsWith("<ul")||p.trim().startsWith("<ol")||p.trim().startsWith("<hr")) return p;
-    return `<p>${p.replace(/\n/g,"<br/>")}</p>`;
-  }).join("");
-  
-  // Mecanismo Zettelkasten WikiLinks [[Título da Nota]]
-  html=html.replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g,(match,targetTitle,alias)=>{
-    const titleClean=targetTitle.trim();
-    const displayLabel=alias?alias.trim():titleClean;
-    const found=state.notes.find(n=>n.title.toLowerCase()===titleClean.toLowerCase());
-    if(found){
-      return `<span class="wikilink wikilink-exists" data-target-id="${found.id}">${displayLabel}</span>`;
-    }else{
-      return `<span class="wikilink wikilink-missing" data-title="${titleClean}">${displayLabel}</span>`;
+  try{
+    // Priority: individual handle > folder handle > dialog
+    let handle=fileHandles[note.id]||folderFileHandles[note.title];
+    if(!handle||forceDialog){
+      handle=await window.showSaveFilePicker({
+        suggestedName:`${slugify(note.title)||"nota"}.md`,
+        types:[{description:"Markdown",accept:{"text/markdown":[".md"]}}]
+      });
+      fileHandles[note.id]=handle;
+      // Also register in folderFileHandles by title for link resolution
+      folderFileHandles[note.title]=handle;
     }
-  });
-  
-  dest.innerHTML=html;
-  
-  // Listeners para cliques em wikilinks no painel de preview
-  dest.querySelectorAll(".wikilink-exists").forEach(el=>{
-    el.addEventListener("click",()=>openNoteInTab(el.dataset.targetId));
-  });
-  dest.querySelectorAll(".wikilink-missing").forEach(el=>{
-    el.addEventListener("click",()=>{
-      createNewNoteWithTitle(el.dataset.title);
-    });
-  });
+    const writable=await handle.createWritable();
+    await writable.write(note.content);
+    await writable.close();
+    setSaved(true);
+    renderTabs(); // refresh tab indicator
+  }catch(e){if(e.name!=="AbortError")alert("Erro ao salvar: "+e.message);}
 }
 
-// Realce em tempo real simulado no Textarea via camada absoluta inferior
-function triggerHighlight(){
-  const tx=document.getElementById("editor");
-  const layer=document.getElementById("hl-layer");
-  if(!tx || !layer) return;
-  let text=tx.value;
-  // Escapar tags nativas
-  text=text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  
-  // Regex colorização rápida
-  text=text.replace(/(^---\r?\n[\s\S]*?\r?\n---)/g,"<span style='color:var(--sh-fm)'>$1</span>");
-  text=text.replace(/^(\s*#{1,6}\s+.*)$/gm,"<span style='color:var(--sh-head);font-weight:500;'>$1</span>");
-  text=text.replace(/(\*\*.*?\*\*)/g,"<span style='color:var(--sh-bold);font-weight:600;'>$1</span>");
-  text=text.replace(/(\*.*?\*)/g,"<span style='color:var(--sh-italic);font-style:italic;'>$1</span>");
-  text=text.replace(/(\[\[.*?\]\])/g,"<span style='color:var(--sh-wiki);text-decoration:underline;'>$1</span>");
-  text=text.replace(/(
-http://googleusercontent.com/immersive_entry_chip/0
+document.getElementById("btn-save").onclick=async()=>{
+  const n=curNote();if(!n)return;
+  await saveNoteToFile(n,false);
+};
+document.getElementById("btn-save-as").onclick=async()=>{
+  const n=curNote();if(!n)return;
+  await saveNoteToFile(n,true);
+};
+
+// ══════════════════════════════════════════
+//  EVENTS
+// ══════════════════════════════════════════
+document.getElementById("btn-sidebar").onclick=()=>{sidebarOpen=!sidebarOpen;document.getElementById("sidebar").classList.toggle("closed",!sidebarOpen);document.getElementById("btn-sidebar").classList.toggle("on",sidebarOpen);};
+document.getElementById("btn-new").onclick=()=>openModal("modal-new");
+document.getElementById("btn-export").onclick=()=>openModal("modal-export");
+document.getElementById("btn-theme").onclick=()=>openModal("modal-theme");
+document.getElementById("btn-focus").onclick=()=>setFocusMode(!focusMode);
+document.getElementById("btn-new-cancel").onclick=()=>closeModal("modal-new");
+document.getElementById("btn-new-confirm").onclick=()=>{const t=document.getElementById("new-note-input").value.trim();if(t){createNote(t);closeModal("modal-new");}};
+document.getElementById("new-note-input").onkeydown=e=>{if(e.key==="Enter"){const t=e.target.value.trim();if(t){createNote(t);closeModal("modal-new");}}if(e.key==="Escape")closeModal("modal-new");};
+document.getElementById("btn-export-close").onclick=()=>closeModal("modal-export");
+document.querySelectorAll(".ex-opt").forEach(el=>el.onclick=()=>{const n=curNote();if(n)doExport(n,el.dataset.fmt);closeModal("modal-export");});
+document.getElementById("btn-theme-close").onclick=()=>closeModal("modal-theme");
+document.querySelectorAll(".vm-btn").forEach(b=>b.onclick=()=>setViewMode(b.dataset.vm));
+document.querySelectorAll(".sb-tab").forEach(tab=>tab.onclick=()=>{
+  sidebarMode=tab.dataset.sb;
+  document.querySelectorAll(".sb-tab").forEach(t=>t.classList.toggle("on",t.dataset.sb===sidebarMode));
+  document.getElementById("sb-search").style.display=sidebarMode==="explorer"?"flex":"none";
+  renderSidebar();
+});
+document.getElementById("search-input").oninput=e=>{searchQuery=e.target.value;renderSidebar();};
+
+// Editor events
+const editorEl=document.getElementById("editor");
+editorEl.oninput=e=>updateNote(e.target.value);
+editorEl.onscroll=syncScroll;
+editorEl.onkeydown=e=>{
+  if(e.key==="Tab"){
+    e.preventDefault();
+    const ta=e.target,s=ta.selectionStart;
+    ta.value=ta.value.slice(0,s)+"  "+ta.value.slice(ta.selectionEnd);
+    ta.selectionStart=ta.selectionEnd=s+2;
+    updateNote(ta.value);
+  }
+  if(e.key==="Escape"&&focusMode)setFocusMode(false);
+  // Ctrl+S / Cmd+S
+  if((e.ctrlKey||e.metaKey)&&e.key==="s"){
+    e.preventDefault();
+    const n=curNote();if(n)saveNoteToFile(n,false);
+  }
+};
+document.querySelectorAll(".tbtn").forEach(b=>b.onclick=()=>insertFmt(b.dataset.fmt));
+document.getElementById("preview").onclick=e=>{
+  const el=e.target.closest(".wikilink");if(!el)return;
+  const id=el.dataset.noteid,title=el.dataset.title;
+  if(id){openNote(id);return;}
+  if(confirm(`Criar nova nota: "${title}"?`))createNote(title);
+};
+document.querySelectorAll(".overlay").forEach(ov=>ov.onclick=e=>{if(e.target===ov)ov.classList.add("hidden");});
+
+// ══════════════════════════════════════════
+//  PWA
+// ══════════════════════════════════════════
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();installPromptEvent=e;document.getElementById("install-bar").classList.add("visible");});
+window.addEventListener("appinstalled",()=>document.getElementById("install-bar").classList.remove("visible"));
+document.getElementById("install-bar").onclick=()=>{if(installPromptEvent){installPromptEvent.prompt();installPromptEvent=null;document.getElementById("install-bar").classList.remove("visible");}};
+
+if("serviceWorker" in navigator){
+  const sw=`const C="askesis-zettel-v1";self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(n=>n!==C).map(n=>caches.delete(n))))));self.addEventListener("fetch",e=>{if(e.request.method!=="GET")return;e.respondWith(caches.open(C).then(cache=>fetch(e.request).then(r=>{cache.put(e.request,r.clone());return r;}).catch(()=>caches.match(e.request))));});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:"application/javascript"}))).catch(()=>{});
+}
+
+const mf={name:"Askesis-Zettel",short_name:"Askesis-Z",description:"Editor Markdown Zettelkasten",theme_color:"#0d0d0d",background_color:"#0d0d0d",display:"standalone",start_url:".",icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%230d0d0d'/><text x='256' y='360' font-family='serif' font-size='300' text-anchor='middle' fill='%23c9a96e'>✦</text></svg>",sizes:"512x512",type:"image/svg+xml",purpose:"any maskable"}]};
+const ml=document.createElement("link");ml.rel="manifest";ml.href="data:application/manifest+json,"+encodeURIComponent(JSON.stringify(mf));document.head.appendChild(ml);
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+applyTheme(currentTheme);
+renderTabs();
+renderEditor();
+renderSidebar();
+renderStatus();
+setViewMode("split");
+setSaved(true);
+</script>
+</body>
+</html>
