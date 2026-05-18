@@ -1284,7 +1284,7 @@ function renderTabs(){
   nb.id="tab-new";nb.textContent="+";nb.onclick=()=>openModal("modal-new");
   bar.appendChild(nb);
 }
-function setActiveTab(idx){activeTab=idx;renderTabs();renderEditor();renderSidebar();renderStatus();}
+function setActiveTab(idx){activeTab=idx;_statusCache={noteId:null,bl:0};renderTabs();renderEditor();renderSidebar();renderStatus();}
 function closeTab(idx){if(tabs.length===1)return;tabs.splice(idx,1);activeTab=Math.min(activeTab,tabs.length-1);renderTabs();renderEditor();renderSidebar();renderStatus();}
 function openNote(noteId){
   const idx=tabs.findIndex(t=>t.noteId===noteId);
@@ -1509,11 +1509,25 @@ function escHtml(s){
 // ══════════════════════════════════════════
 //  STATUS
 // ══════════════════════════════════════════
+// Cache para evitar recalcular backlinks quando a nota não mudou
+let _statusCache={noteId:null,bl:0};
 function renderStatus(){
   const n=curNote(),c=n?n.content:"";
-  const bl=n?notes.filter(x=>x.id!==n.id&&x.content.toLowerCase().includes(`[[${n.title.toLowerCase()}]]`)).length:0;
+  // Contagem de palavras: split simples é suficiente e rápido
+  const words=c?c.split(/\s+/).filter(Boolean).length:0;
+  // Backlinks: caro (percorre todas as notas), só recalcula quando a nota muda
+  let bl=0;
+  if(n){
+    if(n.id!==_statusCache.noteId){
+      const pat=`[[${n.title.toLowerCase()}]]`;
+      bl=notes.reduce((s,x)=>s+(x.id!==n.id&&x.content.toLowerCase().includes(pat)?1:0),0);
+      _statusCache={noteId:n.id,bl};
+    } else {
+      bl=_statusCache.bl;
+    }
+  }
   document.getElementById("st-id").textContent=n?n.id:"";
-  document.getElementById("st-words").textContent=c.split(/\s+/).filter(Boolean).length+" palavras";
+  document.getElementById("st-words").textContent=words+" palavras";
   document.getElementById("st-chars").textContent=c.length+" chars";
   document.getElementById("st-links").textContent=(c.match(/\[\[([^\]]+)\]\]/g)||[]).length+" links";
   document.getElementById("st-backlinks").textContent=bl+" backlinks";
@@ -1538,12 +1552,35 @@ function deleteNote(id){
   delete fileHandles[id];
   save();renderTabs();renderEditor();renderSidebar();renderStatus();
 }
+// ── Tiered debounce timers ──
+// highlight : imediato via rAF (já debounced internamente)
+// preview   : 120 ms  — perceptível mas aceitável, pouco custoso no split view
+// save+status+sidebar : 600 ms — operações caras, não precisam de resposta imediata
+let _previewTimer=null;
+let _heavyTimer=null;
+
 function updateNote(content){
   const n=curNote();if(!n)return;
-  n.content=content;n.updated=tod();
-  save();
+  n.content=content;
+  n.updated=tod();
   setSaved(false,"● modificado");
-  renderHighlight();renderPreview();renderSidebar();renderStatus();
+
+  // 1. Highlight — usa rAF interno, não bloqueia digitação
+  renderHighlight();
+
+  // 2. Preview — debounce curto: atualiza enquanto o usuário faz pausa breve
+  clearTimeout(_previewTimer);
+  _previewTimer=setTimeout(renderPreview, 120);
+
+  // 3. Save + Sidebar + Status — debounce longo: operações caras
+  //    localStorage.setItem é I/O síncrono; renderSidebar reconstrói DOM;
+  //    renderStatus percorre todas as notas para backlinks
+  clearTimeout(_heavyTimer);
+  _heavyTimer=setTimeout(()=>{
+    save();
+    renderStatus();
+    renderSidebar();
+  }, 600);
 }
 
 // ══════════════════════════════════════════
