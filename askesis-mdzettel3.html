@@ -1293,38 +1293,71 @@ function openNote(noteId){
 }
 
 // ══════════════════════════════════════════
-//  EDITOR + HIGHLIGHT
+//  EDITOR + HIGHLIGHT LAYER SYNC
+//
+//  Architecture:
+//  - #editor    : textarea, z-index 2, transparent text, scrolls normally
+//  - #hl-layer  : div, z-index 1, never scrolls, shifted via transform
+//
+//  Three invariants that MUST hold at all times:
+//  1. Same font / font-size / line-height / padding-* (guaranteed by CSS vars)
+//  2. Same content width (hl right-padding compensates for scrollbar gutter)
+//  3. Same vertical offset (hl translated by -scrollTop)
+//
+//  Rule: syncScroll must ALWAYS run after innerHTML is committed to DOM
+//  so the browser has the correct scrollHeight. Never call syncScroll
+//  inside the same microtask as innerHTML assignment.
 // ══════════════════════════════════════════
-// Measure the textarea's scrollbar width and apply it as extra right-padding
-// on the hl-layer, so both elements wrap text at exactly the same column.
-function syncLayerWidth(){
-  const ta=document.getElementById("editor");
-  const hl=document.getElementById("hl-layer");
-  if(!ta||!hl)return;
-  // offsetWidth - clientWidth = scrollbar width (0 if no scrollbar shown)
-  const sbW=ta.offsetWidth-ta.clientWidth;
-  // Base right padding is 40px; add scrollbar width so content area matches
-  hl.style.paddingRight=(40+sbW)+"px";
+
+const _ta=()=>document.getElementById("editor");
+const _hl=()=>document.getElementById("hl-layer");
+
+// Read the actual computed horizontal padding from the textarea —
+// never hardcode it, so CSS changes (responsive, focus mode) are
+// automatically reflected.
+function _getPadH(){
+  const ta=_ta();
+  if(!ta)return 0;
+  // getComputedStyle is accurate after layout; returns "Npx"
+  return parseFloat(getComputedStyle(ta).paddingRight)||0;
 }
 
-// syncScroll: shift the layer up by the textarea's scrollTop via transform.
-// The layer never scrolls itself — this is the only reliable approach.
+// syncLayerWidth: make the layer's usable text area identical to the textarea.
+// The textarea uses scrollbar-gutter:stable, so clientWidth already excludes
+// the reserved gutter space. The layer must match that same width.
+function syncLayerWidth(){
+  const ta=_ta(), hl=_hl();
+  if(!ta||!hl)return;
+  // scrollbar gutter width = reserved space even when bar is hidden
+  const gutterW=ta.offsetWidth-ta.clientWidth;
+  // Read the actual right padding so we stay in sync with CSS
+  const padR=_getPadH();
+  hl.style.paddingRight=(padR+gutterW)+"px";
+}
+
+// syncScroll: shift the highlight layer to match the textarea's scroll.
+// Must be called AFTER innerHTML is in the DOM (browser has layout).
 function syncScroll(){
-  const ta=document.getElementById("editor");
-  const hl=document.getElementById("hl-layer");
-  if(!hl||!ta)return;
+  const ta=_ta(), hl=_hl();
+  if(!ta||!hl)return;
   hl.style.transform=`translateY(${-ta.scrollTop}px)`;
 }
 
-// Debounce via rAF — avoids hammering innerHTML on rapid keystrokes in large docs
+// renderHighlight: update layer content then sync geometry.
+// Uses a single rAF so innerHTML + layout + syncScroll happen in order:
+//   1. innerHTML assigned  (DOM mutation)
+//   2. rAF fires           (browser has laid out the new content)
+//   3. syncLayerWidth      (reads fresh offsetWidth/clientWidth)
+//   4. syncScroll          (reads scrollTop against new layout)
 let _hlRaf=null;
 function renderHighlight(){
-  const ta=document.getElementById("editor");
-  const hl=document.getElementById("hl-layer");
+  const ta=_ta(), hl=_hl();
   if(!hl||!ta)return;
   if(_hlRaf)cancelAnimationFrame(_hlRaf);
+  // Assign innerHTML synchronously so the DOM mutation is queued,
+  // then let rAF fire after the browser processes layout.
+  hl.innerHTML=hlMd(ta.value);
   _hlRaf=requestAnimationFrame(()=>{
-    hl.innerHTML=hlMd(ta.value);
     syncLayerWidth();
     syncScroll();
     _hlRaf=null;
@@ -1333,15 +1366,18 @@ function renderHighlight(){
 
 function renderEditor(){
   const n=curNote();
-  const ta=document.getElementById("editor");
+  const ta=_ta();
   ta.value=n?n.content:"";
-  ta.scrollTop=0; // reset scroll so layer and textarea start in sync
+  ta.scrollTop=0;
   renderHighlight();
   renderPreview();
 }
 
-// ResizeObserver: fires on window resize, sidebar toggle, split view change.
-// Re-render highlight so word-wrap recalculates, then re-sync scroll.
+// ResizeObserver: fires when editor-wrap changes size (window resize,
+// sidebar toggle, split-view change, mobile orientation).
+// We DON'T call renderHighlight here — that would cause a full re-render
+// on every resize frame. Instead we only recalculate geometry:
+// re-wrap the *existing* layer content by forcing a reflow, then re-sync.
 (function(){
   const wrap=document.getElementById("editor-wrap");
   if(!wrap||!window.ResizeObserver)return;
@@ -1349,13 +1385,16 @@ function renderEditor(){
   new ResizeObserver(()=>{
     if(_resizeRaf)cancelAnimationFrame(_resizeRaf);
     _resizeRaf=requestAnimationFrame(()=>{
-      syncLayerWidth();
+      // Full re-render needed because word-wrap recalculates line breaks
+      // when container width changes — line count can change, so a geometry-
+      // only sync is insufficient. But we batch it to one rAF per resize burst.
       renderHighlight();
-      syncScroll();
       _resizeRaf=null;
     });
   }).observe(wrap);
 })();
+
+// (scroll event registered below with editorEl)
 function renderPreview(){
   const n=curNote();
   document.getElementById("preview").innerHTML=n?md(n.content):"";
