@@ -1,0 +1,66 @@
+/* =====================================================================
+   ASKEMATA — impressão / exportação em PDF
+   Duas variantes, ativadas via classe no <body>:
+     .print-a5         -> folheto A5, coluna única
+     .print-a4-2col     -> artigo A4, duas colunas (estilo periódico)
+   O disparo é sempre window.print(); o usuário escolhe "Salvar como PDF"
+   no diálogo de impressão do navegador. O tamanho da página (@page size)
+   é injetado dinamicamente pelo app.js, ver função setPageSize().
+   ===================================================================== */
+
+@media print {
+
+  @page { margin: 18mm 16mm; }
+
+  .masthead, .topnav, .sidebar, .site-footer, .article__toolbar, .skip-link {
+    display: none !important;
+  }
+
+  .layout {
+    display: block;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .article { max-width: none; }
+
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  .article__body a { color: #000; text-decoration: none; }
+  .article__body a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.78em;
+    color: #444;
+  }
+
+  .article__header { border-bottom: 1px solid #000; }
+  .article__abstract { background: none; border-left: 2px solid #000; }
+
+  h1, h2, h3, h4 { break-after: avoid; }
+  p, li, blockquote { orphans: 3; widows: 3; }
+  img, table, pre, blockquote { break-inside: avoid; }
+
+  /* ---------------- Variante A5 — folheto, coluna única ---------------- */
+  body.print-a5 {
+    font-size: 9.5pt;
+  }
+  body.print-a5 .article__title { font-size: 15pt; }
+  body.print-a5 .article__body { column-count: 1; }
+
+  /* ------------- Variante A4 — duas colunas, estilo periódico ---------- */
+  body.print-a4-2col .article__header {
+    column-span: all;
+  }
+  body.print-a4-2col .article__body {
+    column-count: 2;
+    column-gap: 9mm;
+    column-rule: 0.5pt solid #999;
+    text-align: justify;
+  }
+}
