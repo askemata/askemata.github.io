@@ -2,22 +2,27 @@
 title: "Guia do editor: exportar um artigo em PDF"
 author: "Equipe Askemata"
 date: "2026-07-01"
-abstract: "Como usar os botões de exportação para gerar um PDF em A5 ou em A4 com duas colunas."
-keywords: [guia, exportação, pdf, impressão]
+abstract: "As quatro formas de gerar um PDF a partir de um artigo, da mais simples à de maior fidelidade tipográfica."
+keywords: [guia, exportação, pdf, impressão, latex, pagedjs]
 language: "pt-BR"
 ---
 
-Todo artigo exibe, logo abaixo do menu superior, dois controles: **Exportar A5** e **Exportar A4 (2 colunas)**.
+Todo artigo exibe, logo abaixo do menu superior, quatro opções — da mais rápida à de maior fidelidade tipográfica.
 
-## O que cada um faz
+## 1. Exportar A5 / Exportar A4 (2 colunas)
 
-- **Exportar A5** — remove o menu, a barra lateral e o rodapé, e formata o texto em coluna única, em tamanho reduzido — ideal para um folheto ou leitura impressa compacta.
-- **Exportar A4 (2 colunas)** — formata o artigo em duas colunas, como um artigo de periódico, no tamanho A4.
+Usa só o recurso de impressão do próprio navegador. Ao clicar, o navegador abre a caixa de diálogo de impressão já ajustada para o formato escolhido — basta trocar o destino para **Salvar como PDF**. É o caminho mais simples, mas a fidelidade varia entre navegadores: funciona bem no Chrome e no Edge, e de forma mais inconsistente no Firefox e principalmente no Safari.
 
-## Salvando como PDF
+## 2. Pré-visualizar (alta fidelidade)
 
-Ao clicar em qualquer um dos botões, o navegador abre a caixa de diálogo de impressão já ajustada para o formato escolhido. Basta trocar o destino de "impressora" para **Salvar como PDF** (essa opção existe nativamente em Chrome, Edge, Firefox e Safari) e confirmar.
+Abre uma pré-visualização paginada por uma biblioteca chamada Paged.js, que calcula a paginação em JavaScript em vez de depender só da implementação de cada navegador. O resultado é bem mais consistente entre Chrome, Firefox e Safari. Ainda roda inteiramente no navegador, sem nenhuma instalação.
 
-## Por que esse método, e não um gerador de PDF pronto
+## 3. PDF LaTeX (A5 / A4)
 
-Esse fluxo usa apenas os recursos de impressão do próprio navegador — não depende de nenhum serviço externo nem de instalação de programas como o LaTeX. Isso mantém o site inteiramente estático, ao custo de um controle tipográfico um pouco menor do que uma composição feita diretamente em LaTeX. Se, no futuro, for necessário um acabamento gráfico ainda mais refinado, o mesmo Markdown pode alimentar uma rota alternativa via Pandoc — mas isso exigiria uma etapa de processamento fora do navegador.
+Links diretos para arquivos já prontos, gerados automaticamente por um robô do GitHub (GitHub Actions) que roda Pandoc e uma distribuição real de LaTeX a cada atualização do site. É a mesma qualidade tipográfica de um documento composto diretamente em LaTeX — hifenização, quebras de página e espaçamento calculados pelo motor do LaTeX. Esses arquivos só existem depois que esse processo roda pelo menos uma vez no repositório publicado.
+
+## Qual escolher?
+
+- Para uma conferência rápida: **Exportar A5/A4**.
+- Para um resultado visualmente consistente entre diferentes navegadores, sem sair do site: **Pré-visualizar (alta fidelidade)**.
+- Para o padrão tipográfico mais alto possível, para publicação ou arquivo: **PDF LaTeX**.
