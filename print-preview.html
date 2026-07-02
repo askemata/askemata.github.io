@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pré-visualização de impressão — Askemata</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/preview.css">
+</head>
+<body>
+
+<div class="preview-toolbar">
+  <span class="preview-toolbar__label">Pré-visualização de alta fidelidade — paginação via Paged.js</span>
+  <label>
+    Formato:
+    <select id="size-select">
+      <option value="a5">A5</option>
+      <option value="a4-2col" selected>A4 (duas colunas)</option>
+    </select>
+  </label>
+  <button id="btn-print" type="button">Imprimir / Salvar PDF</button>
+  <a id="btn-back" href="index.html">Voltar ao artigo</a>
+</div>
+
+<iframe id="paged-frame" title="Artigo paginado" class="preview-frame"></iframe>
+
+<script src="assets/js/print-preview.js"></script>
+</body>
+</html>

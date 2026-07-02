@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="assets/css/print.css" media="print">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/16.3.0/lib/marked.umd.min.js" defer></script>
+<script src="assets/js/content-loader.js" defer></script>
 <script src="assets/js/app.js" defer></script>
 </head>
 <body>
@@ -37,7 +38,13 @@
   </main>
 
   <aside class="sidebar" aria-label="Sumário">
-    <p class="sidebar__label">Sumário</p>
+    <div class="sidebar__head">
+      <p class="sidebar__label">Sumário</p>
+      <button type="button" class="sidebar__toggle" id="sidebar-toggle" aria-expanded="false" aria-controls="sidebar-nav">
+        <span class="sidebar__toggle-icon" aria-hidden="true"></span>
+        Menu
+      </button>
+    </div>
     <nav id="sidebar-nav"></nav>
   </aside>
 </div>
