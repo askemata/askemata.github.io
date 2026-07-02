@@ -1,0 +1,46 @@
+/* ASKEMATA — preview.css : shell de print-preview.html */
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: #DCD6C8;
+  font-family: 'Latin Modern Sans', Helvetica, Arial, sans-serif;
+}
+
+.preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem 1.4rem;
+  padding: 0.9rem 1.4rem;
+  background: #1C1A17;
+  color: #F1EEE6;
+  font-size: 0.85rem;
+}
+
+.preview-toolbar__label { font-weight: 700; margin-right: auto; }
+
+.preview-toolbar select,
+.preview-toolbar button,
+.preview-toolbar a {
+  font: inherit;
+  color: #F1EEE6;
+  background: transparent;
+  border: 1px solid #6b675e;
+  border-radius: 3px;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  text-decoration: none;
+}
+.preview-toolbar select:hover,
+.preview-toolbar button:hover,
+.preview-toolbar a:hover { border-color: #F1EEE6; }
+
+.preview-frame {
+  display: block;
+  width: 100%;
+  height: calc(100% - 3.4rem);
+  border: 0;
+}

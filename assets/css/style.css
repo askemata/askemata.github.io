@@ -66,11 +66,12 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 }
 
 .masthead__title {
-  font-family: var(--font-sans);
+  font-family: var(--font-serif);
   font-weight: 700;
-  font-size: 2rem;
-  letter-spacing: 0.42em;
-  text-indent: 0.42em;
+  font-variant: small-caps;
+  font-size: 2.1rem;
+  letter-spacing: 0.38em;
+  text-indent: 0.38em;
   margin: 0;
 }
 
@@ -150,14 +151,17 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 
 .article__toolbar {
   display: flex;
-  gap: 1.1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  align-items: baseline;
   font-family: var(--font-sans);
   font-size: 0.78rem;
   letter-spacing: 0.03em;
   color: var(--ink-soft);
   margin-bottom: 1.6rem;
 }
-.article__toolbar button {
+.article__toolbar button,
+.article__toolbar a {
   font: inherit;
   color: var(--ink-soft);
   background: none;
@@ -168,7 +172,9 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
   text-underline-offset: 3px;
   text-decoration-color: var(--rule-strong);
 }
-.article__toolbar button:hover { color: var(--accent); text-decoration-color: var(--accent); }
+.article__toolbar button:hover,
+.article__toolbar a:hover { color: var(--accent); text-decoration-color: var(--accent); }
+.article__toolbar-pdf a { margin-left: 0.3rem; }
 
 .article__header {
   margin-bottom: 2.4rem;
@@ -354,6 +360,49 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
   padding-left: 1.6rem;
 }
 
+.sidebar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sidebar__toggle {
+  display: none; /* só aparece em telas pequenas, ver media query abaixo */
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+}
+.sidebar__toggle:hover { border-color: var(--accent); color: var(--accent); }
+
+.sidebar__toggle-icon,
+.sidebar__toggle-icon::before,
+.sidebar__toggle-icon::after {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+.sidebar__toggle-icon {
+  position: relative;
+}
+.sidebar__toggle-icon::before,
+.sidebar__toggle-icon::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+.sidebar__toggle-icon::before { top: -5px; }
+.sidebar__toggle-icon::after { top: 5px; }
+
 .sidebar__label {
   font-size: 0.72rem;
   letter-spacing: 0.1em;
@@ -446,4 +495,28 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }
+}
+
+/* ---------------------------------------------------------------------
+   Barra lateral em menu hambúrguer — telas pequenas
+   (fica ao final do arquivo de propósito, para sobrepor as regras
+   gerais de .sidebar definidas acima na cascata)
+   --------------------------------------------------------------------- */
+@media (max-width: 860px) {
+  .sidebar {
+    border-left: none;
+    border-bottom: 1px solid var(--rule);
+    padding-left: 0;
+    padding-bottom: 1.1rem;
+  }
+
+  .sidebar__toggle { display: inline-flex; }
+
+  /* Sumário fica escondido por padrão; o botão revela/esconde */
+  #sidebar-nav { display: none; }
+  .sidebar.is-open #sidebar-nav {
+    display: block;
+    margin-top: 1rem;
+  }
+  .sidebar.is-open .sidebar__toggle { border-color: var(--accent); color: var(--accent); }
 }
