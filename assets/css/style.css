@@ -11,8 +11,9 @@
   --ink-soft:     #5B564D;   /* texto secundário, legendas, metadados */
   --rule:         #D9D2C3;   /* filetes / hairlines */
   --rule-strong:  #B9AF98;   /* filetes de destaque (duplo filete do masthead) */
-  --accent:       #7A2331;   /* oxblood — links, marcadores, destaque */
+  --accent:       #7A2331;   /* oxblood — links, marcadores, destaque sobre papel */
   --accent-soft:  #F1E1DF;   /* fundo sutil para hover / seleção */
+  --accent-gold:  #B08D57;   /* acento sobre fundo escuro (menu superior) — bom contraste */
   --navy:         #2C3A52;   /* acento secundário — visitado, ícones */
 
   /* --- Tipografia --- */
@@ -55,7 +56,6 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
    --------------------------------------------------------------------- */
 .masthead {
   background: var(--paper-shade);
-  border-bottom: 1px solid var(--rule-strong);
   padding: 1.6rem 1.5rem 0;
 }
 
@@ -63,6 +63,15 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
   max-width: 74rem;
   margin: 0 auto;
   text-align: center;
+}
+
+.masthead__kicker {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 0 0 0.6rem;
 }
 
 .masthead__title {
@@ -81,44 +90,61 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
   font-style: italic;
   color: var(--ink-soft);
   font-size: 0.92rem;
-  margin: 0.35rem 0 1.1rem;
+  margin: 0.35rem 0 1.5rem;
 }
 
 .masthead__rule {
   border: 0;
-  border-top: 3px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
   height: 3px;
-  margin: 0 auto;
-  max-width: 74rem;
+  background: var(--accent);
+  margin: 0;
 }
 
 .topnav {
+  background: var(--ink);
+}
+.topnav__inner {
   max-width: 74rem;
   margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem 1.8rem;
+  padding: 0 1.5rem;
+}
+.topnav__meta {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-gold);
+  white-space: nowrap;
 }
 .topnav ul {
   list-style: none;
   display: flex;
+  flex: 1 1 auto;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem 1.8rem;
+  gap: 0.4rem 1.6rem;
   margin: 0;
-  padding: 0.7rem 1rem;
+  padding: 0.8rem 0;
   font-family: var(--font-sans);
 }
 .topnav a {
-  color: var(--ink);
+  color: var(--paper);
   text-decoration: none;
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
+  font-size: 0.8rem;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
-  padding: 0.25rem 0.1rem;
+  padding: 0.3rem 0.05rem;
   border-bottom: 2px solid transparent;
 }
 .topnav a:hover, .topnav a[aria-current="page"] {
-  border-bottom-color: var(--accent);
-  color: var(--accent);
+  border-bottom-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+@media (max-width: 640px) {
+  .topnav__meta { display: none; }
 }
 
 /* ---------------------------------------------------------------------
